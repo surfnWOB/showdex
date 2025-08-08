@@ -1,11 +1,9 @@
 /**
- * effect.d.ts
- *
- * Adapted from `pokemon-showdown-client/src/battle-dex-data.ts`.
- *
+ * @file `pokemon-effect.d.ts` - Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/battle-dex-data.ts`.
  * @author Keith Choison <keith@tize.io>
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @license MIT
+ * @since 0.1.0
  */
 
 declare namespace Showdown {
@@ -17,11 +15,10 @@ declare namespace Showdown {
     | 'PureEffect';
 
   interface Effect {
-    readonly id: string;
+    readonly id: ID;
     readonly name: string;
     readonly gen: number;
     readonly effectType: EffectType;
-
     /**
      * Do we have data on this item/move/ability/species?
      *
@@ -30,10 +27,14 @@ declare namespace Showdown {
     readonly exists: boolean;
   }
 
-  interface PureEffect extends Effect {
-    effectType: 'PureEffect';
+  class PureEffect implements Effect {
+    public readonly effectType = 'PureEffect' as const;
+    public readonly id: ID;
+    public readonly name: string;
+    public readonly gen: number;
+    public readonly exists: boolean;
 
-    (id: string, name: string): this;
+    public constructor(id: ID, name: string);
   }
 
   interface Type extends Effect {

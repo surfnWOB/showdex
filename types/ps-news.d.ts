@@ -1,0 +1,18 @@
+/**
+ * @file `ps-news.d.ts` - Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/panel-mainmenu.tsx`.
+ * @author Keith Choison <keith@tize.io>
+ * @author Guangcong Luo <guangcongluo@gmail.com>
+ * @license AGPLv3
+ * @since 1.2.6
+ */
+
+declare namespace Showdown {
+  class NewsPanel extends PSRoomPanel {
+    public static readonly id = 'news' as const;
+    public static readonly routes = ['news'] as const;
+    public static readonly title = 'News' as const;
+    public static readonly location = 'mini-window' as const;
+
+    public change: (event: Event) => void;
+  }
+}

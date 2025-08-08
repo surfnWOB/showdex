@@ -1,8 +1,5 @@
 /**
- * sprite-data.d.ts
- *
- * Adapted from `pokemon-showdown-client/src/battle-dex.ts`.
- *
+ * @file `battle-sprite-data.d.ts` - Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/battle-dex.ts`.
  * @author Keith Choison <keith@tize.io>
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @license MIT

@@ -1,11 +1,9 @@
 /**
- * move.d.ts
- *
- * Adapted from `pokemon-showdown-client/src/battle-dex-data.ts`.
- *
+ * @file `battle-move.d.ts` - Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/battle-dex-data.ts`.
  * @author Keith Choison <keith@tize.io>
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @license MIT
+ * @since 0.1.0
  */
 
 declare namespace Showdown {
@@ -67,7 +65,7 @@ declare namespace Showdown {
     // spread
     | 'allAdjacent'
     | 'allAdjacentFoes'
-    // side and field
+    // side & field
     | 'allySide'
     | 'foeSide'
     | 'all';
@@ -77,43 +75,42 @@ declare namespace Showdown {
     | 'Special'
     | 'Status';
 
-  interface Move extends Effect {
-    readonly effectType: 'Move';
+  class Move implements Effect {
+    public readonly effectType = 'Move' as const;
+    public readonly basePower: number;
+    public readonly accuracy: number | true;
+    public readonly pp: number;
+    public readonly type: TypeName;
+    public readonly category: MoveCategory;
+    public readonly priority: number;
+    public readonly target: MoveTarget;
+    public readonly pressureTarget: MoveTarget;
+    public readonly flags: Readonly<MoveFlags>;
+    public readonly critRatio: number;
+    public readonly damage?: number | 'level' | false;
+    public readonly desc: string;
+    public readonly shortDesc: string;
+    public readonly isNonstandard?: string = null;
+    public readonly isZ: ID;
+    public readonly zMove?: { basePower?: number; effect?: string; boost?: StatsTable; };
+    public readonly isMax: boolean | string;
+    public readonly maxMove: { basePower: number; };
+    public readonly ohko?: true | 'Ice';
+    public readonly recoil?: number[];
+    public readonly heal?: number[];
+    public readonly multihit?: number | number[];
+    public readonly hasCrashDamage: boolean;
+    public readonly basePowerCallback: boolean;
+    public readonly noPPBoosts: boolean;
+    public readonly status: string;
+    public readonly secondaries: ReadonlyArray<unknown>;
+    public readonly num: number;
 
-    readonly basePower: number;
-    readonly accuracy: number | true;
-    readonly pp: number;
-    readonly type: TypeName;
-    readonly category: MoveCategory;
-    readonly priority: number;
-    readonly target: MoveTarget;
-    readonly pressureTarget: MoveTarget;
-    readonly flag: Readonly<MoveFlags>;
-    readonly critRatio: number;
+    public constructor(id: ID, name: string, data: unknown);
+  }
 
-    readonly desc: string;
-    readonly shortDesc: string;
-
-    readonly isNonstandard?: string;
-    readonly isZ: string;
-    readonly zMove?: {
-      basePower?: number;
-      effect?: string;
-      boost?: { [stat in StatName]?: number; };
-    };
-
-    readonly isMax: boolean | string;
-    readonly maxMove: { basePower: number; };
-    readonly ohko?: true | 'Ice';
-    readonly recoil?: number[];
-    readonly heal?: number[];
-    readonly multihit?: number | number[];
-    readonly hasCrashDamage: boolean;
-    readonly noPPBoosts: boolean;
-    readonly secondaries: ReadonlyArray<unknown>;
-    readonly noSketch: boolean;
-    readonly num: number;
-
-    (id: string, name: string, data: Partial<Move>): this;
+  /** Adapted from `pokemon-showdown-client/build-tools/build-indexes`. */
+  interface BattleMovedex {
+    [moveId: string]: Move;
   }
 }

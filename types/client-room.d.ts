@@ -1,9 +1,7 @@
 /**
- * client-room.d.ts
- *
- * Provides generic Room typings for the live PS client running on Backbone.js.
- *
+ * @file `client-room.d.ts` - Provides generic Room typings for the live PS client running on Backbone.js.
  * @author Keith Choison <keith@tize.io>
+ * @since 0.1.0
  */
 
 declare namespace Showdown {

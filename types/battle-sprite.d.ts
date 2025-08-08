@@ -1,11 +1,9 @@
 /**
- * sprite.d.ts
- *
- * Adapted from `pokemon-showdown-client/src/battle-animations.ts`.
- *
+ * @file `battle-sprite.d.ts` - Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/battle-animations.ts`.
  * @author Keith Choison <keith@tize.io>
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @license MIT
+ * @since 0.1.0
  */
 
 declare namespace Showdown {
