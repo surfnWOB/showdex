@@ -12,7 +12,7 @@ declare namespace Showdown {
   /**
    * Internally does a `dangerouslySetInnerHTML` into a `<div>` after doing a `BattleLog.sanitizeHTML(children)`.
    */
-  type SanitizedHTML = (props: { children: string; }) => React.JSX.Element;
+  type SanitizedHTML = (props: { children: string; }) => JSX.Element;
 
   class PageRoom extends PSRoom {
     public override readonly id = 'html' as const;
@@ -28,6 +28,6 @@ declare namespace Showdown {
     public static readonly id = 'html' as const;
     public static readonly routes = ['view-*'] as const;
     public static readonly Model = PageRoom as const;
-    public static clientRooms: Record<string, React.JSX.Element>;
+    public static clientRooms: Record<string, JSX.Element>;
   }
 }

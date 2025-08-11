@@ -1,3 +1,9 @@
+/**
+ * @file `Calcdex.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.0
+ */
+
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import cx from 'classnames';
@@ -28,21 +34,26 @@ import {
   useHonkdexSettings,
   useShowdexBundles,
 } from '@showdex/redux/store';
-import { findPlayerTitle, getCalcdexRoomId } from '@showdex/utils/app';
+import { findPlayerTitle } from '@showdex/utils/app';
 import { useMobileViewport, useRandomUuid } from '@showdex/utils/hooks';
-import { getBattleRoom } from '@showdex/utils/host';
 import styles from './Calcdex.module.scss';
 
 export interface CalcdexProps {
+  onUserPopup?: (username?: string) => void;
   onRequestHellodex?: () => void;
   onRequestHonkdex?: (instanceId?: string) => void;
+  onSwitchViewpoint?: () => void;
   onCloseOverlay?: () => void;
+  onLeaveRoom?: () => void;
 }
 
 export const Calcdex = ({
+  onUserPopup,
   onRequestHellodex,
   onRequestHonkdex,
+  onSwitchViewpoint,
   onCloseOverlay,
+  onLeaveRoom,
 }: CalcdexProps): JSX.Element => {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -71,7 +82,6 @@ export const Calcdex = ({
     switchPlayers,
   } = state;
 
-  const room = React.useMemo(() => getBattleRoom(battleId), [battleId]);
   const dupeCalcdex = useCalcdexDuplicator();
 
   const playerOptions = React.useMemo<DropdownOption<CalcdexPlayerKey>[]>(() => (
@@ -122,20 +132,32 @@ export const Calcdex = ({
     t,
   ]);
 
-  const renderAsOverlay = renderMode === 'overlay';
+  const renderAsOverlay = React.useMemo(() => renderMode === 'overlay', [renderMode]);
 
-  const topKey = (
+  const topKey = React.useMemo(() => (
     !!authPlayerKey
       && playerKey === authPlayerKey
       && (
         (settings?.authPosition === 'bottom' && opponentKey)
           || (settings?.authPosition === 'auto' && ((playerKey === 'p1' && playerKey) || opponentKey))
       )
-  ) || (!authPlayerKey && switchPlayers ? opponentKey : playerKey);
+  ) || (!authPlayerKey && switchPlayers ? opponentKey : playerKey), [
+    authPlayerKey,
+    opponentKey,
+    playerKey,
+    settings?.authPosition,
+    switchPlayers,
+  ]);
 
-  const bottomKey = topKey === playerKey
-    ? opponentKey
-    : playerKey;
+  const bottomKey = React.useMemo(() => (
+    topKey === playerKey
+      ? opponentKey
+      : playerKey
+  ), [
+    opponentKey,
+    playerKey,
+    topKey,
+  ]);
 
   const contextMenuId = useRandomUuid();
 
@@ -197,6 +219,7 @@ export const Calcdex = ({
               defaultName={t('player.user.defaultName', { index: 1 })}
               playerOptions={playerOptions}
               mobile={mobile}
+              onUserPopup={onUserPopup}
             />
           </PiconRackSortableContext>
 
@@ -217,6 +240,7 @@ export const Calcdex = ({
               defaultName={t('player.user.defaultName', { index: 2 })}
               playerOptions={playerOptions}
               mobile={mobile}
+              onUserPopup={onUserPopup}
             />
           </PiconRackSortableContext>
 
@@ -240,9 +264,9 @@ export const Calcdex = ({
             props: {
               label: t('contextMenu.switchSides', 'Switch Players'),
               icon: 'fa-random',
-              disabled: typeof room?.switchViewpoint !== 'function'
+              disabled: typeof onSwitchViewpoint !== 'function'
                 || (!!authPlayerKey && battleActive), // no effect in this case
-              onPress: hideAfter(() => room.switchViewpoint()),
+              onPress: hideAfter(onSwitchViewpoint),
             },
           },
           {
@@ -284,16 +308,10 @@ export const Calcdex = ({
               label: t(`contextMenu.close${renderAsOverlay ? 'Overlay' : 'Tab'}`, 'Close'),
               icon: 'close-circle',
               disabled: !battleId
-                || (renderAsOverlay && typeof onCloseOverlay !== 'function'),
-              //  || (!renderAsOverlay && typeof app?.leaveRoom !== 'function'),
+                || (renderAsOverlay && typeof onCloseOverlay !== 'function')
+                || (!renderAsOverlay && typeof onLeaveRoom !== 'function'),
               hidden: !renderAsOverlay,
-              onPress: hideAfter(() => {
-                if (renderAsOverlay) {
-                  return void onCloseOverlay();
-                }
-
-                app.leaveRoom(getCalcdexRoomId(battleId));
-              }),
+              onPress: hideAfter(() => void (renderAsOverlay ? onCloseOverlay : onLeaveRoom)()),
             },
           },
         ]}

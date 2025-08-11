@@ -135,7 +135,7 @@ declare namespace Showdown {
     public static readonly routes = ['dm-*', 'groupchat-*', '*'] as const;
     public static readonly model = ChatRoom as const;
     public static readonly location = 'right' as const;
-    public static readonly icon: React.JSX.Element;
+    public static readonly icon: JSX.Element;
 
     public send: (text: string, element: HTMLElement) => void;
     public onKey: (event: KeyboardEvent) => boolean;

@@ -3,7 +3,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import Svg from 'react-inlinesvg';
 import cx from 'classnames';
 import { format } from 'date-fns';
-import { GradientButton, MemberIcon } from '@showdex/components/app';
+import { type HomieButtonProps, GradientButton, MemberIcon } from '@showdex/components/app';
 import { BuildInfo } from '@showdex/components/debug';
 import {
   type BaseButtonProps,
@@ -27,6 +27,7 @@ import styles from './PatronagePane.module.scss';
 export interface PatronagePaneProps {
   className?: string;
   style?: React.CSSProperties;
+  onUserPopup?: HomieButtonProps['onUserPopup'];
   onRequestClose?: BaseButtonProps['onPress'];
 }
 
@@ -37,6 +38,7 @@ const buildDateMs = parseInt(env('build-date'), 16) || 0;
 export const PatronagePane = ({
   className,
   style,
+  onUserPopup,
   onRequestClose,
 }: PatronagePaneProps): JSX.Element => {
   const { t } = useTranslation('hellodex');
@@ -54,8 +56,8 @@ export const PatronagePane = ({
 
   const donorTiers = React.useMemo(() => (bundles?.tiers || []).filter((s) => s?.term === 'once'), [bundles?.tiers]);
   const renderedDonors = React.useMemo(
-    () => donorTiers.map(PatronageTierRenderer('DonorTier', { colorScheme })),
-    [colorScheme, donorTiers],
+    () => donorTiers.map(PatronageTierRenderer('DonorTier', { colorScheme, onUserPopup })),
+    [colorScheme, donorTiers, onUserPopup],
   );
 
   const lastDonorUpdate = React.useMemo(() => format(new Date(
@@ -67,8 +69,8 @@ export const PatronagePane = ({
 
   const patronTiers = React.useMemo(() => (bundles?.tiers || []).filter((i) => i?.term === 'monthly'), [bundles?.tiers]);
   const renderedPatrons = React.useMemo(
-    () => patronTiers.map(PatronageTierRenderer('PatronTier', { colorScheme, showTitles: true })),
-    [colorScheme, patronTiers],
+    () => patronTiers.map(PatronageTierRenderer('PatronTier', { colorScheme, showTitles: true, onUserPopup })),
+    [colorScheme, patronTiers, onUserPopup],
   );
 
   const lastPatronUpdate = React.useMemo(() => format(new Date(

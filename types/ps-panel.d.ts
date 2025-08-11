@@ -56,5 +56,5 @@ declare namespace Showdown {
     onDragEnter?: (event: DragEvent) => void;
   }
 
-  type PSPanelWrapper = (props: PSPanelWrapperProps) => React.JSX.Element;
+  type PSPanelWrapper = (props: PSPanelWrapperProps) => JSX.Element;
 }

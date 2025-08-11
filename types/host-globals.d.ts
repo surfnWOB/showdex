@@ -8,12 +8,16 @@ declare namespace Showdown {
   /**
    * Exposed `window` globals available on both classic (i.e., Backbone.js) & Preact versions of the Showdown client.
    *
+   * * Optionally includes the `app` & `PS` globals for determining the current `__SHOWDEX_HOST`.
    * * Note: `unknown` types indicate I didn't bother typing them any further lol.
    *   - Also not an exhaustive list!
    *
    * @since 1.2.6
    */
   interface HostGlobals {
+    app?: Showdown.ClientGlobals['app'];
+    PS?: Showdown.PSGlobals['PS'];
+
     Ability: Ability;
     BattleAbilities: BattleAbilities;
     BattleAliases: Record<ID, string>;

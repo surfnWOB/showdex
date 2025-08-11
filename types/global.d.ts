@@ -24,15 +24,8 @@ declare const __DEV__: NodeJS.Global['__DEV__'];
 declare const exportFunction: FirefoxBrowser.ExportFunction;
 declare const cloneInto: FirefoxBrowser.CloneInto;
 
-// Showdown-specific globals (does not declare all of them!)
-declare type ShowdownGlobals =
-  & Showdown.HostGlobals
-  & Partial<Pick<Showdown.ClientGlobals, 'app'>>
-  & Partial<Pick<Showdown.PSGlobals, 'PS'>>;
-
-// only defining these for typing the window.app & window.Dex guards in main.ts (& also for the __SHOWDEX_INIT mutex lock)
-// (also in hindsight, could've just defined it like this since we're using the DOM tsconfig lib but doesn't matter tbh)
-declare interface Window extends Window, ShowdownGlobals {
+// DOM `window` globals
+declare interface Window extends Window, Showdown.HostGlobals {
   /**
    * Showdex will populate this with its `BUILD_NAME` env once initialization starts to prevent other Showdexes from
    * potentially loading in.

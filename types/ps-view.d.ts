@@ -37,8 +37,8 @@ declare namespace Showdown {
     public static getPopupStyle(room: PSRoom, width?: number | 'auto', fullSize?: boolean): React.CSSProperties;
 
     public handleButtonClick(element: HTMLButtomElement): boolean;
-    public renderRoom(room: PSRoom): React.JSX.Element;
-    public renderPopup(room: PSRoom): React.JSX.Element;
+    public renderRoom(room: PSRoom): JSX.Element;
+    public renderPopup(room: PSRoom): JSX.Element;
   }
 
   /** Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/panel-teamdropdown.tsx`. */

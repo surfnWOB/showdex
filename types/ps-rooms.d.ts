@@ -21,7 +21,7 @@ declare namespace Showdown {
     public static readonly routes = ['rooms'] as const;
     public static readonly Model = RoomsRoom as const;
     public static readonly location = 'right' as const;
-    public static readonly icon: React.JSX.Element;
+    public static readonly icon: JSX.Element;
     public static readonly title = 'Chat Rooms' as const;
 
     public hidden = false;
@@ -41,6 +41,6 @@ declare namespace Showdown {
     public updateRoomList(search?: string): void;
     public getRoomList(forceNoAutocomplete?: boolean): RoomsSection[];
     public getRoomListFocusTitle(): string;
-    public renderRoomList(): React.JSX.Element;
+    public renderRoomList(): JSX.Element;
   }
 }

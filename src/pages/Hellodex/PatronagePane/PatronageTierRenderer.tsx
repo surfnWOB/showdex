@@ -1,6 +1,6 @@
 import * as React from 'react';
 import cx from 'classnames';
-import { HomieButton } from '@showdex/components/app';
+import { type HomieButtonProps, HomieButton } from '@showdex/components/app';
 import { bullop } from '@showdex/consts/core';
 import { type ShowdexSupporterTier } from '@showdex/interfaces/app';
 import { formatId } from '@showdex/utils/core';
@@ -25,6 +25,7 @@ export const PatronageTierRenderer = (
   config?: {
     colorScheme?: Showdown.ColorScheme;
     showTitles?: boolean;
+    onUserPopup?: HomieButtonProps['onUserPopup'];
   },
 ) => (
   tier: ShowdexSupporterTier,
@@ -33,7 +34,8 @@ export const PatronageTierRenderer = (
   const {
     colorScheme = 'light',
     showTitles,
-  } = { ...config };
+    onUserPopup,
+  } = config || {};
 
   const {
     title,
@@ -41,7 +43,7 @@ export const PatronageTierRenderer = (
     // names,
     members,
     __updated: updated,
-  } = { ...tier };
+  } = tier || {};
 
   const containerKey = `PatronagePane:${key}:${formatId(title)}`;
   const notFirstTier = index > 0;
@@ -85,6 +87,7 @@ export const PatronageTierRenderer = (
                 term={term}
                 showTitles={showTitles}
                 updated={updated}
+                onUserPopup={onUserPopup}
               />
 
               {

@@ -43,7 +43,7 @@ declare namespace Showdown {
         props?: RenderableProps<TProps>,
         state?: Readonly<TState>,
         context?: TContext,
-      ): React.JSX.Element;
+      ): JSX.Element;
     }
   }
 }

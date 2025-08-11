@@ -104,7 +104,7 @@ declare namespace Showdown {
     public toggleVisibility: () => void;
 
     public selectChallengeUser(event: Event): void;
-    public renderTournamentTools(): React.JSX.Element;
+    public renderTournamentTools(): JSX.Element;
   }
 
   interface TournamentBracketProps {
@@ -122,7 +122,7 @@ declare namespace Showdown {
     public onMouseUp: (event: MouseEvent) => void;
     public popOut: (event: Event) => void;
 
-    public renderTableBracket(): React.JSX.Element;
+    public renderTableBracket(): JSX.Element;
   }
 
   interface TournamentTreeBracketProps {

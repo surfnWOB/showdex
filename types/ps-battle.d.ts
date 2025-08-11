@@ -25,14 +25,14 @@ declare namespace Showdown {
     public static readonly routes = ['battles'] as const;
     public static readonly model = BattlesRoom as const;
     public static readonly location = 'right' as const;
-    public static readonly icon: React.JSX.Element;
+    public static readonly icon: JSX.Element;
     public static readonly title = 'Battles' as const;
 
     public refresh: () => void;
     public changeFormat: (event: Event) => void;
     public applyFilters: (event: Event) => void;
 
-    public renderBattleLink(battle: BattleDesc): React.JSX.Element;
+    public renderBattleLink(battle: BattleDesc): JSX.Element;
   }
 
   class BattleRoom extends ChatRoom {
@@ -89,7 +89,7 @@ declare namespace Showdown {
     public updateLayout(): void;
     public receiveRequest(request?: BattleRequest): void;
     public notifyRequest(): void;
-    public renderControls(): React.JSX.Element;
+    public renderControls(): JSX.Element;
     public renderMoveButton(
       props?: {
         name: string;
@@ -102,7 +102,7 @@ declare namespace Showdown {
           disabled?: boolean;
         };
       },
-    ): React.JSX.Element;
+    ): JSX.Element;
     public renderPokemonButton(
       props: {
         pokemon?: Pokemon | ServerPokemon;
@@ -111,21 +111,21 @@ declare namespace Showdown {
         disabled?: boolean | 'fade';
         tooltip: string;
       },
-    ): React.JSX.Element;
-    public renderMoveMenu(choices: BattleChoiceBuilder): React.JSX.Element;
-    public renderMoveControls(active: BattleRequestActivePokemon, choices: BattleChoiceBuilder): React.JSX.Element[];
-    public renderMoveTargetControls(request: BattleMoveRequest, choices: BattleChoiceBuilder): React.JSX.Element[];
+    ): JSX.Element;
+    public renderMoveMenu(choices: BattleChoiceBuilder): JSX.Element;
+    public renderMoveControls(active: BattleRequestActivePokemon, choices: BattleChoiceBuilder): JSX.Element[];
+    public renderMoveTargetControls(request: BattleMoveRequest, choices: BattleChoiceBuilder): JSX.Element[];
     public renderSwitchMenu(
       request: BattleMoveRequest | BattleSwitchRequest,
       choices: BattleChoiceBuilder,
       ignoreTrapping?: boolean,
-    ): React.JSX.Element;
-    public renderTeamPreviewChooser(request: BattleTeamRequest, choices: BattleChoiceBuilder): React.JSX.Element;
-    public renderTeamList(): React.JSX.Element;
-    public renderChosenTeam(request: BattleTeamRequest, choices: BattleChoiceBuilder): React.JSX.Element[];
-    public renderOldChoices(request: BattleRequest, choices: BattleChoiceBuilder): React.JSX.Element[];
-    public renderPlayerWaitingControls(): React.JSX.Element;
-    public renderPlayerControls(request: BattleRequest): React.JSX.Element;
-    public renderAfterBattleControls(): React.JSX.Element;
+    ): JSX.Element;
+    public renderTeamPreviewChooser(request: BattleTeamRequest, choices: BattleChoiceBuilder): JSX.Element;
+    public renderTeamList(): JSX.Element;
+    public renderChosenTeam(request: BattleTeamRequest, choices: BattleChoiceBuilder): JSX.Element[];
+    public renderOldChoices(request: BattleRequest, choices: BattleChoiceBuilder): JSX.Element[];
+    public renderPlayerWaitingControls(): JSX.Element;
+    public renderPlayerControls(request: BattleRequest): JSX.Element;
+    public renderAfterBattleControls(): JSX.Element;
   }
 }

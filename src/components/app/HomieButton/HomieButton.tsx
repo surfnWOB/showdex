@@ -11,7 +11,6 @@ import { type ShowdexSupporterTierMember, type ShowdexSupporterTierTerm } from '
 import { useColorScheme, useShowdexBundles } from '@showdex/redux/store';
 import { findPlayerTitle } from '@showdex/utils/app';
 import { formatId } from '@showdex/utils/core';
-import { openUserPopup } from '@showdex/utils/host';
 import { pluralize } from '@showdex/utils/humanize';
 import { determineColorScheme } from '@showdex/utils/ui';
 import { MemberIcon } from '../MemberIcon';
@@ -25,6 +24,7 @@ export interface HomieButtonProps {
   term?: ShowdexSupporterTierTerm;
   showTitles?: boolean;
   updated?: number;
+  onUserPopup?: (username: string) => void;
 }
 
 export const HomieButton = ({
@@ -35,6 +35,7 @@ export const HomieButton = ({
   term = 'once',
   showTitles,
   updated,
+  onUserPopup,
 }: HomieButtonProps): JSX.Element => {
   const colorSchemeFromStore = useColorScheme();
   const colorScheme = colorSchemeFromProps || colorSchemeFromStore;
@@ -220,7 +221,7 @@ export const HomieButton = ({
       style={{ ...nameStyle, ...style }}
       tooltip={renderedTooltip}
       absoluteHover
-      onPress={() => openUserPopup(name)}
+      onPress={() => void onUserPopup?.(name)}
     >
       {renderedUsername}
     </Button>

@@ -10,7 +10,6 @@ import { useColorScheme, useShowdexBundles } from '@showdex/redux/store';
 import { findPlayerTitle } from '@showdex/utils/app';
 import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
-import { openUserPopup } from '@showdex/utils/host';
 import { capitalize } from '@showdex/utils/humanize';
 import { useCalcdexContext } from '../CalcdexContext';
 import styles from './PlayerInfo.module.scss';
@@ -23,6 +22,7 @@ export interface PlayerInfoProps {
   defaultName?: string;
   playerOptions?: DropdownOption<CalcdexPlayerKey>[];
   mobile?: boolean;
+  onUserPopup?: (username?: string) => void;
 }
 
 const l = logger('@showdex/components/calc/PlayerInfo');
@@ -35,6 +35,7 @@ export const PlayerInfo = ({
   defaultName = '--',
   playerOptions,
   mobile,
+  onUserPopup,
 }: PlayerInfoProps): JSX.Element => {
   const { t } = useTranslation('calcdex');
   const colorScheme = useColorScheme();
@@ -202,8 +203,8 @@ export const PlayerInfo = ({
           tooltipDisabled={!playerTitle && !settings?.showUiTooltips}
           hoverScale={1}
           absoluteHover
-          disabled={!name}
-          onPress={() => openUserPopup(name)}
+          disabled={!name || typeof onUserPopup !== 'function'}
+          onPress={() => void onUserPopup?.(name)}
         >
           {
             !!playerTitle?.icon &&

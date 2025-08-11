@@ -1,8 +1,15 @@
+/**
+ * @file `Honkdex.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.2.0
+ */
+
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import cx from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  type BattleInfoProps,
   BattleInfo,
   FieldCalc,
   PlayerCalc,
@@ -12,25 +19,25 @@ import {
 import { BuildInfo } from '@showdex/components/debug';
 import { PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
 import { ContextMenu, Scrollable, useContextMenu } from '@showdex/components/ui';
-import { type CalcdexBattleState } from '@showdex/interfaces/calc';
 import {
   useCalcdexDuplicator,
   useColorScheme,
   useColorTheme,
   useGlassyTerrain,
 } from '@showdex/redux/store';
-import { getHonkdexRoomId } from '@showdex/utils/app';
 import { useRandomUuid } from '@showdex/utils/hooks';
 import styles from './Honkdex.module.scss';
 
 export interface HonkdexProps {
   onRequestHellodex?: () => void;
-  onRequestHonkdex?: (instanceId?: string, initState?: Partial<CalcdexBattleState>) => void;
+  onRequestHonkdex?: BattleInfoProps['onRequestHonkdex'];
+  onLeaveRoom?: () => void;
 }
 
 export const Honkdex = ({
   onRequestHellodex,
   onRequestHonkdex,
+  onLeaveRoom,
 }: HonkdexProps): JSX.Element => {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -170,8 +177,8 @@ export const Honkdex = ({
               theme: 'info',
               label: t('contextMenu.close', 'Close'),
               icon: 'close-circle',
-              disabled: !battleId || typeof app?.leaveRoom !== 'function',
-              onPress: hideAfter(() => app.leaveRoom(getHonkdexRoomId(battleId))),
+              disabled: !battleId || typeof onLeaveRoom !== 'function',
+              onPress: hideAfter(onLeaveRoom),
             },
           },
         ]}

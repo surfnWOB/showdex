@@ -13,5 +13,5 @@ declare namespace Showdown {
     | { type: string; b?: boolean; }
     | { category: string; };
 
-  type PSIcon = (props: PSIconProps) => React.JSX.Element;
+  type PSIcon = (props: PSIconProps) => JSX.Element;
 }

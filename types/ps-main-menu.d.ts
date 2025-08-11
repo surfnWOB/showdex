@@ -66,16 +66,16 @@ declare namespace Showdown {
     public static readonly id = 'mainmenu' as const;
     public static readonly routes = [''] as const;
     public static readonly Model = MainMenuRoom as const;
-    public static readonly icon: React.JSX.Element;
+    public static readonly icon: JSX.Element;
 
     public submitSearch: (event: Event, format: string, team?: Team) => void;
     public handleDragStart: (event: DragEvent) => void;
     public handleDragEnter: (event: DragEvent) => void;
     public handleClickMinimize: (event: MouseEvent) => void;
 
-    public renderMiniRoom(room: PSRoom): React.JSX.Element;
-    public renderMiniRooms(): React.JSX.Element;
-    public renderGames(): React.JSX.Element;
-    public renderSearchButton(): React.JSX.Element;
+    public renderMiniRoom(room: PSRoom): JSX.Element;
+    public renderMiniRooms(): JSX.Element;
+    public renderGames(): JSX.Element;
+    public renderSearchButton(): JSX.Element;
   }
 }

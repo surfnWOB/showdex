@@ -11,7 +11,7 @@ import {
   InlineField,
 } from '@showdex/components/form';
 import { ToggleButton } from '@showdex/components/ui';
-import { type CalcdexBattleState, CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
+import { CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
 import { useColorScheme, useColorTheme, useHonkdexSettings } from '@showdex/redux/store';
 import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
@@ -22,7 +22,7 @@ import styles from './BattleInfo.module.scss';
 export interface BattleInfoProps {
   className?: string;
   style?: React.CSSProperties;
-  onRequestHonkdex?: (instanceId?: string, initState?: Partial<CalcdexBattleState>) => void;
+  onRequestHonkdex?: (instanceId?: string, gen?: GenerationNum, format?: string) => void;
 }
 
 const l = logger('@showdex/components/calc/BattleInfo');
@@ -121,7 +121,7 @@ export const BattleInfo = ({
     value: GenerationNum,
   ) => {
     if (genLocked) {
-      return void onRequestHonkdex?.(null, { gen: value });
+      return void onRequestHonkdex?.(null, value);
     }
 
     updateBattle({

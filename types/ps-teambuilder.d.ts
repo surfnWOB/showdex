@@ -32,7 +32,7 @@ declare namespace Showdown {
   }
 
   /** Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/panel-teamdropdown.tsx`. */
-  type TeamBox = (props: TeamBoxProps) => React.JSX.Element;
+  type TeamBox = (props: TeamBoxProps) => JSX.Element;
 
   /**
    * Team selector popup.
@@ -114,7 +114,7 @@ declare namespace Showdown {
     public static readonly id = 'teambuilder' as const;
     public static readonly routes = ['teambuilder'] as const;
     public static readonly Model = TeambuilderRoom as const;
-    public static readonly icon: React.JSX.Element;
+    public static readonly icon: JSX.Element;
     public static readonly title = 'Teambuilder' as const;
 
     public static addDraggedTeam(event: DragEvent, folder?: string): void;
@@ -133,8 +133,8 @@ declare namespace Showdown {
      * * `null` = dragging a new team.
      */
     public getDraggedTeam(event: DragEvent): Team | number | null;
-    public renderFolder(value: string): React.JSX.Element;
-    public renderFolderList(): React.JSX.Element;
+    public renderFolder(value: string): JSX.Element;
+    public renderFolderList(): JSX.Element;
   }
 
   /** Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/panel-teambuilder-team.tsx`. */
@@ -167,7 +167,7 @@ declare namespace Showdown {
     public handleChangeFormat: (event: Event) => void;
     public save: () => void;
 
-    public renderResources(): React.JSX.Element;
+    public renderResources(): JSX.Element;
   }
 
   /** Adapted from `pokemon-showdown-client/play.pokemonshowdown.com/src/panel-teambuilder-team.tsx`. */

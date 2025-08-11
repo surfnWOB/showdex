@@ -1,2 +1,4 @@
-export * from './Calcdex.bootstrap';
-export * from './Calcdex.renderer';
+export * from './Calcdex';
+export * from './CalcdexBootstrappable';
+export * from './CalcdexClassicBootstrapper';
+export * from './CalcdexRenderer';

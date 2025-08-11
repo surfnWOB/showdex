@@ -6,4 +6,4 @@
  * @default null
  * @since 1.0.3
  */
-export const getAuthUsername = (): string => app?.user?.attributes?.name || null;
+export const getAuthUsername = (): string => window?.app?.user?.attributes?.name || null;

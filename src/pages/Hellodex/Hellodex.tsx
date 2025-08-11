@@ -1,3 +1,9 @@
+/**
+ * @file `Hellodex.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.3
+ */
+
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import Svg from 'react-inlinesvg';
@@ -28,10 +34,9 @@ import {
   useShowdexBundles,
   useUpdateSettings,
 } from '@showdex/redux/store';
-import { findPlayerTitle, getCalcdexRoomId } from '@showdex/utils/app';
+import { findPlayerTitle } from '@showdex/utils/app';
 import { env, getResourceUrl } from '@showdex/utils/core';
 import { useRandomUuid, useRoomNavigation } from '@showdex/utils/hooks';
-import { openUserPopup } from '@showdex/utils/host';
 import { BattleRecord } from './BattleRecord';
 import { FooterButton } from './FooterButton';
 import { type InstanceButtonRef, InstanceButton } from './InstanceButton';
@@ -41,9 +46,12 @@ import { useHellodexSize } from './useHellodexSize';
 import styles from './Hellodex.module.scss';
 
 export interface HellodexProps {
+  onUserPopup?: (username: string) => void;
+  onRequestBattles?: () => void;
   onRequestCalcdex?: (battleId: string) => void;
   onRequestHonkdex?: (instanceId?: string) => void;
-  onRemoveHonkdex?: (...instanceIds: string[]) => void;
+  onRemoveHonkdex?: (instanceId: string) => void;
+  onCloseCalcdex?: (battleId: string) => void;
 }
 
 const packageVersion = `v${env('package-version', 'X.X.X')}`;
@@ -55,9 +63,12 @@ const repoUrl = env('hellodex-repo-url');
 const communityUrl = env('hellodex-community-url');
 
 export const Hellodex = ({
+  onUserPopup,
+  onRequestBattles,
   onRequestCalcdex,
   onRequestHonkdex,
   onRemoveHonkdex,
+  onCloseCalcdex,
 }: HellodexProps): JSX.Element => {
   const { t } = useTranslation('hellodex');
   const contentRef = React.useRef<HTMLDivElement>(null);
@@ -157,6 +168,7 @@ export const Hellodex = ({
         {
           patronageVisible &&
           <PatronagePane
+            onUserPopup={onUserPopup}
             onRequestClose={closePatronagePane}
           />
         }
@@ -203,7 +215,8 @@ export const Hellodex = ({
                     label="BOT Keith"
                     hoverScale={1}
                     absoluteHover
-                    onPress={() => openUserPopup('sumfuk')}
+                    disabled={typeof onUserPopup !== 'function'}
+                    onPress={() => void onUserPopup?.(__DEV__ ? 'showdex_testee' : 'sumfuk')}
                   />
                 ),
                 cameron: (
@@ -213,7 +226,8 @@ export const Hellodex = ({
                     label="analogcam"
                     hoverScale={1}
                     absoluteHover
-                    onPress={() => openUserPopup('camdawgboi')}
+                    disabled={typeof onUserPopup !== 'function'}
+                    onPress={() => void onUserPopup?.(__DEV__ ? 'showdex_tester' : 'camdawgboi')}
                   />
                 ),
               }}
@@ -283,15 +297,15 @@ export const Hellodex = ({
                           <Button
                             className={cx(
                               styles.spectateButton,
-                              typeof app === 'undefined' && styles.disabled,
+                              typeof onRequestBattles !== 'function' && styles.disabled,
                             )}
                             labelClassName={styles.spectateButtonLabel}
                             aria-label={t('instances.empty.spectateTooltip')}
                             tooltip={t('instances.empty.spectateTooltip')}
                             hoverScale={1}
                             absoluteHover
-                            disabled={typeof app === 'undefined'}
-                            onPress={() => app.joinRoom('battles', 'battles')}
+                            disabled={typeof onRequestBattles !== 'function'}
+                            onPress={() => void onRequestBattles?.()}
                           />
                         ),
                       }}
@@ -617,8 +631,8 @@ export const Hellodex = ({
               label: t('contextMenu.spectate', 'Spectate Battles'),
               icon: 'sword',
               iconStyle: { transform: 'scale(1.15)' },
-              disabled: typeof app?.joinRoom !== 'function',
-              onPress: hideAfter(() => app.joinRoom('battles', 'battles')),
+              disabled: typeof onRequestBattles !== 'function',
+              onPress: hideAfter(() => void onRequestBattles?.()),
             },
           },
           {
@@ -714,17 +728,16 @@ export const Hellodex = ({
               label: t('instances.calcdex.contextMenu.closeBattle', 'Leave Battle'),
               icon: 'door-exit',
               iconStyle: { transform: 'scale(1.2)' },
-              disabled: typeof app?.leaveRoom !== 'function',
+              disabled: typeof onCloseCalcdex !== 'function',
               hidden: !calcdexSettings?.destroyOnClose,
               onPress: ({ props: p }) => hideAfter(() => {
                 const id = (p as Record<'instanceId', string>)?.instanceId;
 
-                if (!id || typeof app?.leaveRoom !== 'function') {
+                if (!id || typeof onCloseCalcdex !== 'function') {
                   return;
                 }
 
-                app.leaveRoom(getCalcdexRoomId(id));
-                app.leaveRoom(id);
+                onCloseCalcdex(id);
               })(),
             },
           },
