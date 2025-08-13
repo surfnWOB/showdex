@@ -29,6 +29,7 @@ import { clamp, formatId, nonEmptyObject } from '@showdex/utils/core';
 import { logger, wtf } from '@showdex/utils/debug';
 import { detectGenFromFormat } from '@showdex/utils/dex';
 import { detectClassicHost } from '@showdex/utils/host';
+import { type BootdexClassicAdapter } from '../Bootdex/BootdexClassicAdapter';
 import { BootdexClassicBootstrappable } from '../Bootdex/BootdexClassicBootstrappable';
 import { MixinCalcdexBootstrappable } from './CalcdexBootstrappable';
 import { CalcdexDomRenderer } from './CalcdexRenderer';
@@ -257,10 +258,11 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       return;
     }
 
-    const { store } = CalcdexClassicBootstrapper.Adapter || {};
+    const { Adapter } = CalcdexClassicBootstrapper;
 
     this.close();
-    store.dispatch(calcdexSlice.actions.destroy(this.battleId));
+    (Adapter as typeof BootdexClassicAdapter).removeReceiver(this.battleId);
+    Adapter.store.dispatch(calcdexSlice.actions.destroy(this.battleId));
   }
 
   public override run(data?: string): void {
@@ -495,7 +497,8 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
         }
 
         // grab the latest overlayVisible value
-        const state = rootState?.calcdex?.[this.battle?.id || this.battleId];
+        const freshState = store.getState() as typeof rootState;
+        const state = freshState?.calcdex?.[this.battle?.id || this.battleId];
         const { overlayVisible: visible } = state || {};
 
         const toggleButtonIcon = visible ? 'close' : 'calculator';
@@ -618,7 +621,8 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       this.battleRoom.toggleCalcdexOverlay = () => {
         // battle.calcdexOverlayVisible = !battle.calcdexOverlayVisible;
 
-        const state = rootState?.calcdex?.[this.battle?.id || this.battleId];
+        const freshState = store.getState() as typeof rootState;
+        const state = freshState?.calcdex?.[this.battle?.id || this.battleId];
         const visible = !state?.overlayVisible;
 
         store.dispatch(calcdexSlice.actions.update({
