@@ -1,7 +1,7 @@
 /**
  * @file `BootdexClassicAdapter.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { logger } from '@showdex/utils/debug';

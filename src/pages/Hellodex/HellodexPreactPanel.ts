@@ -1,22 +1,21 @@
 /**
  * @file `HellodexPreactPanel.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 /* eslint-disable max-classes-per-file */
 
 import * as ReactDOM from 'react-dom/client';
 import cx from 'classnames';
-import { detectPreactHost } from '@showdex/utils/host';
-import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappable';
+import {
+  BootdexPreactBootstrappable,
+  preact,
+  PSPanelWrapper,
+  PSRoom,
+  PSRoomPanel,
+} from '../Bootdex/BootdexPreactBootstrappable';
 import { HellodexDomRenderer } from './HellodexRenderer';
-
-const PSRoom = detectPreactHost(window) ? window.PSRoom : null;
-const PSRoomPanel = detectPreactHost(window) ? window.PSRoomPanel : null;
-const PSPanelWrapper = detectPreactHost(window) ? window.PSPanelWrapper : null;
-// const Icon = 'i' as React.ElementType<JSX.IntrinsicElements['i'] & { class?: string; }>;
-const preact = detectPreactHost(window) ? window.preact : null;
 
 export class HellodexPreactRoom extends PSRoom {
   public override title = 'Hellodex';

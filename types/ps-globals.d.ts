@@ -1,7 +1,7 @@
 /**
  * @file `ps-globals.d.ts` - `window` globals exposed by the Preact Showdown client.
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 declare namespace Showdown {
@@ -11,7 +11,7 @@ declare namespace Showdown {
      *
      * * Typically won't exist when the `__SHOWDEX_HOST` is the `'classic'` (Backbone.js-based) Showdown client.
      *
-     * @since 1.2.6
+     * @since 1.3.0
      */
     PS: PS;
     PSBackground: typeof PSBackground;

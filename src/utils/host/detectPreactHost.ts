@@ -11,7 +11,7 @@
  *
  * console.log(window.PS?.user?.name); // -> undefined
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 export const detectPreactHost = (
   host: Window,

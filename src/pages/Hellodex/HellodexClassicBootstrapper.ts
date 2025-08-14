@@ -1,7 +1,7 @@
 /**
  * @file `HellodexClassicBootstrapper.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import * as ReactDOM from 'react-dom/client';
@@ -39,7 +39,7 @@ export class HellodexClassicBootstrapper extends BootdexClassicBootstrappable {
    * * Creates a `ReactDOM.Root` from the `Showdown.HtmlRoom`'s `el` (`HTMLDivElement`), accessible under the `reactRoot` property.
    *   - When this room's `requestLeave()` is called (typically by `app.leaveRoom()` or the user closing the tab),
    *     `reactRoot.unmount()` will be automatically called.
-   * * As of v1.2.6, this is now inside the `HellodexClassicBootstrapper` to keep logic separate from those used for the
+   * * As of v1.3.0, this is now inside the `HellodexClassicBootstrapper` to keep logic separate from those used for the
    *   rewritten `'preact'` Showdown client.
    *   - As a result, the Redux `store` is no longer a function argument.
    *

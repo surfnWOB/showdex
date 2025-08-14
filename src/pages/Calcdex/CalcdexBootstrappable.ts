@@ -1,7 +1,7 @@
 /**
  * @file `CalcdexBootstrappable.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 /* eslint-disable max-classes-per-file */
@@ -40,7 +40,7 @@ const l = logger('@showdex/pages/Calcdex/CalcdexBootstrappable');
  * abstract class BootdexPreactBootstrapple extends BootdexBootstrappable { ... }
  * abstract class BootdexBootstrappable { ... }
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 export const MixinCalcdexBootstrappable = <
   TBootstrappable extends typeof BootdexBootstrappable,
@@ -114,14 +114,14 @@ export const MixinCalcdexBootstrappable = <
     /**
      * Closes the Calcdex (& its associated client battle room, if applicable).
      *
-     * @since 1.2.6
+     * @since 1.3.0
      */
     public abstract close(): void;
 
     /**
      * Removes all traces of (& also `close()`'s) the Calcdex.
      *
-     * @since 1.2.6
+     * @since 1.3.0
      */
     public abstract destroy(): void;
   }

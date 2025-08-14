@@ -48,7 +48,7 @@ declare interface Window extends Window, Showdown.HostGlobals {
    * * Preact detection works by looking for the `window.PS` global, regardless of `window.app`'s existence.
    *   - `'classic'` (Backbone.js-powered) client won't have that aforementioned `window.PS` global.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   __SHOWDEX_HOST?: 'classic' | 'preact';
 }

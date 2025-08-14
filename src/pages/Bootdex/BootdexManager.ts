@@ -1,7 +1,7 @@
 /**
  * @file `BootdexManager.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { type GenerationNum } from '@smogon/calc';
@@ -64,7 +64,7 @@ export class BootdexManager {
   /**
    * Opens the existing Hellodex tab or creates a new one.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static openHellodex(): void {
     new (this.named('hellodex'))().open();
@@ -73,7 +73,7 @@ export class BootdexManager {
   /**
    * Closes the existing Hellodex tab.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static closeHellodex(): void {
     new (this.named('hellodex'))().close();
@@ -82,7 +82,7 @@ export class BootdexManager {
   /**
    * Opens the existing Calcdex tab (or battle if overlayed) or creates a new one.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static openCalcdex(battleId: string): void {
     if (!battleId) {
@@ -95,7 +95,7 @@ export class BootdexManager {
   /**
    * Closes an existing Calcdex tab w/ the provided `battleId`.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static closeCalcdex(battleId: string): void {
     if (!battleId) {
@@ -108,7 +108,7 @@ export class BootdexManager {
   /**
    * Removes all traces of an existing Calcdex w/ the provided `battleId`.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static destroyCalcdex(battleId: string): void {
     if (!battleId) {
@@ -121,7 +121,7 @@ export class BootdexManager {
   /**
    * Opens the existing Honkdex tab or creates a new one if an `instanceId` wasn't provided.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static openHonkdex(
     instanceId?: string,
@@ -134,7 +134,7 @@ export class BootdexManager {
   /**
    * Closes an existing Honkdex tab w/ the provided `instanceId`.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static closeHonkdex(instanceId: string): void {
     if (!instanceId) {
@@ -147,7 +147,7 @@ export class BootdexManager {
   /**
    * Removes all traces of an existing Honkdex w/ the provided `instanceId`.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static destroyHonkdex(instanceId: string): void {
     if (!instanceId) {

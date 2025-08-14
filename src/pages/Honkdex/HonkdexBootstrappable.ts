@@ -1,7 +1,7 @@
 /**
  * @file `HonkdexBootstrappable.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 /* eslint-disable max-classes-per-file */
@@ -56,7 +56,7 @@ export const MixinHonkdexBootstrappable = <
     /**
      * Prepares a `CalcdexBattleState` for this Honkdex instance, or no-op's if one already exists.
      *
-     * @since 1.2.6
+     * @since 1.3.0
      */
     protected prepare(): void {
       if (!this.instanceId) {

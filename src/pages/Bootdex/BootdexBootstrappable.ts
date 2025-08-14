@@ -1,7 +1,7 @@
 /**
  * @file `BootdexBootstrappable.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { logger, runtimer } from '@showdex/utils/debug';
@@ -39,7 +39,7 @@ export abstract class BootdexBootstrappable {
   /**
    * Opens the room containing the lists of active battles.
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   public static openBattlesRoom: () => void = () => void 0;
 

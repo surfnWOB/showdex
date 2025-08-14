@@ -4,7 +4,7 @@
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @author Adam Tran <aviettran@gmail.com>
  * @license MIT
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 /* eslint-disable max-classes-per-file */

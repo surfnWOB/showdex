@@ -1,7 +1,7 @@
 /**
  * @file `BootdexClassicBootstrappable.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { logger, wtf } from '@showdex/utils/debug';
@@ -92,7 +92,7 @@ export abstract class BootdexClassicBootstrappable extends BootdexBootstrappable
    *
    * * As of v1.1.0, this has been renamed from `createSideRoom()` since there's a Calcdex setting to open rooms on the left now
    *   (i.e., just regular rooms, not side-rooms).
-   * * As of v1.2.6, this is now inside the `BootdexClassicBootstrappable` to keep logic separate from those used for
+   * * As of v1.3.0, this is now inside the `BootdexClassicBootstrappable` to keep logic separate from those used for
    *   the rewritten `'preact'` Showdown client.
    *
    * @since 0.1.0

@@ -1,7 +1,7 @@
 /**
  * @file `HellodexPreactBootstrapper.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { env } from '@showdex/utils/core';
@@ -16,6 +16,7 @@ const l = logger('@showdex/pages/Hellodex/HellodexPreactBootstrapper');
 export class HellodexPreactBootstrapper extends BootdexPreactBootstrappable {
   public static override readonly scope = l.scope;
   public static override readonly Adapter = BootdexPreactAdapter;
+
   public readonly roomId = 'hellodex' as Showdown.RoomID;
 
   protected override startTimer(): void {

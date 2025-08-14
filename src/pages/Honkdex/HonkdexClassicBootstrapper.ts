@@ -1,7 +1,7 @@
 /**
  * @file `HonkdexClassicBootstrapper.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import * as ReactDOM from 'react-dom/client';
@@ -18,7 +18,7 @@ const l = logger('@showdex/pages/Honkdex/HonkdexClassicBootstrapper');
 export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(BootdexClassicBootstrappable) {
   public static override readonly scope = l.scope;
 
-  protected readonly roomId: `view-honkdex-${string}`;
+  public readonly roomId: `view-honkdex-${string}`;
 
   public static getHonkdexRoomId(instanceId: string): `view-honkdex-${string}` {
     return `view-honkdex-${instanceId}`;

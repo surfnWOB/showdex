@@ -1,7 +1,7 @@
 /**
  * @file `BootdexPreactBootstrappable.ts`
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 import { formatId } from '@showdex/utils/core';
@@ -42,3 +42,11 @@ export abstract class BootdexPreactBootstrappable extends BootdexBootstrappable 
     return room.classType === 'battle';
   }
 }
+
+// exported for convenience (technically available w/out the `window`, i.e., `new PSRoom()` is gucc),
+// but these make TypeScript happy
+export const PSRoom = detectPreactHost(window) ? window.PSRoom : null;
+export const PSRoomPanel = detectPreactHost(window) ? window.PSRoomPanel : null;
+export const PSPanelWrapper = detectPreactHost(window) ? window.PSPanelWrapper : null;
+// export const Icon = 'i' as React.ElementType<JSX.IntrinsicElements['i'] & { class?: string; }>;
+export const preact = detectPreactHost(window) ? window.preact : null;

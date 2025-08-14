@@ -94,7 +94,7 @@ declare type PickOptional<T, K extends keyof T> = Modify<T, Partial<Pick<T, K>>>
  * type LeanSosig = PickPartial<Sosig, 'fatness'>;
  * // -> { fatness?: number; color: number; gain: number; }
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 declare type PickPartial<T, K extends keyof T> = Modify<T, Partial<Pick<T, K>>>;
 
@@ -199,7 +199,7 @@ declare type DeepWritable<T> = { -readonly [P in keyof T]: DeepWritable<T[P]>; }
  * type SosigArrayParams = UnionArrays<SosigParams>;
  * // -> 'fatness'[] | 'color'[] | 'gain'[]
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 declare type UnionArrays<T> = T extends unknown ? T[] : never;
 
@@ -214,7 +214,7 @@ declare type UnionArrays<T> = T extends unknown ? T[] : never;
  * type SecondArray = WrapArray<string[]>;
  * // -> string[]
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 declare type WrapArray<T> = T extends unknown[] ? T : T[];
 
@@ -229,12 +229,12 @@ declare type WrapArray<T> = T extends unknown[] ? T : T[];
  * type SecondArray = UnwrapArray<string[]>;
  * // -> string
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 declare type UnwrapArray<T> = T extends unknown[] ? T[number] : T;
 
 /**
  * @alias `UnwrapArray<T>`
- * @since 1.2.6
+ * @since 1.3.0
  */
 declare type Flatten<T> = UnwrapArray<T>;

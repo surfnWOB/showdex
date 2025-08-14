@@ -1,7 +1,7 @@
 /**
  * @file `host-globals.d.ts` - Common `window` globals exposed by both the classic & Preact Showdown clients.
  * @author Keith Choison <keith@tize.io>
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 declare namespace Showdown {
@@ -12,7 +12,7 @@ declare namespace Showdown {
    * * Note: `unknown` types indicate I didn't bother typing them any further lol.
    *   - Also not an exhaustive list!
    *
-   * @since 1.2.6
+   * @since 1.3.0
    */
   interface HostGlobals {
     app?: Showdown.ClientGlobals['app'];

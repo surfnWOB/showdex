@@ -3,7 +3,7 @@
  * @author Keith Choison <keith@tize.io>
  * @author Guangcong Luo <guangcongluo@gmail.com>
  * @license AGPLv3
- * @since 1.2.6
+ * @since 1.3.0
  */
 
 /* eslint-disable max-classes-per-file, react/prefer-stateless-function, react/no-unused-class-component-methods */

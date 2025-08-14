@@ -11,7 +11,7 @@
  *
  * console.log(window.app?.user?.attributes?.name); // -> undefined (possibly)
  * ```
- * @since 1.2.6
+ * @since 1.3.0
  */
 export const detectClassicHost = (
   host: Window,
