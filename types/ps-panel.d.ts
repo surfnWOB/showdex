@@ -33,15 +33,15 @@ declare namespace Showdown {
     public focus(): void;
   }
 
-  type PSRoomPanelSubclass<TRoom extends PSRoom = PSRoom> = PSRoomPanel<TRoom> & {
+  type PSRoomPanelSubclass<TRoom extends PSRoom = PSRoom> = (new () => PSRoomPanel<TRoom>) & {
     readonly id: string;
     readonly routes: string[];
-    /** Optional `Room` class. */
+    /** Optional `PSRoom` class. */
     readonly Model?: new (options: RoomOptions) => TRoom;
     readonly location?: PSRoomLocation;
     /** Whether this room's `id` should be in the URL. */
     noURL?: boolean;
-    icon?: React.ReactNode;
+    icon?: Showdown.Preact.VNode;
     title?: string;
     handleDrop?: (event: DragEvent) => boolean | void;
   };
@@ -52,9 +52,9 @@ declare namespace Showdown {
     scrollable?: boolean | 'hidden';
     width?: number | 'auto';
     fullSize?: boolean;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     onDragEnter?: (event: DragEvent) => void;
   }
 
-  type PSPanelWrapper = (props: PSPanelWrapperProps) => JSX.Element;
+  type PSPanelWrapper = Preact.FunctionalComponent<PSPanelWrapperProps>;
 }

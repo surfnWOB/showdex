@@ -10,7 +10,7 @@
 
 declare namespace Showdown {
   class MainMenuRoom extends PSRoom {
-    public override readonly classType = 'mainmenu' as const;
+    public override readonly classType = 'mainmenu';
     public userdetailsCache: {
       [userid: string]: {
         userid: ID;
@@ -63,9 +63,9 @@ declare namespace Showdown {
   }
 
   class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
-    public static readonly id = 'mainmenu' as const;
-    public static readonly routes = [''] as const;
-    public static readonly Model = MainMenuRoom as const;
+    public static readonly id = 'mainmenu';
+    public static readonly routes = [''];
+    public static readonly Model = MainMenuRoom;
     public static readonly icon: JSX.Element;
 
     public submitSearch: (event: Event, format: string, team?: Team) => void;

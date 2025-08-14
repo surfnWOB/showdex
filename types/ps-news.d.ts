@@ -8,9 +8,9 @@
 
 declare namespace Showdown {
   class NewsPanel extends PSRoomPanel {
-    public static readonly id = 'news' as const;
-    public static readonly routes = ['news'] as const;
-    public static readonly title = 'News' as const;
+    public static readonly id = 'news';
+    public static readonly routes = ['news'];
+    public static readonly title = 'News';
     public static readonly location = 'mini-window' as const;
 
     public change: (event: Event) => void;

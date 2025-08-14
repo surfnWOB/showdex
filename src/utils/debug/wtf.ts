@@ -8,7 +8,7 @@
  * wtf(420.69) // -> 'number'
  * wtf(NaN) // -> 'NaN'
  * wtf(true) // -> 'boolean'
- * wtf(['is', 'going', 'on']) // -> 'array'
+ * wtf(['is', 'going', 'on']) // -> 'Array'
  * wtf({ foo: 'bar' }) // -> 'object'
  * wtf(undefined) // -> 'undefined'
  * wtf(null) // -> 'null'
@@ -28,7 +28,7 @@ export const wtf = (
 ): string => (
   (thing === null && 'null')
     || (Number.isNaN(thing) && 'NaN')
-    || (Array.isArray(thing) && 'array')
+    || (Array.isArray(thing) && 'Array')
     || (typeof thing === 'object' && thing?.constructor?.name)
     || typeof thing
 );

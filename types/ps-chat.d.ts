@@ -131,9 +131,9 @@ declare namespace Showdown {
   }
 
   class ChatPanel extends PSRoomPanel<ChatRoom> {
-    public static readonly id = 'chat' as const;
-    public static readonly routes = ['dm-*', 'groupchat-*', '*'] as const;
-    public static readonly model = ChatRoom as const;
+    public static readonly id = 'chat';
+    public static readonly routes = ['dm-*', 'groupchat-*', '*'];
+    public static readonly Model = ChatRoom;
     public static readonly location = 'right' as const;
     public static readonly icon: JSX.Element;
 

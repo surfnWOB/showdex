@@ -58,6 +58,7 @@ const packageVersion = `v${env('package-version', 'X.X.X')}`;
 const versionSuffix = env('package-version-suffix');
 const buildDate = env('build-date');
 const buildSuffix = env('build-suffix');
+const __TEST__ = buildSuffix?.startsWith('test.');
 const forumUrl = env('hellodex-forum-url');
 const repoUrl = env('hellodex-repo-url');
 const communityUrl = env('hellodex-community-url');
@@ -216,7 +217,7 @@ export const Hellodex = ({
                     hoverScale={1}
                     absoluteHover
                     disabled={typeof onUserPopup !== 'function'}
-                    onPress={() => void onUserPopup?.(__DEV__ ? 'showdex_testee' : 'sumfuk')}
+                    onPress={() => void onUserPopup?.(__DEV__ || __TEST__ ? 'showdex_testee' : 'sumfuk')}
                   />
                 ),
                 cameron: (
@@ -227,7 +228,7 @@ export const Hellodex = ({
                     hoverScale={1}
                     absoluteHover
                     disabled={typeof onUserPopup !== 'function'}
-                    onPress={() => void onUserPopup?.(__DEV__ ? 'showdex_tester' : 'camdawgboi')}
+                    onPress={() => void onUserPopup?.(__DEV__ || __TEST__ ? 'showdex_tester' : 'camdawgboi')}
                   />
                 ),
               }}

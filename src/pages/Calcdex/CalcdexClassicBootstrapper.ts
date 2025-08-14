@@ -106,43 +106,39 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
     }
 
     calcdexRoom.reactRoot = ReactDOM.createRoot(calcdexRoom.el);
+    calcdexRoom.requestLeave = () => {
+      // check if there's a corresponding ClientBattleRoom for this Calcdex room
+      // (app should be available here; otherwise, createHtmlRoom() would've returned null)
+      const battle = (window.app.rooms?.[battleId] as Showdown.ClientBattleRoom)?.battle;
 
-    if (typeof store?.getState === 'function') {
-      calcdexRoom.requestLeave = () => {
-        // check if there's a corresponding ClientBattleRoom for this Calcdex room
-        // (app should be available here; otherwise, createHtmlRoom() would've returned null)
-        // const battle = getBattleRoom(battleId)?.battle;
-        const battle = (window.app.rooms?.[battleId] as Showdown.ClientBattleRoom)?.battle;
+      if (battle?.id) {
+        delete battle.calcdexRoom;
+      }
+
+      // unmount the reactRoot we created earlier
+      // (if destroyOnClose is false, the reactRoot will be recreated when the user selects the
+      // battle in the Hellodex instances list [via openCalcdexInstance() -> createCalcdexRoom()])
+      calcdexRoom.reactRoot?.unmount?.();
+
+      // we need to grab a fresher version of the state when this function runs
+      // (i.e., do NOT use calcdexSettings here! it may contain a stale version of the settings)
+      const freshSettings = rootState?.showdex?.settings?.calcdex;
+
+      if (freshSettings?.destroyOnClose) {
+        // clean up allocated memory from Redux for this Calcdex instance
+        store.dispatch(calcdexSlice.actions.destroy(battleId));
 
         if (battle?.id) {
-          delete battle.calcdexRoom;
+          // technically calcdexReactRoot would only exist for battle-overlayed Calcdexes,
+          // but calling it here just in case I screwed something up LOL
+          battle.calcdexReactRoot?.unmount?.();
+          battle.calcdexDestroyed = true;
         }
+      }
 
-        // unmount the reactRoot we created earlier
-        // (if destroyOnClose is false, the reactRoot will be recreated when the user selects the
-        // battle in the Hellodex instances list [via openCalcdexInstance() -> createCalcdexRoom()])
-        calcdexRoom.reactRoot?.unmount?.();
-
-        // we need to grab a fresher version of the state when this function runs
-        // (i.e., do NOT use calcdexSettings here! it may contain a stale version of the settings)
-        const freshSettings = rootState?.showdex?.settings?.calcdex;
-
-        if (freshSettings?.destroyOnClose) {
-          // clean up allocated memory from Redux for this Calcdex instance
-          store.dispatch(calcdexSlice.actions.destroy(battleId));
-
-          if (battle?.id) {
-            // technically calcdexReactRoot would only exist for battle-overlayed Calcdexes,
-            // but calling it here just in case I screwed something up LOL
-            battle.calcdexReactRoot?.unmount?.();
-            battle.calcdexDestroyed = true;
-          }
-        }
-
-        // actually leave the room
-        return true;
-      };
-    }
+      // actually leave the room
+      return true;
+    };
 
     return calcdexRoom;
   }
@@ -161,6 +157,10 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
 
   protected get battle() {
     return this.battleRoom?.battle;
+  }
+
+  protected override startTimer(): void {
+    super.startTimer(CalcdexClassicBootstrapper.scope);
   }
 
   protected renderCalcdex(dom: ReactDOM.Root): void {

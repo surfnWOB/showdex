@@ -21,12 +21,12 @@ declare namespace Showdown {
   }
 
   class BattlesPanel extends PSRoomPanel<BattlesRoom> {
-    public static readonly id = 'battles' as const;
-    public static readonly routes = ['battles'] as const;
-    public static readonly model = BattlesRoom as const;
+    public static readonly id = 'battles';
+    public static readonly routes = ['battles'];
+    public static readonly Model = BattlesRoom;
     public static readonly location = 'right' as const;
     public static readonly icon: JSX.Element;
-    public static readonly title = 'Battles' as const;
+    public static readonly title = 'Battles';
 
     public refresh: () => void;
     public changeFormat: (event: Event) => void;
@@ -72,7 +72,7 @@ declare namespace Showdown {
   class BattlePanel extends PSRoomPanel<BattleRoom> {
     public static readonly id = 'battle' as const;
     public static readonly routes = ['battle-*'] as const;
-    public static readonly model = BattleRoom as const;
+    public static readonly Model = BattleRoom as const;
 
     /** Last displayed team. Won't show the most recent request until the last one is gone. */
     public team?: ServerPokemon[] = null;

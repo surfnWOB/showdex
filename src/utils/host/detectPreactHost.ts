@@ -17,5 +17,5 @@ export const detectPreactHost = (
   host: Window,
 ): host is Window & Showdown.PSGlobals => (
   (!host?.__SHOWDEX_HOST || host.__SHOWDEX_HOST === 'preact')
-    && typeof host.PS?.startTime === 'number'
+    && typeof host.PS?.join === 'function'
 );

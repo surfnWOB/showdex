@@ -24,8 +24,8 @@ export abstract class BootdexAdapter {
   public static i18next?: Awaited<ReturnType<typeof loadI18nextLocales>> = null;
   private static __initialized = false;
 
-  protected static hook: () => void | Promise<void> = () => void 0;
-  protected static ready: () => void | Promise<void> = () => void 0;
+  protected static hook?: () => void | Promise<void> = null;
+  protected static ready?: () => void | Promise<void> = null;
 
   private static async __init(): Promise<void> {
     if (this.__initialized) {

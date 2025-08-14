@@ -19,10 +19,34 @@ export abstract class BootdexBootstrappable {
   public static readonly Adapter = BootdexAdapter;
   public static readonly Manager = BootdexManager;
 
+  /**
+   * Returns whether the current layout has a single panel from the client's options.
+   *
+   * * Returns `false` if the layout has left-right panels or the client's options couldn't be determined.
+   * * Appears that while in battle, a viewport width less than `1275px` will collapse into a single panel.
+   *
+   * @since 1.0.3
+   */
+  public static hasSinglePanel: () => boolean = () => false;
+
+  /**
+   * Opens a user popup.
+   *
+   * @since 0.1.3
+   */
+  public static openUserPopup: (username: string) => void = () => void 0;
+
+  /**
+   * Opens the room containing the lists of active battles.
+   *
+   * @since 1.2.6
+   */
+  public static openBattlesRoom: () => void = () => void 0;
+
   protected endTimer?: ReturnType<typeof runtimer> = null;
 
-  protected startTimer(): void {
-    this.endTimer = runtimer(BootdexBootstrappable.scope, l);
+  protected startTimer(scope = BootdexBootstrappable.scope): void {
+    this.endTimer = runtimer(scope, l);
   }
 
   public abstract open(): void;

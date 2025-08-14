@@ -60,6 +60,33 @@ export abstract class BootdexClassicBootstrappable extends BootdexBootstrappable
   public static override readonly scope = l.scope;
   public static override readonly Adapter = BootdexClassicAdapter;
 
+  public static override hasSinglePanel: typeof BootdexBootstrappable.hasSinglePanel = () => detectClassicHost(window) && (
+    (window.app.curRoom?.id?.startsWith('battle-') && $?.(window).width() < 1275)
+      || window.Dex?.prefs?.('onepanel')
+  );
+
+  public static override openUserPopup: typeof BootdexBootstrappable.openUserPopup = (username) => {
+    if (!detectClassicHost(window) || typeof window.app.addPopup !== 'function') {
+      return void l.error(
+        'Can\'t open the UserPopup for', username, 'since one of the following globals isn\'t available!',
+        '\n', 'window.app.addPopup()', '(typeof)', wtf(window.app?.addPopup), // eslint-disable-line @typescript-eslint/unbound-method
+        '\n', 'window.UserPopup', '(typeof)', wtf((window as unknown as Showdown.ClientGlobals).UserPopup),
+      );
+    }
+
+    window.app.addPopup(window.UserPopup, {
+      name: username,
+    });
+  };
+
+  public static override openBattlesRoom: typeof BootdexBootstrappable.openBattlesRoom = () => {
+    if (!detectClassicHost(window)) {
+      return;
+    }
+
+    window.app.joinRoom('battles', 'battles');
+  };
+
   /**
    * Abstraction that creates an `ClientHtmlRoom` in the `'classic'` Showdown client.
    *
@@ -149,40 +176,5 @@ export abstract class BootdexClassicBootstrappable extends BootdexBootstrappable
     window.app.topbar.updateTabbar();
 
     return room;
-  }
-
-  /**
-   * Returns whether the current layout has a single panel from the client's options.
-   *
-   * * Returns `false` if the layout has left-right panels or the client's options couldn't be determined.
-   * * Appears that while in battle, a viewport width less than `1275px` will collapse into a single panel.
-   *
-   * @default false
-   * @since 1.0.3
-   */
-  public static hasSinglePanel(): boolean {
-    return detectClassicHost(window) && (
-      (window.app.curRoom?.id?.startsWith('battle-') && $?.(window).width() < 1275)
-        || window.Dex?.prefs?.('onepanel')
-    );
-  }
-
-  /**
-   * Opens a user popup.
-   *
-   * @since 0.1.3
-   */
-  public static openUserPopup(username: string): void {
-    if (!detectClassicHost(window) || typeof window.app?.addPopup !== 'function') {
-      return void l.error(
-        'Can\'t open the UserPopup for', username, 'since one of the following globals isn\'t available!',
-        '\n', 'window.app.addPopup()', '(typeof)', wtf(window.app?.addPopup), // eslint-disable-line @typescript-eslint/unbound-method
-        '\n', 'window.UserPopup', '(typeof)', wtf((window as unknown as Showdown.ClientGlobals).UserPopup),
-      );
-    }
-
-    window.app.addPopup(window.UserPopup, {
-      name: username,
-    });
   }
 }

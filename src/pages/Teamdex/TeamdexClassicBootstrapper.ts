@@ -14,6 +14,10 @@ const l = logger('@showdex/pages/Teamdex/TeamdexClassicBootstrapper');
 export class TeamdexClassicBootstrapper extends MixinTeamdexBootstrappable(BootdexClassicBootstrappable) {
   public static override readonly scope = l.scope;
 
+  protected override startTimer(): void {
+    super.startTimer(TeamdexClassicBootstrapper.scope);
+  }
+
   public open(): void { // eslint-disable-line class-methods-use-this
     l.info('coming soon to a theater near you !!!');
   }

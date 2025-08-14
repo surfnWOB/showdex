@@ -66,8 +66,6 @@ export interface ShowdexSliceState {
   /**
    * Name of the currently authenticated Showdown user.
    *
-   * * Note that this is populated inside the Hellodex bootstrapper, which loads as soon as Showdown starts.
-   *
    * @since 1.1.3
    */
   authUsername: string;

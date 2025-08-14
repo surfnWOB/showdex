@@ -6,11 +6,14 @@
 
 import {
   BootdexClassicAdapter,
+  BootdexPreactAdapter,
   BootdexManager,
   CalcdexClassicBootstrapper,
   HellodexClassicBootstrapper,
+  HellodexPreactBootstrapper,
   HonkdexClassicBootstrapper,
   TeamdexClassicBootstrapper,
+  TeamdexPreactBootstrapper,
 } from '@showdex/pages';
 import { env } from '@showdex/utils/core';
 import { logger, wtf } from '@showdex/utils/debug';
@@ -73,10 +76,13 @@ void (async () => {
       '\n', '(note: no relation to @pre ... that was for the punies hehe)', // fun fact: puny + react = preact (punny huh)
     );
 
-    // BootdexPreactAdapter.run();
+    BootdexManager.register('hellodex', HellodexPreactBootstrapper);
 
-    // return void yay();
-    throw new Error('workin on it');
+    await BootdexPreactAdapter.run();
+    new TeamdexPreactBootstrapper().run();
+    new HellodexPreactBootstrapper().run();
+
+    return void yay();
   }
 
   if (detectClassicHost(window)) {

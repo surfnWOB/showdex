@@ -8,7 +8,6 @@ import * as ReactDOM from 'react-dom/client';
 import { env, nonEmptyObject } from '@showdex/utils/core';
 import { logger, wtf } from '@showdex/utils/debug';
 import { detectClassicHost } from '@showdex/utils/host';
-import { BootdexAdapter } from '../Bootdex';
 import { BootdexClassicBootstrappable } from '../Bootdex/BootdexClassicBootstrappable';
 import { HellodexDomRenderer } from './HellodexRenderer';
 
@@ -53,7 +52,7 @@ export class HellodexClassicBootstrapper extends BootdexClassicBootstrappable {
       return null;
     }
 
-    const { rootState } = BootdexAdapter;
+    const { rootState } = this.Adapter;
     const { hellodex: settings } = rootState?.showdex?.settings || {};
     const shouldFocus = focus || !settings?.focusRoomsRoom;
 
@@ -81,19 +80,30 @@ export class HellodexClassicBootstrapper extends BootdexClassicBootstrappable {
     return hellodexRoom;
   }
 
+  protected override startTimer(): void {
+    super.startTimer(HellodexClassicBootstrapper.scope);
+  }
+
   protected renderHellodex(dom: ReactDOM.Root): void { // eslint-disable-line class-methods-use-this
     if (!detectClassicHost(window) || !dom) {
       return;
     }
 
+    const {
+      Adapter,
+      Manager,
+      openUserPopup,
+      openBattlesRoom,
+    } = HellodexClassicBootstrapper as unknown as typeof BootdexClassicBootstrappable;
+
     HellodexDomRenderer(dom, {
-      store: BootdexAdapter.store,
-      onUserPopup: (username) => void (HellodexClassicBootstrapper as unknown as typeof BootdexClassicBootstrappable).openUserPopup?.(username),
-      onRequestBattles: () => void window.app.joinRoom('battles', 'battles'),
-      onRequestCalcdex: (id) => void HellodexClassicBootstrapper.Manager?.openCalcdex(id),
-      onRequestHonkdex: (id) => void HellodexClassicBootstrapper.Manager?.openHonkdex(id),
-      onRemoveHonkdex: (id) => void HellodexClassicBootstrapper.Manager?.destroyHonkdex(id),
-      onCloseCalcdex: (id) => void HellodexClassicBootstrapper.Manager?.closeCalcdex(id),
+      store: Adapter.store,
+      onUserPopup: openUserPopup,
+      onRequestBattles: openBattlesRoom,
+      onRequestCalcdex: (id) => void Manager?.openCalcdex(id),
+      onRequestHonkdex: (id) => void Manager?.openHonkdex(id),
+      onRemoveHonkdex: (id) => void Manager?.destroyHonkdex(id),
+      onCloseCalcdex: (id) => void Manager?.closeCalcdex(id),
     });
   }
 
