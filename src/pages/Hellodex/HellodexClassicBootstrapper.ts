@@ -168,13 +168,13 @@ export class HellodexClassicBootstrapper extends BootdexClassicBootstrappable {
     this.startTimer();
 
     l.silly(
-      'Hellodex bootstrapper was invoked;',
+      'Hellodex classic bootstrapper was invoked;',
       'determining if there\'s anything to do...',
     );
 
     if (!env.bool('hellodex-enabled')) {
       l.debug(
-        'Hellodex bootstrap request was ignored',
+        'Hellodex classic bootstrap request was ignored',
         'since it has been disabled by the environment.',
       );
 

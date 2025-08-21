@@ -86,13 +86,13 @@ export class BootdexClassicAdapter extends BootdexAdapter {
           return void this.__mutex.battleBuf.push([roomId, data]);
         }
 
-        let receiver = this.receiverNamed(roomId);
+        let receiver = this.battleReceiverNamed(roomId);
 
         if (!receiver && typeof this.receiverFactory === 'function') {
           receiver = this.receiverFactory(roomId);
 
           if (typeof receiver === 'function') {
-            this.addReceiver(roomId, receiver);
+            this.addBattleReceiver(roomId, receiver);
           }
         }
 
@@ -136,7 +136,7 @@ export class BootdexClassicAdapter extends BootdexAdapter {
 
   protected static override ready = (): void => {
     // process any buffered battle `data` first before releasing the shitty 'ok' mutex lock
-    this.__mutex.battleBuf.forEach(([roomId, data]) => void this.receiverNamed(roomId)?.(data));
+    this.__mutex.battleBuf.forEach(([roomId, data]) => void this.battleReceiverNamed(roomId)?.(data));
     this.__mutex.battleBuf.length = 0;
     this.__mutex.ok = true;
   };
@@ -145,7 +145,7 @@ export class BootdexClassicAdapter extends BootdexAdapter {
     return this.__battleReceivers;
   }
 
-  public static receiverNamed(key: string): Showdown.ClientApp['receive'] {
+  public static battleReceiverNamed(key: string): Showdown.ClientApp['receive'] {
     if (!key || !this.__battleReceivers.length) {
       return null;
     }
@@ -155,7 +155,7 @@ export class BootdexClassicAdapter extends BootdexAdapter {
     return this.__battleReceivers[index]?.[1] || null;
   }
 
-  public static addReceiver(
+  public static addBattleReceiver(
     ...receiver: UnwrapArray<typeof BootdexClassicAdapter.__battleReceivers>
   ): void {
     if (
@@ -169,7 +169,7 @@ export class BootdexClassicAdapter extends BootdexAdapter {
     this.__battleReceivers.push(receiver);
   }
 
-  public static removeReceiver(key: string): void {
+  public static removeBattleReceiver(key: string): void {
     if (!key || !this.__battleReceivers.length) {
       return;
     }
@@ -183,7 +183,7 @@ export class BootdexClassicAdapter extends BootdexAdapter {
     this.__battleReceivers.splice(index, 1);
   }
 
-  public static clearReceivers(): void {
+  public static clearBattleReceivers(): void {
     if (!this.__battleReceivers.length) {
       return;
     }

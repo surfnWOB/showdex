@@ -37,9 +37,9 @@ export const MixinHonkdexBootstrappable = <
   Bootstrappable: TBootstrappable,
 ) => {
   abstract class HonkdexBootstrappableMixin extends (Bootstrappable as typeof BootdexBootstrappable & InstanceType<TBootstrappable>) {
-    protected readonly instanceId: string;
-    protected readonly gen: GenerationNum;
-    protected readonly format: string;
+    public readonly instanceId: string;
+    public readonly gen: GenerationNum;
+    public readonly format: string;
 
     public constructor(
       instanceId = uuidv4(),
@@ -51,6 +51,14 @@ export const MixinHonkdexBootstrappable = <
       this.instanceId = instanceId;
       this.gen = gen;
       this.format = getGenfulFormat(gen, format);
+
+      if (this.calcdexState?.battleId && this.calcdexState.gen !== this.gen) {
+        this.instanceId = uuidv4();
+      }
+    }
+
+    public get calcdexState() {
+      return HonkdexBootstrappableMixin.Adapter?.rootState?.calcdex?.[this.instanceId];
     }
 
     /**
@@ -59,17 +67,19 @@ export const MixinHonkdexBootstrappable = <
      * @since 1.3.0
      */
     protected prepare(): void {
+      this.startTimer();
+
       if (!this.instanceId) {
-        return;
+        return void this.endTimer('(bad instanceId)');
       }
 
-      const { rootState, store } = HonkdexBootstrappableMixin.Adapter || {};
+      const { Adapter } = HonkdexBootstrappableMixin;
 
-      if (rootState?.calcdex?.[this.instanceId]?.battleId === this.instanceId) {
-        return;
+      if (this.calcdexState?.battleId === this.instanceId) {
+        return void this.endTimer('(already prepared)');
       }
 
-      store.dispatch(calcdexSlice.actions.init({
+      Adapter.store.dispatch(calcdexSlice.actions.init({
         scope: l.scope,
 
         operatingMode: 'standalone',
@@ -122,10 +132,10 @@ export const MixinHonkdexBootstrappable = <
         return;
       }
 
-      const { store } = HonkdexBootstrappableMixin.Adapter || {};
+      const { Adapter } = HonkdexBootstrappableMixin;
 
       this.close();
-      store.dispatch(calcdexSlice.actions.destroy(this.instanceId));
+      Adapter.store.dispatch(calcdexSlice.actions.destroy(this.instanceId));
       void purgeHonksDb(this.instanceId);
     }
   }

@@ -17,6 +17,7 @@ declare namespace Showdown {
       TContext = object,
     > {
       (props: RenderableProps<TProps>, context: TContext): VNode;
+      name: string;
       displayName?: string;
       defaultProps?: Partial<TProps>;
     }
@@ -62,6 +63,7 @@ declare namespace Showdown {
       TContext = object,
     > {
       new (props: RenderableProps<TProps>, context: TContext): Component<TProps, TState, TContext>;
+      name: string;
       displayName?: string;
       defaultProps?: Partial<TProps>;
     }
@@ -70,23 +72,57 @@ declare namespace Showdown {
       | ComponentConstructor<TProps>
       | FunctionalComponent<TProps>;
 
+    type ComponentChild = VNode | string;
+    type ComponentChildren = ComponentChild | ComponentChild[];
+
     /** Preact virtual node. */
     interface VNode<TProps = unknown> {
       key?: string | number;
-      nodeName: ComponentFactory<TProps> | string;
-      attributes: TProps;
-      children: (VNode | string)[];
+      type?: ComponentFactory | string;
+      ref?: React.RefObject<Element>;
+      props: TProps & { children?: ComponentChildren; };
+      __?: VNode;
+      __b?: number;
+      __c?: {
+        base: Element;
+        constructor: ComponentFactory;
+        context: object;
+        props: object;
+        state: object;
+        render: typeof render;
+      };
+      __d?: unknown;
+      __e?: Element;
+      __h?: unknown;
+      __k?: unknown[];
+      __v?: number;
     }
 
+    function toChildArray(
+      children: ComponentChildren,
+    ): ComponentChild[];
+
+    function createElement<TProps extends object = object>(
+      type: ComponentFactory<TProps> | string,
+      props?: React.Attributes & TProps,
+      ...children: ComponentChild[]
+    ): VNode;
+    function createElement(
+      type: string,
+      params?: Record<string, unknown>,
+      ...children: ComponentChild[]
+    ): VNode;
+
+    /** @alias `createElement()` */
     function h<TProps extends object = object>(
-      nodeName: ComponentFactory<TProps> | string,
-      attributes?: React.Attributes & TProps,
-      ...children: (VNode | string)[]
+      type: ComponentFactory<TProps> | string,
+      props?: React.Attributes & TProps,
+      ...children: ComponentChild[]
     ): VNode;
     function h(
-      nodeName: string,
+      type: string,
       params?: Record<string, unknown>,
-      ...children: (VNode | string)[]
+      ...children: ComponentChild[]
     ): VNode;
 
     function render(
@@ -96,21 +132,21 @@ declare namespace Showdown {
     ): Element;
     function rerender(): void;
 
-    function cloneElement(element: JSX.Element, props?: unknown): JSX.Element;
+    function cloneElement(element: VNode | JSX.Element, props?: unknown): VNode;
     function createRef<TRef>(): React.RefObject<TRef>;
 
     interface Globals {
       Component: ComponentConstructor;
       Fragment: ComponentConstructor;
-      cloneElement: typeof cloneElement;
-      createElement: unknown;
-      createRef: typeof createRef;
+      createElement: typeof createElement;
       h: typeof h;
+      cloneElement: typeof cloneElement;
+      createRef: typeof createRef;
       hydrate: unknown;
       isValidElement: unknown;
       options: Record<string, unknown>;
       render: typeof render;
-      toChildArray: unknown;
+      toChildArray: typeof toChildArray;
     }
   }
 }

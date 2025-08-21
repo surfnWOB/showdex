@@ -59,20 +59,20 @@ export class HellodexPreactBootstrapper extends BootdexPreactBootstrappable {
   }
 
   public run(): void {
-    if (!detectPreactHost(window)) {
-      return;
-    }
-
     this.startTimer();
 
+    if (!detectPreactHost(window)) {
+      return void this.endTimer('(bad preact)', window.__SHOWDEX_HOST);
+    }
+
     l.silly(
-      'Hellodex bootstrapper was invoked;',
+      'Hellodex Preact bootstrapper was invoked;',
       'determining if there\'s anything to do...',
     );
 
     if (!env.bool('hellodex-enabled')) {
       l.debug(
-        'Hellodex bootstrap request was ignored',
+        'Hellodex Preact bootstrap request was ignored',
         'since it has been disabled by the environment.',
       );
 

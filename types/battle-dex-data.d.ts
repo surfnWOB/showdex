@@ -72,5 +72,12 @@ declare namespace Showdown {
     | 'Stellar'
     | '???';
 
+  type StatusName =
+    | 'par'
+    | 'psn'
+    | 'frz'
+    | 'slp'
+    | 'brn';
+
   type GenderName = 'M' | 'F' | 'N';
 }

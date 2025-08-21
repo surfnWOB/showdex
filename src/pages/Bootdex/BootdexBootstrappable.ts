@@ -19,6 +19,8 @@ export abstract class BootdexBootstrappable {
   public static readonly Adapter = BootdexAdapter;
   public static readonly Manager = BootdexManager;
 
+  private __runtimerActive = false;
+
   /**
    * Returns whether the current layout has a single panel from the client's options.
    *
@@ -46,7 +48,21 @@ export abstract class BootdexBootstrappable {
   protected endTimer?: ReturnType<typeof runtimer> = null;
 
   protected startTimer(scope = BootdexBootstrappable.scope): void {
-    this.endTimer = runtimer(scope, l);
+    if (this.__runtimerActive) {
+      return;
+    }
+
+    const endTimer = runtimer(scope, l);
+
+    this.endTimer = (...args: Parameters<typeof endTimer>) => {
+      const result = endTimer(...args);
+
+      this.__runtimerActive = false;
+
+      return result;
+    };
+
+    this.__runtimerActive = true;
   }
 
   public abstract open(): void;

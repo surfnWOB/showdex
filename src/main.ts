@@ -9,9 +9,11 @@ import {
   BootdexPreactAdapter,
   BootdexManager,
   CalcdexClassicBootstrapper,
+  CalcdexPreactBootstrapper,
   HellodexClassicBootstrapper,
   HellodexPreactBootstrapper,
   HonkdexClassicBootstrapper,
+  HonkdexPreactBootstrapper,
   TeamdexClassicBootstrapper,
   TeamdexPreactBootstrapper,
 } from '@showdex/pages';
@@ -76,11 +78,15 @@ void (async () => {
       '\n', '(note: no relation to @pre ... that was for the punies hehe)', // fun fact: puny + react = preact (punny huh)
     );
 
+    BootdexManager.register('calcdex', CalcdexPreactBootstrapper);
     BootdexManager.register('hellodex', HellodexPreactBootstrapper);
+    BootdexManager.register('honkdex', HonkdexPreactBootstrapper);
 
     await BootdexPreactAdapter.run();
     new TeamdexPreactBootstrapper().run();
     new HellodexPreactBootstrapper().run();
+    new HonkdexPreactBootstrapper().run();
+    new CalcdexPreactBootstrapper().run();
 
     return void yay();
   }
@@ -89,11 +95,12 @@ void (async () => {
     BootdexManager.register('calcdex', CalcdexClassicBootstrapper);
     BootdexManager.register('hellodex', HellodexClassicBootstrapper);
     BootdexManager.register('honkdex', HonkdexClassicBootstrapper);
-    BootdexClassicAdapter.receiverFactory = (roomId) => (data) => void new CalcdexClassicBootstrapper(roomId).run(data);
+    BootdexClassicAdapter.receiverFactory = (roomId) => () => void new CalcdexClassicBootstrapper(roomId).run();
 
     await BootdexClassicAdapter.run();
     new TeamdexClassicBootstrapper().run();
     new HellodexClassicBootstrapper().run();
+    new HonkdexClassicBootstrapper().run();
 
     return void yay();
   }

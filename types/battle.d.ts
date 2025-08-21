@@ -172,13 +172,17 @@ declare namespace Showdown {
     public paused: boolean;
 
     // Showdex-injected custom properties
-    calcdexRoom?: ClientHtmlRoom;
-    // calcdexOverlayVisible?: boolean;
-    calcdexReactRoot?: import('react-dom/client').Root;
+    calcdexDisabled?: boolean;
+    calcdexAsOverlay?: boolean;
     calcdexInit?: boolean;
     calcdexStateInit?: boolean;
-    calcdexSheetsAccepted?: boolean;
+    calcdexIdPatched?: boolean;
     calcdexDestroyed?: boolean;
+    /** note: for `'classic'` (i.e., Backbone.js) Showdown client `__SHOWDEX_HOST`'s only !! */
+    calcdexRoom?: ClientHtmlRoom;
+    calcdexRoomId?: RoomID;
+    calcdexReactRoot?: import('react-dom/client').Root;
+    calcdexSheetsAccepted?: boolean;
     nonce?: string;
 
     public subscription?: (state: BattleSubscriptionState) => void;
@@ -273,17 +277,8 @@ declare namespace Showdown {
      *   it's also important to make sure timer updates happen in real-time.
      */
     public instantAdd(command: string): void;
-
-    public runMinor<
-      TArgs extends Args,
-      TKwArgs extends KwArgs,
-    >(args: TArgs, kwArgs: TKwArgs, nextArgs?: Args, nextKwargs?: TKwArgs): void;
-
-    public runMajor<
-      TArgs extends Args,
-      TKwArgs extends KwArgs,
-    >(args: TArgs, kwArgs: TKwArgs, preempt?: boolean): void;
-
+    public runMinor(args: Args, kwArgs: KwArgs, nextArgs?: Args, nextKwargs?: KwArgs): void;
+    public runMajor(args: Args, kwArgs: KwArgs, preempt?: boolean): void;
     public run(str: string, preempt?: boolean): void;
 
     /**

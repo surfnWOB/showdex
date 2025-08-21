@@ -80,6 +80,19 @@ export class BootdexManager {
   }
 
   /**
+   * Runs the Calcdex bootstrapper for the provided `battleId`.
+   *
+   * @since 1.3.0
+   */
+  public static runCalcdex(battleId: string): void {
+    if (!battleId) {
+      return;
+    }
+
+    new (this.named('calcdex'))(battleId).run();
+  }
+
+  /**
    * Opens the existing Calcdex tab (or battle if overlayed) or creates a new one.
    *
    * @since 1.3.0

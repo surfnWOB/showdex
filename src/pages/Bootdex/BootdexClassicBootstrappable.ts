@@ -98,6 +98,7 @@ export abstract class BootdexClassicBootstrappable extends BootdexBootstrappable
    * @since 0.1.0
    */
   public static createHtmlRoom(
+    this: void,
     roomId: string,
     title: string,
     options?: BootdexClassicHtmlRoomOptions,

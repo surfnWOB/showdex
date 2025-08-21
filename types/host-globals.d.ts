@@ -18,8 +18,9 @@ declare namespace Showdown {
     app?: Showdown.ClientGlobals['app'];
     PS?: Showdown.PSGlobals['PS'];
 
-    Ability: Ability;
-    BattleAbilities: BattleAbilities;
+    Ability: typeof Ability;
+    Battle: typeof Battle;
+    BattleAbilities: typeof BattleAbilities;
     BattleAliases: Record<ID, string>;
     BattleArticleTitles: Record<ID, string>;
     BattleAvatarNumbers: Record<`${number}`, string>;
@@ -28,13 +29,13 @@ declare namespace Showdown {
     BattleBackdropsFour: string[];
     BattleBackdropsThree: string[];
     BattleBaseSpeciesChart: string[];
-    BattleBGM: BattleBGM;
+    BattleBGM: typeof BattleBGM;
     BattleCategorySearch: unknown;
     BattleChatCommands: Record<string, string[]>;
     BattleFormats: BattleFormats;
     BattleItemSearch: unknown;
-    BattleItems: BattleItems;
-    BattleLog: BattleLog;
+    BattleItems: typeof BattleItems;
+    BattleLog: typeof BattleLog;
     BattleMoveAnims: unknown;
     BattleMoveSearch: unknown;
     BattleMovedex: BattleMovedex;
@@ -50,12 +51,12 @@ declare namespace Showdown {
     BattleSound: BattleSound;
     BattleStatGuesser: BattleStatGuesser;
     BattleStatusAnims: Record<Exclude<PokemonStatus, '???'> | 'attracted' | 'confused' | 'confusedselfhit' | 'cursed' | 'flinch' | 'focuspunch', AnimData>;
-    BattleTeambuilderTable: BattleTeambuilderTable;
+    BattleTeambuilderTable: typeof BattleTeambuilderTable;
     BattleText: unknown;
     BattleTextAFD: unknown;
     BattleTextNotAFD: unknown;
-    BattleTextParser: BattleTextParser;
-    BattleTooltips: BattleTooltips;
+    BattleTextParser: typeof BattleTextParser;
+    BattleTooltips: typeof BattleTooltips;
     BattleTypeChart: Record<TypeName, Type>;
     BattleTypeSearch: unknown;
     BattleTypedSearch: unknown;
@@ -69,12 +70,12 @@ declare namespace Showdown {
     Move: Move;
     NonBattleGames: Record<ID, string>;
     Pokemon: Pokemon;
-    PokemonSprite: PokemonSprite;
-    PureEffect: PureEffect;
+    PokemonSprite: typeof PokemonSprite;
+    PureEffect: typeof PureEffect;
     Side: Side;
-    Species: Species;
+    Species: typeof Species;
     Sprite: Sprite;
-    Teams: Teams;
+    Teams: unknown;
     TextFormatter: unknown;
   }
 }

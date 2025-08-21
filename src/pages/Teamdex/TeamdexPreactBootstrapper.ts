@@ -31,14 +31,14 @@ export class TeamdexPreactBootstrapper extends MixinTeamdexBootstrappable(Bootde
   }
 
   public run(): void {
-    if (!detectPreactHost(window)) {
-      throw new Error('TeamdexPreactBootstrapper can only be run in the preact Showdown client!');
-    }
-
     this.startTimer();
 
+    if (!detectPreactHost(window)) {
+      return void this.endTimer('(bad preact)', window.__SHOWDEX_HOST);
+    }
+
     l.silly(
-      'Teamdex bootstrapper was invoked;',
+      'Teamdex Preact bootstrapper was invoked;',
       'determining if there\'s anything to do...',
     );
 

@@ -40,8 +40,8 @@ declare namespace Showdown {
     PSView: typeof PSView;
 
     BattleDiv: typeof BattleDiv;
-    BattleForfeitPanel: unknown;
-    BattleOptionsPanel: unknown;
+    BattleForfeitPanel: typeof BattleForfeitPanel;
+    BattleOptionsPanel: typeof BattleOptionsPanel;
     BattlePanel: typeof BattlePanel;
     BattleRoom: typeof BattleRoom;
     BattlesPanel: typeof BattlesPanel;

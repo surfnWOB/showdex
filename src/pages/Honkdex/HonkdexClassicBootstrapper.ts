@@ -5,8 +5,6 @@
  */
 
 import * as ReactDOM from 'react-dom/client';
-import { type GenerationNum } from '@smogon/calc';
-import { nonEmptyObject } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { detectClassicHost } from '@showdex/utils/host';
 import { BootdexClassicBootstrappable } from '../Bootdex/BootdexClassicBootstrappable';
@@ -18,9 +16,10 @@ const l = logger('@showdex/pages/Honkdex/HonkdexClassicBootstrapper');
 export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(BootdexClassicBootstrappable) {
   public static override readonly scope = l.scope;
 
-  public readonly roomId: `view-honkdex-${string}`;
-
-  public static getHonkdexRoomId(instanceId: string): `view-honkdex-${string}` {
+  public static getHonkdexRoomId(
+    this: void,
+    instanceId: string,
+  ): `view-honkdex-${string}` {
     return `view-honkdex-${instanceId}`;
   }
 
@@ -40,7 +39,8 @@ export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(Bootd
       return null;
     }
 
-    const honkdexRoom = (this as unknown as typeof BootdexClassicBootstrappable).createHtmlRoom(this.getHonkdexRoomId(instanceId), 'Honkdex', {
+    const { createHtmlRoom } = this as unknown as typeof BootdexClassicBootstrappable;
+    const honkdexRoom = createHtmlRoom(this.getHonkdexRoomId(instanceId), 'Honkdex', {
       side: true,
       icon: 'car',
       focus,
@@ -55,28 +55,28 @@ export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(Bootd
     return honkdexRoom;
   }
 
+  public get roomId() {
+    return HonkdexClassicBootstrapper.getHonkdexRoomId(this.instanceId);
+  }
+
+  public get room() {
+    return window.app.rooms?.[this.roomId] as ReturnType<typeof HonkdexClassicBootstrapper.createHonkdexRoom>;
+  }
+
   protected renderHonkdex(dom: ReactDOM.Root): void {
     if (!detectClassicHost(window) || !this.instanceId || !dom) {
       return;
     }
 
+    const { Adapter, Manager, getHonkdexRoomId } = HonkdexClassicBootstrapper;
+
     HonkdexDomRenderer(dom, {
-      store: HonkdexClassicBootstrapper.Adapter?.store,
+      store: Adapter?.store,
       instanceId: this.instanceId,
-      onRequestHellodex: () => void HonkdexClassicBootstrapper.Manager?.openHellodex(),
-      onRequestHonkdex: (...argv) => void HonkdexClassicBootstrapper.Manager?.openHonkdex(...argv),
-      onLeaveRoom: () => void window.app.leaveRoom(HonkdexClassicBootstrapper.getHonkdexRoomId(this.instanceId)),
+      onRequestHellodex: () => void Manager?.openHellodex(),
+      onRequestHonkdex: (...argv) => void Manager?.openHonkdex(...argv),
+      onLeaveRoom: () => void window.app.leaveRoom(getHonkdexRoomId(this.instanceId)),
     });
-  }
-
-  public constructor(instanceId?: string, gen?: GenerationNum, format?: string) {
-    super(instanceId, gen, format);
-
-    if (!this.instanceId) {
-      return;
-    }
-
-    this.roomId = HonkdexClassicBootstrapper.getHonkdexRoomId(this.instanceId);
   }
 
   public open(): void {
@@ -84,7 +84,7 @@ export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(Bootd
       return;
     }
 
-    if (this.roomId in window.app.rooms) {
+    if (this.room?.id) {
       return void window.app.focusRoomRight(this.roomId);
     }
 
@@ -95,11 +95,20 @@ export class HonkdexClassicBootstrapper extends MixinHonkdexBootstrappable(Bootd
   }
 
   public close(): void {
-    if (!detectClassicHost(window) || !this.roomId || !nonEmptyObject(window.app?.rooms)) {
+    if (!detectClassicHost(window) || !this.room?.id) {
       return;
     }
 
     window.app.leaveRoom(this.roomId);
+  }
+
+  public override destroy(): void {
+    if (!detectClassicHost(window) || !this.instanceId) {
+      return;
+    }
+
+    this.room?.reactRoot?.unmount?.();
+    super.destroy(); // o_O !! not as cool as it sounds tho
   }
 
   public run(): void { // eslint-disable-line class-methods-use-this

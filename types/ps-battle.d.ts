@@ -10,7 +10,7 @@
 
 declare namespace Showdown {
   class BattlesRoom extends PSRoom {
-    public override readonly classType = 'battle' as const;
+    public override readonly classType = 'battle';
     /** `null` = still loading. */
     public formats = '';
     public filters = '';
@@ -24,7 +24,7 @@ declare namespace Showdown {
     public static readonly id = 'battles';
     public static readonly routes = ['battles'];
     public static readonly Model = BattlesRoom;
-    public static readonly location = 'right' as const;
+    public static readonly location = 'right';
     public static readonly icon: JSX.Element;
     public static readonly title = 'Battles';
 
@@ -36,7 +36,7 @@ declare namespace Showdown {
   }
 
   class BattleRoom extends ChatRoom {
-    public readonly classType = 'battle' as const;
+    public readonly classType = 'battle';
     public declare pmTarget: null;
     public declare challengeMenuOpen: false;
     public declare challengingFormat: null;
@@ -69,10 +69,12 @@ declare namespace Showdown {
     public secondsToTime(seconds: number | true): string;
   }
 
-  class BattlePanel extends PSRoomPanel<BattleRoom> {
-    public static readonly id = 'battle' as const;
-    public static readonly routes = ['battle-*'] as const;
-    public static readonly Model = BattleRoom as const;
+  // note: TRoom generic doesn't actually exist in the original class declaration, but exists here for TypeScript lol
+  // (functionally has no effect in JS-land, unless you change the static Model member prop value, which should match the TRoom)
+  class BattlePanel<TRoom extends BattleRoom = BattleRoom> extends PSRoomPanel<TRoom> {
+    public static readonly id = 'battle';
+    public static readonly routes = ['battle-*'];
+    public static readonly Model = BattleRoom;
 
     /** Last displayed team. Won't show the most recent request until the last one is gone. */
     public team?: ServerPokemon[] = null;
@@ -89,7 +91,7 @@ declare namespace Showdown {
     public updateLayout(): void;
     public receiveRequest(request?: BattleRequest): void;
     public notifyRequest(): void;
-    public renderControls(): JSX.Element;
+    public renderControls(): Showdown.Preact.VNode;
     public renderMoveButton(
       props?: {
         name: string;
@@ -102,7 +104,7 @@ declare namespace Showdown {
           disabled?: boolean;
         };
       },
-    ): JSX.Element;
+    ): Preact.VNode;
     public renderPokemonButton(
       props: {
         pokemon?: Pokemon | ServerPokemon;
@@ -111,21 +113,47 @@ declare namespace Showdown {
         disabled?: boolean | 'fade';
         tooltip: string;
       },
-    ): JSX.Element;
-    public renderMoveMenu(choices: BattleChoiceBuilder): JSX.Element;
-    public renderMoveControls(active: BattleRequestActivePokemon, choices: BattleChoiceBuilder): JSX.Element[];
-    public renderMoveTargetControls(request: BattleMoveRequest, choices: BattleChoiceBuilder): JSX.Element[];
+    ): Preact.VNode;
+    public renderMoveMenu(choices: BattleChoiceBuilder): Preact.VNode;
+    public renderMoveControls(active: BattleRequestActivePokemon, choices: BattleChoiceBuilder): Preact.VNode[];
+    public renderMoveTargetControls(request: BattleMoveRequest, choices: BattleChoiceBuilder): Preact.VNode[];
     public renderSwitchMenu(
       request: BattleMoveRequest | BattleSwitchRequest,
       choices: BattleChoiceBuilder,
       ignoreTrapping?: boolean,
-    ): JSX.Element;
-    public renderTeamPreviewChooser(request: BattleTeamRequest, choices: BattleChoiceBuilder): JSX.Element;
-    public renderTeamList(): JSX.Element;
-    public renderChosenTeam(request: BattleTeamRequest, choices: BattleChoiceBuilder): JSX.Element[];
-    public renderOldChoices(request: BattleRequest, choices: BattleChoiceBuilder): JSX.Element[];
-    public renderPlayerWaitingControls(): JSX.Element;
-    public renderPlayerControls(request: BattleRequest): JSX.Element;
-    public renderAfterBattleControls(): JSX.Element;
+    ): Preact.VNode;
+    public renderTeamPreviewChooser(request: BattleTeamRequest, choices: BattleChoiceBuilder): Preact.VNode;
+    public renderTeamList(): Preact.VNode;
+    public renderChosenTeam(request: BattleTeamRequest, choices: BattleChoiceBuilder): Preact.VNode[];
+    public renderOldChoices(request: BattleRequest, choices: BattleChoiceBuilder): Preact.VNode[];
+    public renderPlayerWaitingControls(): Preact.VNode;
+    public renderPlayerControls(request: BattleRequest): Preact.VNode;
+    public renderAfterBattleControls(): Preact.VNode;
+    public override render(): Preact.VNode;
+  }
+
+  class BattleOptionsPanel extends PSRoomPanel {
+    public static readonly id = 'battleoptions';
+    public static readonly routes = ['battleoptions'];
+    public static readonly location = 'semimodal-popup';
+    public static readonly noURL = true;
+
+    public handleHardcoreMode: (event: Event) => void;
+    public handleIgnoreSpectators: (event: Event | boolean) => void;
+    public handleIgnoreOpponent: (event: Event | boolean) => void;
+    public handleIgnoreNicks: (event: Event | boolean) => void;
+    public handleAllSettings: (event: Event) => void;
+
+    public getBattleRoom(): BattleRoom;
+    public override render(): Preact.VNode;
+  }
+
+  class BattleForfeitPanel extends PSRoomPanel {
+    public static readonly id = 'forfeit';
+    public static readonly routes = ['forfeitbattle'];
+    public static readonly location = 'semimodal-popup';
+    public static readonly noURL = true;
+
+    public override render(): Preact.VNode;
   }
 }
