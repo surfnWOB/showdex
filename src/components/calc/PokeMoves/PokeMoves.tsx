@@ -252,6 +252,7 @@ export const PokeMoves = ({
     <TableGrid
       className={cx(
         styles.container,
+        pokemon?.showMoveOverrides && styles.editor,
         !!colorScheme && styles[colorScheme],
         !!colorTheme && styles[colorTheme],
         glassyTerrain && styles.glassy,
