@@ -4,6 +4,7 @@
  * @since 1.3.0
  */
 
+import { type SyncBattlePayload } from '@showdex/redux/actions';
 import { logger, runtimer } from '@showdex/utils/debug';
 import { BootdexAdapter } from './BootdexAdapter';
 import { BootdexManager } from './BootdexManager';
@@ -44,6 +45,13 @@ export abstract class BootdexBootstrappable {
    * @since 1.3.0
    */
   public static openBattlesRoom: () => void = () => void 0;
+
+  /**
+   * Accepts an Open Team Sheets (OTS) request, if any.
+   *
+   * @since 1.3.0
+   */
+  public static acceptBattleOts: SyncBattlePayload['onAcceptOts'] = () => void 0;
 
   protected endTimer?: ReturnType<typeof runtimer> = null;
 

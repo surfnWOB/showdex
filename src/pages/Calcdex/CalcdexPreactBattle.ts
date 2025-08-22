@@ -6,12 +6,16 @@
 
 import type * as ReactDOM from 'react-dom/client';
 import { NIL as NIL_UUID } from 'uuid';
+import { calcdexSlice } from '@showdex/redux/store';
 import { detectAuthPlayerKeyFromBattle } from '@showdex/utils/battle';
 import { calcBattleCalcdexNonce } from '@showdex/utils/calc';
 import { logger } from '@showdex/utils/debug';
+import { detectPreactHost } from '@showdex/utils/host';
 import { BootdexManager as Manager } from '../Bootdex/BootdexManager';
 import { BootdexPreactAdapter as Adapter } from '../Bootdex/BootdexPreactAdapter';
 import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappable';
+import { type CalcdexBootstrappable } from './CalcdexBootstrappable';
+// import { CalcdexPreactBattleSide } from './CalcdexPreactBattleSide';
 
 const l = logger('@showdex/pages/Calcdex/CalcdexPreactBattle');
 
@@ -38,8 +42,9 @@ export class CalcdexPreactBattle extends Battle {
   public calcdexRoomId?: Showdown.RoomID = null;
   /** Populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
   public calcdexReactRoot?: ReactDOM.Root = null;
-  // public calcdexReactRef?: React.RefObject<HTMLDivElement> = null;
   /** Also populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
+  public calcdexReactRef?: React.RefObject<HTMLDivElement> = { current: null };
+  /** Also also populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
   public calcdexReactRenderer?: () => void = null;
   public calcdexAsOverlay = false;
   /** Whether the Calcdex shouldn't initialize (like AT ALL!) for this battle :o */
@@ -56,9 +61,12 @@ export class CalcdexPreactBattle extends Battle {
    */
   public calcdexDestroyed = false;
   public calcdexSheetsAccepted = false;
+
+  /** Populated by the `CalcdexPreactBootstrapper`'s `patchCalcdexIdentifier()` & invoked by the `CalcdexPreactBattleSide`'s `addPokemon()`. */
+  public calcdexClientIdPatcher?: CalcdexBootstrappable['patchClientCalcdexIdentifier'] = null;
   public calcdexWinHandler?: (winner?: string) => void = null;
 
-  public static fromBattle(
+  /* public static fromBattle(
     battle: Showdown.Battle,
     battleRoom?: Showdown.BattleRoom,
   ) {
@@ -76,9 +84,9 @@ export class CalcdexPreactBattle extends Battle {
     // ({ scene: calcdexBattle.scene } = battle);
 
     return calcdexBattle;
-  }
+  } */
 
-  public constructor(options: ConstructorParameters<typeof Battle>[0]) {
+  public constructor(options: ConstructorParameters<typeof Battle>[0] = {}) {
     super(options);
 
     // note: other instance props like calcdexReady 'n such will be directly mutated from the outside
@@ -86,15 +94,27 @@ export class CalcdexPreactBattle extends Battle {
     const { hasSinglePanel } = BootdexPreactBootstrappable;
 
     this.calcdexDisabled = calcdexSettings?.openOnStart === 'never'
-      || (calcdexSettings?.openOnStart === 'playing' && !this.calcdexAuthKey)
-      || (calcdexSettings?.openOnStart === 'spectating' && !!this.calcdexAuthKey);
+      || (calcdexSettings?.openOnStart === 'playing' && !this.calcdexAuthPlayerKey)
+      || (calcdexSettings?.openOnStart === 'spectating' && !!this.calcdexAuthPlayerKey);
 
     if (this.calcdexDisabled) {
       return;
     }
 
+    /* this.p1 = new CalcdexPreactBattleSide(this, 1);
+    this.p2 = new CalcdexPreactBattleSide(this, 2);
+    this.sides = [this.p1, this.p2];
+    this.p2.foe = this.p1;
+    this.p1.foe = this.p2;
+    this.nearSide = this.p1;
+    this.mySide = this.p1;
+    this.farSide = this.p2;
+    this.resetStep(); */
+
     this.calcdexAsOverlay = calcdexSettings?.openAs === 'overlay'
-      || (calcdexSettings?.openAs === 'showdown' && !hasSinglePanel());
+      || (calcdexSettings?.openAs !== 'showdown' && hasSinglePanel());
+
+    // this.runCalcdex();
 
     if (this.calcdexAsOverlay) {
       return;
@@ -110,32 +130,29 @@ export class CalcdexPreactBattle extends Battle {
       : null;
   }
 
-  public get calcdexAuthKey() {
+  public get calcdexAuthPlayerKey() {
     return detectAuthPlayerKeyFromBattle(this);
   }
 
-  /* public get calcdexState() {
+  public get calcdexState() {
     return Adapter.rootState?.calcdex?.[this.id];
   }
 
-  public override run(str: string, preempt?: boolean): void {
-    super.run(str, preempt);
-
-    if (!this.id || this.calcdexInit || this.calcdexState?.battleNonce === this.calcdexNonce) {
-      return;
-    }
-
-    Manager.runCalcdex(this.id);
-  } */
-
-  public override run(str: string, preempt?: boolean): void {
-    super.run(str, preempt);
+  public runCalcdex() {
+    l.debug('runCalcdex()', this.id, '(init)', this.calcdexInit, '(state)', this.calcdexStateInit);
 
     if (
-      !this.id
+      !detectPreactHost(window)
+        || !this.id
         || this.calcdexInit
-        || !this.p1?.pokemon?.length
-        || !this.p2?.pokemon?.length
+        || typeof this.subscription !== 'function'
+        // || !this.p1?.pokemon?.length
+        // || !this.p2?.pokemon?.length
+        // || (
+        //   !this.p1?.pokemon?.length
+        //     && !this.p2?.pokemon?.length
+        //     && !this.myPokemon?.length
+        // )
     ) {
       return;
     }
@@ -143,13 +160,76 @@ export class CalcdexPreactBattle extends Battle {
     Manager.runCalcdex(this.id);
   }
 
-  public override destroy(): void {
-    if (this.calcdexReactRoot) {
-      this.calcdexReactRoot.unmount();
-      this.calcdexReactRoot = null;
-      this.calcdexReactRenderer = null;
+  public override run(str: string, preempt?: boolean): void {
+    super.run(str, preempt);
+
+    if (this.calcdexDisabled || this.calcdexInit) {
+      return;
     }
 
+    this.runCalcdex();
+  }
+
+  /* public override runMajor(
+    args: Showdown.Args,
+    kwArgs: Showdown.KwArgs,
+    preempt?: boolean,
+  ): void {
+    if (!detectPreactHost(window)) {
+      return super.runMajor(args, kwArgs, preempt);
+    }
+
+    const hadP3 = !!this.p3?.sideid;
+    const hadP4 = !!this.p4?.sideid;
+
+    super.runMajor(args, kwArgs, preempt);
+
+    if (!hadP3 && !!this.p3?.sideid) {
+      this.p3 = new CalcdexPreactBattleSide(this, 3);
+    }
+
+    if (!hadP4 && !!this.p4?.sideid) {
+      this.p4 = new CalcdexPreactBattleSide(this, 4);
+    }
+
+    // this.runCalcdex();
+  } */
+
+  public destroyCalcdexDom() {
+    if (!detectPreactHost(window) || typeof this.calcdexReactRoot?.unmount !== 'function') {
+      return;
+    }
+
+    this.calcdexReactRoot.unmount();
+    this.calcdexReactRoot = null;
+    this.calcdexReactRef = { current: null };
+    this.calcdexReactRenderer = null;
+  }
+
+  public destroyCalcdexState() {
+    if (!detectPreactHost(window) || !this.id || !this.calcdexStateInit) {
+      return;
+    }
+
+    Adapter.store.dispatch(calcdexSlice.actions.destroy(this.id));
+    this.calcdexStateInit = false;
+  }
+
+  public override destroy(): void {
+    if (!detectPreactHost(window) || !this.calcdexDestroyed) {
+      return void super.destroy();
+    }
+
+    l.debug(
+      'destroy()', 'called for the CalcdexPreactBattle of id', this.id,
+      '\n', 'battle', this,
+    );
+
+    this.destroyCalcdexDom();
+    this.destroyCalcdexState();
+    this.calcdexDestroyed = true;
+
+    // this basically calls destroy() on this.sprite (if it exists), then nulls both that & this.side
     super.destroy();
   }
 }

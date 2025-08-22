@@ -5,13 +5,12 @@
  */
 
 import * as ReactDOM from 'react-dom/client';
+import { CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
 import { calcdexSlice } from '@showdex/redux/store';
 import { tRef } from '@showdex/utils/app';
-import { detectAuthPlayerKeyFromBattle, similarPokemon } from '@showdex/utils/battle';
-import { calcBattleCalcdexNonce } from '@showdex/utils/calc';
+import { detectAuthPlayerKeyFromBattle } from '@showdex/utils/battle';
 import { formatId, nonEmptyObject } from '@showdex/utils/core';
 import { logger, wtf } from '@showdex/utils/debug';
-import { detectGenFromFormat } from '@showdex/utils/dex';
 import { detectClassicHost } from '@showdex/utils/host';
 import { BootdexClassicBootstrappable } from '../Bootdex/BootdexClassicBootstrappable';
 import { MixinCalcdexBootstrappable } from './CalcdexBootstrappable';
@@ -168,11 +167,23 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       return void this.endTimer('(already patched)');
     }
 
-    super.patchCalcdexIdentifier();
+    AllPlayerKeys.forEach((playerKey) => {
+      if (!(playerKey in this.battle) || typeof this.battle[playerKey]?.addPokemon !== 'function') {
+        return;
+      }
 
-    if (!this.endTimer) {
-      this.startTimer();
-    }
+      l.debug(
+        'Overriding side.addPokemon() of player', playerKey,
+        '\n', 'battle.id', this.battle.id,
+      );
+
+      const side = this.battle[playerKey];
+      const addPokemon = side.addPokemon.bind(side) as Showdown.Side['addPokemon'];
+
+      side.addPokemon = (...argv) => this.patchClientCalcdexIdentifier(playerKey, addPokemon, argv);
+    });
+
+    this.startTimer();
 
     l.debug(
       'Overriding updateSide() of the current battleRoom',
@@ -194,65 +205,7 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
         '\n', 'myPokemon[]', '(prev)', myPokemon, '(now)', this.battle.myPokemon,
       ); */
 
-      let didUpdate = !myPokemon?.length
-        && !!this.battleRoom.battle.myPokemon?.length;
-
-      // with each updated myPokemon[], see if we find a match to restore its calcdexId
-      this.battleRoom.battle.myPokemon.forEach((pokemon) => {
-        if (!pokemon?.ident || pokemon.calcdexId) {
-          return;
-        }
-
-        // note (2023/07/30): leave the `ident` check as is here since viewing a replay wouldn't trigger this function
-        // (there are no myPokemon[] when viewing a replay, even if you were viewing your own battle!)
-        const prevMyPokemon = myPokemon.find((p) => !!p?.ident && (
-          p.ident === pokemon.ident
-            || p.speciesForme === pokemon.speciesForme
-            || p.details === pokemon.details
-            // update (2023/07/27): this check breaks when p.details is 'Mewtwo' & pokemon.speciesForme is 'Mew',
-            // resulting in the Mewtwo's calcdexId being assigned to the Mew o_O
-            // || p.details.includes(pokemon.speciesForme)
-            // update (2023/07/30): `details` can include the gender, if applicable (e.g., 'Reuniclus, M')
-            /* || p.details === [
-              pokemon.speciesForme.replace('-*', ''),
-              pokemon.gender !== 'N' && pokemon.gender,
-            ].filter(Boolean).join(', ') */
-            || similarPokemon(pokemon, p, {
-              format: this.battleRoom.battle.id.split('-').find((part) => detectGenFromFormat(part)),
-              normalizeFormes: 'wildcard',
-              ignoreMega: true,
-            })
-        ));
-
-        if (!prevMyPokemon?.calcdexId) {
-          return;
-        }
-
-        pokemon.calcdexId = prevMyPokemon.calcdexId;
-        didUpdate = true;
-
-        /* l.debug(
-          'Restored previous calcdexId for', pokemon.speciesForme, 'in battle.myPokemon[]',
-          '\n', 'calcdexId', prevMyPokemon.calcdexId,
-          '\n', 'pokemon', '(prev)', prevMyPokemon, '(now)', pokemon,
-        ); */
-      });
-
-      if (didUpdate && this.battleRoom.battle.calcdexInit) {
-        // const prevNonce = battleRoom.battle.nonce;
-
-        this.battleRoom.battle.nonce = calcBattleCalcdexNonce(this.battleRoom.battle, this.battleRoom.request);
-
-        /* l.debug(
-          'Restored previous calcdexId\'s in battle.myPokemon[]',
-          '\n', 'nonce', '(prev)', prevNonce, '(now)', this.battle.nonce,
-          '\n', 'myPokemon[]', '(prev)', myPokemon, '(now)', this.battle.myPokemon,
-        ); */
-
-        // since myPokemon[] could be available now, forcibly fire a battle sync
-        // (should we check if myPokemon[] is actually populated? maybe... but I'll leave it like this for now)
-        this.battleRoom.battle.subscription('callback');
-      }
+      this.patchServerCalcdexIdentifier(myPokemon);
     };
 
     this.endTimer('(classic patch ok)');
@@ -900,6 +853,8 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       return void this.endTimer('(bad react root)', this.battleId);
     }
 
+    this.patchCalcdexIdentifier();
+
     /* l.debug(
       'Rendering Calcdex for', this.battle.id,
       // '\n', 'nonce', '(now)', this.battle.nonce || initNonce,
@@ -919,6 +874,7 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
 
     this.prevBattleSubscription = this.battle.subscription?.bind?.(this.battle) as Showdown.Battle['subscription'];
     this.battle.subscribe(this.battleSubscription);
+    this.battle.calcdexInit = true;
 
     // force a callback after rendering
     // update (2023/02/04): bad idea, sometimes leads to a half-initialized battle object where there's
@@ -938,7 +894,6 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       this.battle.subscription('atqueueend');
     }
 
-    this.battle.calcdexInit = true;
     this.endTimer('(bootstrap complete)', this.battleId);
   }
 }

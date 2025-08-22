@@ -16,6 +16,7 @@ import { detectPreactHost } from '@showdex/utils/host';
 // import { BootdexManager as Manager } from '../Bootdex/BootdexManager';
 import { BootdexPreactAdapter as Adapter } from '../Bootdex/BootdexPreactAdapter';
 import { preact } from '../Bootdex/BootdexPreactBootstrappable';
+import { type CalcdexBootstrappable } from './CalcdexBootstrappable';
 import { CalcdexPreactBattle } from './CalcdexPreactBattle';
 import styles from './Calcdex.module.scss';
 
@@ -40,6 +41,9 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
   public static readonly scope = l.scope;
 
   public declare battle: CalcdexPreactBattle;
+
+  /** Populated by the `CalcdexPreactBootstrapper`'s `patchCalcdexIdentifier()` & invoked by the `CalcdexPreactBattlePanel`. */
+  public calcdexServerIdPatcher?: CalcdexBootstrappable['patchServerCalcdexIdentifier'] = null;
 
   public constructor(props: ConstructorParameters<typeof PSBattleRoom>[0]) {
     super(props);
@@ -92,51 +96,38 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
     return Adapter?.rootState?.showdex?.settings?.calcdex;
   }
 
-  public override receiveLine(args: Showdown.Args): void {
-    switch (args[0]) {
-      // e.g., '|win|showdex_testee' -> args = ['win', 'showdex_testee']
-      case 'win': {
-        if (!args[1]) {
-          break;
-        }
+  // update (2025/08/22): actually not reliable when the user leaves the room since it'll be received by PS.receive()
+  // instead, while the CalcdexPreactBattleRoom (i.e., this) is already destroy()'d, so this wouldn't fire :o
+  /* public override receiveLine(args: Showdown.Args): void {
+    l.debug('CalcdexPreactBattleRoom:receiveLine()', args);
 
-        this.battle.calcdexWinHandler?.(args[1]);
-
-        break;
-      }
-
-      default: {
-        break;
-      }
+    // e.g., '|win|showdex_testee' -> args = ['win', 'showdex_testee']
+    if (args[0] === 'win' && typeof this.battle?.calcdexWinHandler === 'function') {
+      this.battle.calcdexWinHandler(args[1]);
     }
 
+    // when args[0] is 'win' / 'tie', this will call this.receiveRequest(null),
+    // which will nullify this.request & this.choices
     super.receiveLine(args);
-
-    /* if (
-      !this.battle?.id
-        || this.battle.calcdexInit
-        || !this.battle.p1?.pokemon?.length
-        || !this.battle.p2?.pokemon?.length
-    ) {
-      return;
-    }
-
-    Manager.runCalcdex(this.battle.id); */
-  }
+  } */
 
   public override destroy(): void {
     if (!detectPreactHost(window)) {
       return void super.destroy();
     }
 
-    if (this.battle.calcdexStateInit) {
-      l.debug('destroy()', 'calcdexSettings.closeOn', this.calcdexSettings?.closeOn, 'this.battle.calcdexRoomId', this.battle.calcdexRoomId);
-      if (this.calcdexSettings?.closeOn === 'battle-tab' && this.battle.calcdexRoomId) {
-        window.PS.leave(this.battle.calcdexRoomId);
-      }
+    l.debug(
+      'destroy()', 'called for the CalcdexPreactBattleRoom of battle.id', this.battle.id,
+      '\n', 'room', this,
+      '\n', 'battle', this.battle,
+      '\n', 'state', this.calcdexState,
+      '\n', 'settings', this.calcdexSettings,
+    );
 
-      this.battle.calcdexStateInit = false;
-      this.battle.calcdexDestroyed = true;
+    if (this.battle.calcdexStateInit) {
+      if (this.calcdexSettings?.closeOn === 'battle-tab' && window.PS.rooms[this.battle.calcdexRoomId]?.id) {
+        window.PS.leave(this.battle.calcdexRoomId); // -> CalcdexPreactRoom:destroy()
+      }
 
       if (this.battle.calcdexAsOverlay || this.calcdexSettings?.destroyOnClose) {
         Adapter.store.dispatch(calcdexSlice.actions.destroy(this.battle.id));
@@ -166,10 +157,10 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
     return room?.battle?.calcdexAsOverlay || renderMode === 'overlay';
   }
 
-  public override componentDidMount() {
+  /* public override componentDidMount() {
     const { room } = this.props;
 
-    if (!detectPreactHost(window) || !room?.id) {
+    /* if (!detectPreactHost(window)) {
       return void super.componentDidMount();
     }
 
@@ -178,12 +169,13 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
       $frame: $(this.base).find('.battle'),
       $logFrame: $(this.base).find('.battle-log'),
       log: room.backlog?.map((logs) => `|${logs?.join('|') || ''}`),
-    });
+    }); *\/
 
     // room.battle.calcdexReactRef = preact.createRef<HTMLDivElement>();
 
     super.componentDidMount(); // will use any existing room.battle, if defined
-  }
+    room.battle?.runCalcdex?.();
+  } */
 
   public override componentWillUnmount() {
     const { room } = this.props;
@@ -194,6 +186,52 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
     }
 
     super.componentWillUnmount();
+  }
+
+  public override receiveRequest(request: Showdown.BattleRequest): void {
+    const { room } = this.props;
+
+    /* if (
+      !detectPreactHost(window)
+        || !nonEmptyObject(request?.side)
+        || typeof room?.calcdexServerIdPatcher !== 'function'
+    ) {
+      return void super.receiveRequest(request);
+    } */
+
+    // note: this internally sets battle.myPokemon[] to request.side.pokemon[], but similar to the CalcdexClassicBootstrapper,
+    // we'll want the version of myPokemon[] w/ a lil less valhalla (good song & VSTs tho)
+    const myPokemon = [...(request?.side?.pokemon || [])];
+
+    super.receiveRequest(request);
+
+    if (room.battle?.id && myPokemon?.length && !room.battle.myPokemon?.length) {
+      room.battle.myPokemon = myPokemon;
+    }
+
+    // note: this case is entirely possible in 'panel' renderMode's if the user refreshed the page mid-battle &
+    // the CalcdexPreactBattleRoom loads before the CalcdexPanelRoom, typically when the first command received
+    // from the server is to '/join' the CalcdexPreactBattleRoom; however, it's also entirely possible Showdex
+    // couldn't swap out Showdown's Battle classes in time (e.g., Battle, BattleRequest, Side), so at that point oof
+    if (!room.battle?.calcdexInit) {
+      room.battle.runCalcdex?.();
+    }
+
+    room.calcdexServerIdPatcher?.(myPokemon);
+
+    l.debug(
+      'CalcdexPreactBattlePanel:receiveRequest()', 'for', room.battle?.id,
+      '\n', 'myPokemon[]', myPokemon,
+      '\n', 'request', '(post-super)', request,
+      '\n', 'room.request', room.request,
+      '\n', 'room.battle.myPokemon[]', room.battle?.myPokemon,
+      '\n', 'room.battle.calcdexInit?', room.battle?.calcdexInit, 'calcdexStateInit?', room.battle?.calcdexStateInit,
+      // '\n', 'room.battle', room.battle,
+      '\n', 'room', room.id, room,
+    );
+
+    // force a re-syncCalcdex() (via the injected room.battle.subscription()) w/ the new `request` data
+    room.battle.subscription('callback');
   }
 
   protected lockMobileZoom(forceLock?: boolean): void {

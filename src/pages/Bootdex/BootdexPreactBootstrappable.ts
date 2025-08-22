@@ -25,7 +25,13 @@ export abstract class BootdexPreactBootstrappable extends BootdexBootstrappable 
       return;
     }
 
-    window.PS.join(`user-${formatId(username)}` as Showdown.RoomID);
+    const userId = formatId(username);
+
+    if (!userId) {
+      return;
+    }
+
+    window.PS.join(`user-${userId}` as Showdown.RoomID);
   };
 
   public static override openBattlesRoom: typeof BootdexBootstrappable.openBattlesRoom = () => {
@@ -34,6 +40,14 @@ export abstract class BootdexPreactBootstrappable extends BootdexBootstrappable 
     }
 
     window.PS.join('battles' as Showdown.RoomID);
+  };
+
+  public static override acceptBattleOts: typeof BootdexBootstrappable.acceptBattleOts = (battleId) => {
+    if (!detectPreactHost(window) || !battleId) {
+      return;
+    }
+
+    window.PS.send('/acceptopenteamsheets', battleId as Showdown.RoomID);
   };
 
   public static detectBattleRoom(
@@ -48,5 +62,4 @@ export abstract class BootdexPreactBootstrappable extends BootdexBootstrappable 
 export const PSRoom = detectPreactHost(window) ? window.PSRoom : null;
 export const PSRoomPanel = detectPreactHost(window) ? window.PSRoomPanel : null;
 export const PSPanelWrapper = detectPreactHost(window) ? window.PSPanelWrapper : null;
-// export const Icon = 'i' as React.ElementType<JSX.IntrinsicElements['i'] & { class?: string; }>;
 export const preact = detectPreactHost(window) ? window.preact : null;

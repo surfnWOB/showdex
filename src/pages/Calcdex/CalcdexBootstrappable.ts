@@ -27,13 +27,25 @@ import { calcBattleCalcdexNonce } from '@showdex/utils/calc';
 import { clamp, formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { detectGenFromFormat } from '@showdex/utils/dex';
+import { detectClassicHost } from '@showdex/utils/host';
 import { BootdexBootstrappable } from '../Bootdex/BootdexBootstrappable';
 
 export type CalcdexBootstrappableLike =
   & Omit<typeof CalcdexBootstrappable, 'constructor'>
   & (new (battleId: string) => CalcdexBootstrappable);
 
+type BattleRecordResult = 'win' | 'loss';
+
 const l = logger('@showdex/pages/Calcdex/CalcdexBootstrappable');
+
+const winStepRegex = () => /^\|?\s*\|win\|/i;
+const battleRecordReducerNameFor = (
+  result?: BattleRecordResult | boolean,
+) => (
+  result === true || result === 'win'
+    ? 'recordWin'
+    : 'recordLoss'
+);
 
 /* eslint-disable @typescript-eslint/indent */
 
@@ -77,9 +89,9 @@ export const MixinCalcdexBootstrappable = <
       state,
     ) => {
       l.debug(
-        'battle.subscribe() for', this.battle?.id || this.battleId,
-        '\n', 'state', state,
+        'battle.subscribe()', state, 'for', this.battle?.id || this.battleId,
         '\n', 'battle', this.battle,
+        '\n', 'request', this.battleRequest,
       );
 
       // call the original subscription() first, if any, so we don't break anything we don't mean to!
@@ -195,7 +207,7 @@ export const MixinCalcdexBootstrappable = <
       this.startTimer();
 
       if (!this.battle?.id) {
-        return void this.endTimer('(bad battle.id)');
+        return void this.endTimer('(bad battle)', this.battle);
       }
 
       // don't render if we've already destroyed the calcdex state
@@ -210,7 +222,7 @@ export const MixinCalcdexBootstrappable = <
       }
 
       // ignore any freshly created battle objects with missing players
-      if (!this.battle.p1?.id || AllPlayerKeys.slice(1).every((k) => !this.battle[k]?.id)) {
+      if (AllPlayerKeys.every((k) => !this.battle[k]?.id)) {
         l.debug(
           'Not all players exist yet in the battle!',
           '\n', 'players', AllPlayerKeys.map((k) => this.battle[k]?.id),
@@ -222,9 +234,10 @@ export const MixinCalcdexBootstrappable = <
       }
 
       const { Adapter } = CalcdexBootstrappableMixin;
-      const authUserId = (!!Adapter?.authUsername && formatId(Adapter.authUsername)) || null;
 
-      if (!this.battle.calcdexStateInit) {
+      if (detectClassicHost(window) && !this.battle.calcdexStateInit) {
+        const authUserId = (!!Adapter?.authUsername && formatId(Adapter.authUsername)) || null;
+
         this.initCalcdexState();
 
         // don't continue processing until the next subscription() callback
@@ -239,6 +252,10 @@ export const MixinCalcdexBootstrappable = <
         if (!this.battle.ended && AllPlayerKeys.some((k) => formatId(this.battle[k]?.name) === authUserId)) {
           return void this.endTimer('(auth player delay)');
         }
+      }
+
+      if (!this.battle.calcdexStateInit) {
+        return void this.endTimer('(state uninit)', this.battle);
       }
 
       // make sure the battle was active on the previous sync, but now has ended
@@ -311,128 +328,246 @@ export const MixinCalcdexBootstrappable = <
       void Adapter.store.dispatch(syncBattle({
         battle: this.battle,
         request: this.battleRequest,
+        onAcceptOts: (id) => void CalcdexBootstrappableMixin.acceptBattleOts(id),
       }));
 
       this.endTimer('(sync ok)');
     }
 
-    protected patchCalcdexIdentifier(): void {
+    // patches in the calcdexId to client Showdown.Pokemon
+    protected patchClientCalcdexIdentifier(
+      playerKey: CalcdexPlayerKey,
+      addPokemon: Showdown.Side['addPokemon'],
+      addPokemonArgv: Parameters<Showdown.Side['addPokemon']>,
+    ): ReturnType<Showdown.Side['addPokemon']> {
+      this.startTimer();
+
+      if (!playerKey || typeof addPokemon !== 'function' || !addPokemonArgv?.length) {
+        this.endTimer('(bad patch args)');
+
+        return null;
+      }
+
+      const execAddPokemon = () => addPokemon(...addPokemonArgv);
+
+      if (!this.battle?.id || !this.battle.calcdexStateInit) {
+        this.endTimer('(bad battle)', this.battle?.id, this.battle);
+
+        return execAddPokemon();
+      }
+
+      /* if (this.battle.calcdexIdPatched) {
+        this.endTimer('(already patched)');
+
+        return execAddPokemon();
+      } */
+
+      const side = this.battle[playerKey];
+
+      if (!side?.sideid) {
+        this.endTimer('(bad side)', side);
+
+        return execAddPokemon();
+      }
+
+      // we'll collect potential candidates to assemble the final search list below
+      const pokemonSearchCandidates: (Showdown.Pokemon | CalcdexPokemon)[] = [];
+
+      // make sure this comes first before `pokemonState` in case `replaceSlot` is specified
+      if (side.pokemon?.length) {
+        pokemonSearchCandidates.push(...side.pokemon);
+      }
+
+      // update (2024/01/03): someone encountered a strange case in Gen 9 VGC 2024 Reg F when after using Parting Shot,
+      // accessing battleState.format in the similarPokemon() call below would result in a TypeError, causing their
+      // Showdown to break (spitting the runMajor() stack trace into the BattleRoom chat)... which means battleState was
+      // undefined for some reason o_O (apparently this doesn't happen often tho)
+      if (!this.battleState?.battleId) {
+        // we'll just let the client deal with whatever this is
+        return addPokemon(...addPokemonArgv);
+      }
+
+      const { pokemon: pokemonFromState } = this.battleState[playerKey] || {};
+
+      if (pokemonFromState?.length) {
+        pokemonSearchCandidates.push(...pokemonFromState);
+      }
+
+      // don't filter this in case `replaceSlot` is specified
+      const pokemonSearchList = pokemonSearchCandidates.map((p) => ({
+        calcdexId: p.calcdexId,
+        ident: p.ident,
+        // name: p.name,
+        speciesForme: p.speciesForme,
+        gender: p.gender,
+        details: p.details,
+        searchid: p.searchid,
+      }));
+
+      const [
+        , // unused; i.e., name
+        ident,
+        details,
+        replaceSlot = -1,
+      ] = addPokemonArgv;
+
+      // just js things uwu
+      const prevPokemon = (replaceSlot > -1 && pokemonSearchList[replaceSlot])
+        || pokemonSearchList.filter((p) => !!p.calcdexId).find((p) => (
+          // e.g., ident = 'p1: CalcdexDemolisher' (nicknamed) or 'p1: Ditto' (unnamed default)
+          // update (2023/07/30): while `ident` is mostly available, when viewing a replay (i.e., an old saved battle), it's not!
+          (!ident || (
+            (!!p?.ident && p.ident === ident)
+              // e.g., searchid = 'p1: CalcdexDemolisher|Ditto'
+              // nickname case: pass; default case: fail ('p1: CalcdexDemolisher' !== 'p1: Ditto')
+              // note: not doing startsWith() since 'p1: Mewtwo|Mewtwo' will pass when given ident 'p1: Mew'
+              || (!!p?.searchid?.includes('|') && p.searchid.split('|')[0] === ident)
+          ))
+            && similarPokemon({ details }, p, {
+              format: this.battleState.format,
+              normalizeFormes: 'wildcard',
+              ignoreMega: true,
+            })
+        ));
+
+      /* l.debug(
+        'side.addPokemon()', 'for', ident || name || details?.split(',')?.[0], 'for player', side.sideid,
+        '\n', 'ident', ident,
+        '\n', 'details', details,
+        '\n', 'replaceSlot', replaceSlot,
+        '\n', 'prevPokemon[]', prevPokemon,
+        '\n', 'pokemonSearchList[]', pokemonSearchList,
+        // '\n', 'side', side,
+        // '\n', 'battle', this.battle,
+      ); */
+
+      const newPokemon = execAddPokemon();
+
+      if (!newPokemon?.speciesForme) {
+        this.endTimer('(bad newPokemon)', newPokemon);
+
+        return newPokemon;
+      }
+
+      if (!prevPokemon?.calcdexId) {
+        this.endTimer('(bad prevPokemon)', prevPokemon);
+
+        return newPokemon;
+      }
+
+      newPokemon.calcdexId = prevPokemon.calcdexId;
+
+      l.debug(
+        'Restored calcdexId', newPokemon.calcdexId,
+        'from prevPokemon', prevPokemon.ident || prevPokemon.speciesForme,
+        'to newPokemon', newPokemon.ident || newPokemon.speciesForme,
+        'for player', side.sideid,
+        '\n', 'prevPokemon[]', prevPokemon,
+        '\n', 'newPokemon[]', newPokemon,
+      );
+
+      return newPokemon;
+    }
+
+    // patches in the calcdexId to Showdown.ServerPokemon (i.e., battle.myPokemon[])
+    // note: the myPokemon[] arg should be from the freshest source, e.g., (request as Showdown.BattleRequest).side.pokemon[],
+    // & preferably not from the battle state, e.g., battle.myPokemon[], since it would've already been mutated by that point
+    protected patchServerCalcdexIdentifier(myPokemon: Showdown.ServerPokemon[]): void {
       this.startTimer();
 
       if (!this.battle?.id) {
-        return void this.endTimer('(bad battle.id)');
+        return void this.endTimer('(bad battle)', this.battle?.id, this.battle);
       }
 
-      if (this.battle.calcdexIdPatched) {
+      /* if (this.battle.calcdexIdPatched) {
         return void this.endTimer('(already patched)');
+      } */
+
+      if (!myPokemon?.length) {
+        return void this.endTimer('(no server mon)', myPokemon, this.battle);
       }
 
-      const { Adapter } = CalcdexBootstrappableMixin;
+      const format = this.battle.id.split('-').find((part) => detectGenFromFormat(part));
 
-      // override each player's addPokemon() method to assign a calcdexId lol
-      AllPlayerKeys.forEach((playerKey) => {
-        if (!(playerKey in this.battle) || typeof this.battle[playerKey]?.addPokemon !== 'function') {
+      if (!format) {
+        return void this.endTimer('(bad format)', format, this.battle);
+      }
+
+      l.debug(
+        'patchServerCalcdexIdentifier()', 'myPokemon[]', myPokemon,
+        '\n', 'battle', this.battle,
+        '\n', 'battle.myPokemon[]', this.battle.myPokemon,
+      );
+
+      if (!Array.isArray(this.battle.myPokemon)) {
+        return void this.endTimer('(bad server mon)', this.battle.myPokemon, this.battle);
+      }
+
+      let didUpdate = !myPokemon?.length && !!this.battle.myPokemon?.length;
+
+      // with each updated myPokemon[], see if we find a match to restore its calcdexId
+      this.battle.myPokemon.forEach((pokemon) => {
+        if (!pokemon?.ident || pokemon.calcdexId) {
           return;
         }
 
-        l.debug(
-          'Overriding side.addPokemon() of player', playerKey,
-          '\n', 'battle.id', this.battle.id,
-        );
+        // note (2023/07/30): leave the `ident` check as is here since viewing a replay wouldn't trigger this function
+        // (there are no myPokemon[] when viewing a replay, even if you were viewing your own battle!)
+        const prevMyPokemon = myPokemon.find((p) => !!p?.ident && (
+          p.ident === pokemon.ident
+            || p.speciesForme === pokemon.speciesForme
+            || p.details === pokemon.details
+            // update (2023/07/27): this check breaks when p.details is 'Mewtwo' & pokemon.speciesForme is 'Mew',
+            // resulting in the Mewtwo's calcdexId being assigned to the Mew o_O
+            // || p.details.includes(pokemon.speciesForme)
+            // update (2023/07/30): `details` can include the gender, if applicable (e.g., 'Reuniclus, M')
+            /* || p.details === [
+              pokemon.speciesForme.replace('-*', ''),
+              pokemon.gender !== 'N' && pokemon.gender,
+            ].filter(Boolean).join(', ') */
+            || similarPokemon(pokemon, p, {
+              format,
+              normalizeFormes: 'wildcard',
+              ignoreMega: true,
+            })
+        ));
 
-        const side = this.battle[playerKey];
-        const addPokemon = side.addPokemon.bind(side) as Showdown.Side['addPokemon'];
+        if (!prevMyPokemon?.calcdexId) {
+          return;
+        }
 
-        side.addPokemon = (name, ident, details, replaceSlot) => {
-          // we'll collect potential candidates to assemble the final search list below
-          const pokemonSearchCandidates: (Showdown.Pokemon | CalcdexPokemon)[] = [];
+        pokemon.calcdexId = prevMyPokemon.calcdexId;
+        didUpdate = true;
 
-          // make sure this comes first before `pokemonState` in case `replaceSlot` is specified
-          if (side.pokemon?.length) {
-            pokemonSearchCandidates.push(...side.pokemon);
-          }
-
-          // retrieve any previously tagged Pokemon in the state if we don't have any candidates atm
-          const battleState = Adapter.rootState?.calcdex?.[this.battle.id];
-
-          // update (2024/01/03): someone encountered a strange case in Gen 9 VGC 2024 Reg F when after using Parting Shot,
-          // accessing battleState.format in the similarPokemon() call below would result in a TypeError, causing their
-          // Showdown to break (spitting the runMajor() stack trace into the BattleRoom chat)... which means battleState was
-          // undefined for some reason o_O (apparently this doesn't happen often tho)
-          if (!battleState?.battleId) {
-            // we'll just let the client deal with whatever this is
-            return addPokemon(name, ident, details, replaceSlot);
-          }
-
-          const pokemonState = battleState?.[playerKey]?.pokemon || [];
-
-          if (pokemonState.length) {
-            pokemonSearchCandidates.push(...pokemonState);
-          }
-
-          // don't filter this in case `replaceSlot` is specified
-          const pokemonSearchList = pokemonSearchCandidates.map((p) => ({
-            calcdexId: p.calcdexId,
-            ident: p.ident,
-            // name: p.name,
-            speciesForme: p.speciesForme,
-            gender: p.gender,
-            details: p.details,
-            searchid: p.searchid,
-          }));
-
-          // just js things uwu
-          const prevPokemon = (replaceSlot > -1 && pokemonSearchList[replaceSlot])
-            || pokemonSearchList.filter((p) => !!p.calcdexId).find((p) => (
-              // e.g., ident = 'p1: CalcdexDemolisher' (nicknamed) or 'p1: Ditto' (unnamed default)
-              // update (2023/07/30): while `ident` is mostly available, when viewing a replay (i.e., an old saved battle), it's not!
-              (!ident || (
-                (!!p?.ident && p.ident === ident)
-                  // e.g., searchid = 'p1: CalcdexDemolisher|Ditto'
-                  // nickname case: pass; default case: fail ('p1: CalcdexDemolisher' !== 'p1: Ditto')
-                  // note: not doing startsWith() since 'p1: Mewtwo|Mewtwo' will pass when given ident 'p1: Mew'
-                  || (!!p?.searchid?.includes('|') && p.searchid.split('|')[0] === ident)
-              ))
-                && similarPokemon({ details }, p, {
-                  format: battleState.format,
-                  normalizeFormes: 'wildcard',
-                  ignoreMega: true,
-                })
-            ));
-
-          /* l.debug(
-            'side.addPokemon()', 'for', ident || name || details?.split(',')?.[0], 'for player', side.sideid,
-            '\n', 'ident', ident,
-            '\n', 'details', details,
-            '\n', 'replaceSlot', replaceSlot,
-            '\n', 'prevPokemon[]', prevPokemon,
-            '\n', 'pokemonSearchList[]', pokemonSearchList,
-            // '\n', 'side', side,
-            // '\n', 'battle', this.battle,
-          ); */
-
-          const newPokemon = addPokemon(name, ident, details, replaceSlot);
-
-          if (prevPokemon?.calcdexId) {
-            newPokemon.calcdexId = prevPokemon.calcdexId;
-
-            l.debug(
-              'Restored calcdexId', newPokemon.calcdexId,
-              'from prevPokemon', prevPokemon.ident || prevPokemon.speciesForme,
-              'to newPokemon', newPokemon.ident || newPokemon.speciesForme,
-              'for player', side.sideid,
-              '\n', 'prevPokemon[]', prevPokemon,
-              '\n', 'newPokemon[]', newPokemon,
-            );
-          }
-
-          return newPokemon;
-        };
+        /* l.debug(
+          'Restored previous calcdexId for', pokemon.speciesForme, 'in battle.myPokemon[]',
+          '\n', 'calcdexId', prevMyPokemon.calcdexId,
+          '\n', 'pokemon', '(prev)', prevMyPokemon, '(now)', pokemon,
+        ); */
       });
 
-      this.battle.calcdexIdPatched = true;
-      this.endTimer('(patch ok)'); // not u mina
+      if (!didUpdate || !this.battle.calcdexInit) {
+        return void this.endTimer('(no updates)');
+      }
+
+      const { nonce: prevNonce } = this.battle;
+
+      this.battle.nonce = calcBattleCalcdexNonce(this.battle, this.battleRequest);
+
+      l.debug(
+        'Restored previous calcdexId\'s in battle.myPokemon[]',
+        '\n', 'nonce', '(prev)', prevNonce, '(now)', this.battle.nonce,
+        '\n', 'myPokemon[]', '(prev)', myPokemon, '(now)', this.battle.myPokemon,
+      );
+
+      // since myPokemon[] could be available now, forcibly fire a battle sync
+      // (should we check if myPokemon[] is actually populated? maybe... but I'll leave it like this for now)
+      this.battle.subscription('callback');
     }
+
+    // needs to be uniquely implemented in each __SHOWDEX_HOST bootstrapper
+    // (should make use of both the patchClientCalcdexIdentifier() & patchServerCalcdexIdentifier() methods)
+    protected abstract patchCalcdexIdentifier(): void;
 
     /**
      * Determines if the auth user has won/loss, then increments the win/loss counter.
@@ -442,35 +577,40 @@ export const MixinCalcdexBootstrappable = <
      *
      * @since 1.0.6
      */
-    protected updateBattleRecord(forceResult?: 'win' | 'loss'): void {
+    protected updateBattleRecord(forceResult?: BattleRecordResult): void {
       const { authUsername, store } = CalcdexBootstrappableMixin.Adapter;
 
-      if (
-        !authUsername
-          || (!this.battle?.id && !forceResult)
-          || typeof store?.dispatch !== 'function'
-      ) {
+      if (typeof store?.dispatch !== 'function') {
         return;
       }
 
-      const playerNames = [
-        this.battle?.p1?.name,
-        this.battle?.p2?.name,
-        this.battle?.p3?.name,
-        this.battle?.p4?.name,
-      ].filter(Boolean);
+      if (forceResult && ['win', 'loss'].includes(forceResult)) {
+        return void store.dispatch(hellodexSlice.actions[battleRecordReducerNameFor(forceResult)]());
+      }
 
-      const winStep = this.battle?.stepQueue?.find((s) => s?.startsWith('|win|'));
-      const winUser = winStep?.replace?.('|win|', ''); // e.g., '|win|sumfuk' -> 'sumfuk'
-
-      if ((playerNames.length && !playerNames.includes(authUsername)) || (!winUser && !forceResult)) {
+      if (!authUsername || !this.battle?.id) {
         return;
       }
 
-      const didWin = forceResult === 'win' || (forceResult !== 'loss' && formatId(winUser) === formatId(authUsername));
-      const reducerName = didWin ? 'recordWin' : 'recordLoss';
+      const authUsernameId = formatId(authUsername);
+      const playerNames = AllPlayerKeys.map((k) => this.battle[k]?.name).filter(Boolean);
+      const playerNameIds = playerNames.map(formatId).filter(Boolean);
 
-      store.dispatch(hellodexSlice.actions[reducerName]());
+      if (playerNameIds.length && !playerNameIds.includes(authUsernameId)) {
+        return;
+      }
+
+      // note: winStep might be '|win|showdex_testee' or '|\n|win|showdex_testee'
+      const winStep = this.battle?.stepQueue?.find((s) => winStepRegex().test(s));
+      const winnerName = winStep?.replace?.(winStepRegex(), ''); // e.g., '|win|sumfuk' -> 'sumfuk'
+
+      if (!winnerName) {
+        return;
+      }
+
+      const didWin = formatId(winnerName) === authUsernameId;
+
+      store.dispatch(hellodexSlice.actions[battleRecordReducerNameFor(didWin)]());
     }
 
     /**

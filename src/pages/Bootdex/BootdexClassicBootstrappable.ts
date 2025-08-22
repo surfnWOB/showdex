@@ -87,6 +87,14 @@ export abstract class BootdexClassicBootstrappable extends BootdexBootstrappable
     window.app.joinRoom('battles', 'battles');
   };
 
+  public static override acceptBattleOts: typeof BootdexBootstrappable.acceptBattleOts = (battleId) => {
+    if (!detectClassicHost(window) || !battleId) {
+      return;
+    }
+
+    window.app.send('/acceptopenteamsheets', battleId);
+  };
+
   /**
    * Abstraction that creates an `ClientHtmlRoom` in the `'classic'` Showdown client.
    *

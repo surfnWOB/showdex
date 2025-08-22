@@ -83,10 +83,10 @@ void (async () => {
     BootdexManager.register('honkdex', HonkdexPreactBootstrapper);
 
     await BootdexPreactAdapter.run();
+    new CalcdexPreactBootstrapper().run();
     new TeamdexPreactBootstrapper().run();
     new HellodexPreactBootstrapper().run();
     new HonkdexPreactBootstrapper().run();
-    new CalcdexPreactBootstrapper().run();
 
     return void yay();
   }

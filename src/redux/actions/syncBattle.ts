@@ -54,6 +54,7 @@ import { syncPokemon } from './syncPokemon';
 export interface SyncBattlePayload {
   battle: Showdown.Battle;
   request?: Showdown.BattleRequest;
+  onAcceptOts?: (battleId: string) => void;
 }
 
 export const SyncBattleActionType = 'calcdex:sync' as const;
@@ -72,6 +73,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   const {
     battle,
     request,
+    onAcceptOts,
   } = payload || {};
 
   const endTimer = runtimer(l.scope, l);
@@ -123,7 +125,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         '\n', 'nonce', battleNonce,
         '\n', 'battle', battleId, battle,
         '\n', 'state', battleState,
-        '\n', '(You will only see this message on development.)',
+        '\n', '(you\'ll only see this message in __DEV__)',
       );
     }
 
@@ -177,7 +179,8 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
   const shouldAcceptSheets = sheetsRequested
     && !sheetsAccepted
-    && showdownSettings?.autoAcceptSheets;
+    && showdownSettings?.autoAcceptSheets
+    && typeof onAcceptOts === 'function';
 
   if (shouldAcceptSheets) {
     l.debug(
@@ -187,18 +190,23 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     );
 
     // this is essentially the command that gets run when you click on the SSR'd button
-    app.send('/acceptopenteamsheets', battleId);
+    onAcceptOts(battleId);
     battle.calcdexSheetsAccepted = true;
   }
 
   // find out which side myPokemon[] belongs to
   const detectedPlayerKey = battleState.authPlayerKey || detectPlayerKeyFromBattle(battle);
 
-  if (detectedPlayerKey && !battleState.playerKey) {
+  /* if (detectedPlayerKey && !battleState.playerKey) {
     battleState.playerKey = detectedPlayerKey;
   }
 
   if (!battleState.opponentKey) {
+    battleState.opponentKey = battleState.playerKey === 'p2' ? 'p1' : 'p2';
+  } */
+
+  if (detectedPlayerKey) {
+    battleState.playerKey = detectedPlayerKey;
     battleState.opponentKey = battleState.playerKey === 'p2' ? 'p1' : 'p2';
   }
 
@@ -219,7 +227,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         '\n', 'field', '(state)', battleState.field,
         '\n', 'battle', battleId, battle,
         '\n', 'state', battleState,
-        '\n', '(You will only see this warning on development.)',
+        '\n', '(you\'ll only see this warning in __DEV__)',
       );
     }
 
@@ -292,7 +300,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           'Ignoring updates for player', playerKey, 'since they don\'t exist in the battle state',
           '\n', 'battle', battleId, battle,
           '\n', 'state', battleState,
-          '\n', '(You will only see this warning on development.)',
+          '\n', '(you\'ll only see this warning in __DEV__)',
         );
       }
       */
@@ -325,15 +333,23 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     );
     */
 
-    if (!Array.isArray(player.pokemon) || !player.pokemon.length) {
+    // determine if `myPokemon[]` belongs to the current player
+    const isMyPokemonSide = !!battleState.playerKey && playerKey === battleState.playerKey;
+    const hasMyPokemon = !!myPokemon?.length;
+
+    if (
+      (!isMyPokemonSide || !hasMyPokemon)
+        && (!Array.isArray(player.pokemon) || !player.pokemon.length)
+    ) {
       if (__DEV__) {
         l.warn(
-          'Ignoring Pokemon updates for', playerKey, 'since they don\'t have any pokemon.',
+          'Ignoring Pokemon updates for', playerKey, 'since they don\'t have any Pokemon!',
+          ...(isMyPokemonSide ? ['\n', 'myPokemon[]', myPokemon] : []),
           '\n', 'pokemon[]', '(battle)', player.pokemon,
           '\n', 'pokemon[]', '(state)', playerState.pokemon,
           '\n', 'battle', battleId, battle,
           '\n', 'state', battleState,
-          '\n', '(You will only see this warning on development.)',
+          '\n', '(you\'ll only see this warning in __DEV__)',
         );
       }
 
@@ -378,10 +394,6 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       playerState.maxPokemon = maxPokemon;
     }
 
-    // determine if `myPokemon[]` belongs to the current player
-    const isMyPokemonSide = !!battleState.playerKey && playerKey === battleState.playerKey;
-    const hasMyPokemon = !!myPokemon?.length;
-
     // if we're in an active battle and the logged-in user is also a player,
     // but did not receieve myPokemon from the server yet, don't process any Pokemon!
     // (we need the calcdexId to be assigned to myPokemon first, then mapped to the clientPokemon)
@@ -410,11 +422,15 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
       if (!pokemon.calcdexId) {
         // update (2022/10/18): found a case where the client Pokemon was given before
-        // the ServerPokemon for the myPokemon side rip lol
+        // the ServerPokemon for the myPokemon[] side rip lol
         pokemon.calcdexId = (
           isMyPokemonSide
             && !!pokemon.details // update (2023/07/27): might be guaranteed to exist actually :o
-            && player.pokemon.find((p) => (
+            && [
+              ...(myPokemon || []),
+              ...(player.pokemon || []),
+              ...(playerState.pokemon || []),
+            ].find((p) => (
               !!p?.calcdexId
                 && !!p.details
                 && similarPokemon(pokemon, p, {
@@ -476,11 +492,13 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         return player.pokemon[clientPokemonIndex];
       }
 
-      const serverPokemon = isMyPokemonSide && hasMyPokemon
-        ? myPokemon.find((p) => p.calcdexId === calcdexId)
-        : null;
+      const serverPokemon = (
+        isMyPokemonSide
+          && hasMyPokemon
+          && myPokemon.find((p) => p.calcdexId === calcdexId)
+      ) || null;
 
-      if (!serverPokemon) {
+      if (!serverPokemon?.details) {
         return null;
       }
 
@@ -596,16 +614,14 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         continue;
       }
 
-      const serverPokemon = isMyPokemonSide && hasMyPokemon
-        ? myPokemon.find((p) => p.calcdexId === clientPokemon.calcdexId)
-        : null;
+      const serverPokemon = (
+        isMyPokemonSide
+          && hasMyPokemon
+          && myPokemon.find((p) => p.calcdexId === clientPokemon.calcdexId)
+      ) || null;
 
-      const matchedPokemonIndex = playerState.pokemon
-        .findIndex((p) => p.calcdexId === clientPokemon.calcdexId);
-
-      const matchedPokemon = matchedPokemonIndex > -1
-        ? playerState.pokemon[matchedPokemonIndex]
-        : null;
+      const matchedPokemonIndex = playerState.pokemon.findIndex((p) => p.calcdexId === clientPokemon.calcdexId);
+      const matchedPokemon = playerState.pokemon[matchedPokemonIndex] || null;
 
       // this is our starting point for the current clientPokemon
       const basePokemon = matchedPokemon || sanitizePokemon(
@@ -999,7 +1015,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
               '\n', 'pokemon[]', '(state)', playerState.pokemon,
               '\n', 'battle', battleId, battle,
               '\n', 'state', battleState,
-              '\n', '(You will only see this warning on development.)',
+              '\n', '(you\'ll only see this warning in __DEV__)',
             );
           }
 
@@ -1163,7 +1179,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           '\n', 'order[]', playerState.pokemonOrder,
           '\n', 'battle', battleId, battle,
           '\n', 'state', battleState,
-          '\n', '(You will only see this warning on development.)',
+          '\n', '(you\'ll only see this warning in __DEV__)',
         );
       }
 

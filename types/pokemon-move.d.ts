@@ -77,6 +77,10 @@ declare namespace Showdown {
 
   class Move implements Effect {
     public readonly effectType = 'Move' as const;
+    public readonly id: ID;
+    public readonly name: string;
+    public readonly gen: number;
+    public readonly exists: boolean;
     public readonly basePower: number;
     public readonly accuracy: number | true;
     public readonly pp: number;

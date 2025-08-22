@@ -13,6 +13,7 @@ import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappa
 import { MixinCalcdexBootstrappable } from './CalcdexBootstrappable';
 import { CalcdexPreactBattle } from './CalcdexPreactBattle';
 import { CalcdexPreactBattlePanel, CalcdexPreactBattleRoom } from './CalcdexPreactBattlePanel';
+import { CalcdexPreactBattleSide } from './CalcdexPreactBattleSide';
 import { CalcdexPreactPanel } from './CalcdexPreactPanel';
 import { CalcdexDomRenderer } from './CalcdexRenderer';
 
@@ -39,11 +40,12 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
     return window.PS.rooms?.[this.battleId] as CalcdexPreactBattleRoom;
   }
 
-  protected get battle(): CalcdexPreactBattle {
+  protected get battle() {
     return this.battleRoom?.battle;
   }
 
   protected get battleRequest() {
+    l.debug('battleRequest()', this.battleRoom?.request, '\n', 'battleRoom', this.battleRoom);
     return this.battleRoom?.request;
   }
 
@@ -51,8 +53,29 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
     super.startTimer(CalcdexPreactBootstrapper.scope);
   }
 
+  protected patchCalcdexIdentifier(): void {
+    this.startTimer();
+
+    if (!detectPreactHost(window)) {
+      return void this.endTimer('(bad preact)', window.__SHOWDEX_HOST);
+    }
+
+    if (!this.battle?.id) {
+      return void this.endTimer('(bad battle.id)');
+    }
+
+    if (this.battle.calcdexIdPatched) {
+      return void this.endTimer('(already patched)');
+    }
+
+    this.battleRoom.calcdexServerIdPatcher = (myPokemon) => void this.patchServerCalcdexIdentifier(myPokemon);
+    this.battle.calcdexClientIdPatcher = (pKey, add, argv) => this.patchClientCalcdexIdentifier(pKey, add, argv);
+    this.battle.calcdexIdPatched = true;
+
+    this.endTimer('(preact patch ok)');
+  }
+
   protected renderCalcdex(dom: ReactDOM.Root): void {
-    l.debug('this.battleId', this.battleId, 'dom', dom);
     if (!detectPreactHost(window) || !this.battleId || !dom) {
       return;
     }
@@ -97,16 +120,7 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       return;
     }
 
-    if (window.PS.rooms[this.roomId]?.id) {
-      window.PS.focusRoom(this.roomId);
-    } else {
-      if (this.battle?.id) {
-        this.battle.calcdexStateInit = true;
-        this.battle.calcdexDestroyed = false;
-      }
-
-      window.PS.join(this.roomId);
-    }
+    void (window.PS.rooms[this.roomId]?.id ? window.PS.focusRoom(this.roomId) : window.PS.join(this.roomId));
 
     // refocus the battleRoom that the tabbed Calcdex pertains to, if still joined
     if (shouldFocusBattle) {
@@ -120,12 +134,12 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
     }
 
     if (window.PS.rooms[this.roomId]) {
-      window.PS.leave(this.roomId);
+      window.PS.leave(this.roomId); // -> CalcdexPreactRoom:destroy()
     }
 
     // if (this.battleRoom?.id && !this.battleState?.active) {
     if (this.battleRoom?.id) {
-      window.PS.leave(this.battleRoom.id);
+      window.PS.leave(this.battleRoom.id); // -> CalcdexPreactBattleRoom:destroy() -> CalcdexPreactBattle:destroy()
     }
   }
 
@@ -134,11 +148,18 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       return null;
     }
 
-    const { Adapter } = CalcdexPreactBootstrapper;
+    // const { Adapter } = CalcdexPreactBootstrapper;
+
+    l.debug(
+      'destroy()', 'called for battleId', this.battleId,
+      '\n', 'room', this.battleRoom,
+      '\n', 'battle', this.battle,
+      '\n', 'state', this.battleState,
+    );
 
     this.close();
 
-    if (typeof this.battleRoom?.destroy === 'function') {
+    /* if (typeof this.battleRoom?.destroy === 'function') {
       // basically does the same thing in the `else` block below lol
       return void this.battleRoom.destroy();
     }
@@ -148,7 +169,7 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       this.battle.calcdexDestroyed = true;
     }
 
-    Adapter.store.dispatch(calcdexSlice.actions.destroy(this.battleId));
+    Adapter.store.dispatch(calcdexSlice.actions.destroy(this.battleId)); */
   }
 
   public run(): void {
@@ -178,6 +199,12 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
     }
 
     if (!this.battleId) {
+      l.debug('Hard-swapping the Showdown.Battle for the CalcdexPreactBattle...');
+      window.Battle = CalcdexPreactBattle;
+
+      l.debug('Hard-swapping the Showdown.Side for the CalcdexPreactBattleSide...');
+      window.Side = CalcdexPreactBattleSide;
+
       // this panel is for 'overlay' renderMode's
       l.debug('Swapping the Showdown.BattlePanel for the CalcdexPreactBattlePanel by adding it to the PS.roomTypes...');
       window.PS.addRoomType(CalcdexPreactBattlePanel);
@@ -185,6 +212,13 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       // this panel is for 'panel' renderMode's (lol)
       l.debug('Adding the CalcdexPreactPanel to the PS.roomTypes...');
       window.PS.addRoomType(CalcdexPreactPanel);
+
+      l.debug(
+        'Bootstrapped the Calcdex Preact pre-bootstrap!',
+        '\n', 'Battle', window.Battle,
+        '\n', 'Side', window.Side,
+        '\n', 'PS.roomTypes', window.PS.roomTypes,
+      );
 
       return void this.endTimer('(calcdex enabled)');
     }
@@ -268,6 +302,10 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       return void this.endTimer('(noinit nonexistent)', this.battleId);
     }
 
+    if (!this.battle.calcdexStateInit) {
+      this.initCalcdexState();
+    }
+
     if (!this.battle.stepQueue?.length || !this.battle.stepQueue.some((q) => q?.startsWith('|player|'))) {
       l.debug(
         'Ignoring Calcdex Preact init due to uninitialized players in battle',
@@ -288,8 +326,24 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       return void this.endTimer('(already filthy)', this.battleId);
     }
 
-    if (!this.battle.calcdexStateInit) {
-      this.initCalcdexState();
+    this.patchCalcdexIdentifier();
+
+    if (typeof this.battle.calcdexWinHandler !== 'function') {
+      // hoping that this will fire before the battle is destroy()'d (otherwise we'll have to do that 'classic' jank)
+      this.battle.calcdexWinHandler = (winner) => {
+        // if the calcdexAuthPlayerKey doesn't exist, that means the user isn't a player in this battle (i.e., they're a spectator)
+        if (!this.battle?.calcdexAuthPlayerKey) {
+          return;
+        }
+
+        const { name: authPlayerName } = this.battle[this.battle.calcdexAuthPlayerKey] || {};
+        const winnerId = (!!winner && formatId(winner)) || null;
+        const won = !!winnerId && formatId(authPlayerName) === winnerId;
+
+        // note: not providing the forceResult arg will cause the function to lookup the battle's stepQueue[],
+        // which may or may not have the '|win|...' step we're looking for yet
+        this.updateBattleRecord(won ? 'win' : 'loss');
+      };
     }
 
     // void (this.battle.calcdexAsOverlay ? this.renderCalcdex(this.battle.calcdexReactRoot) : window.PS.join(this.roomId));
@@ -303,23 +357,6 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       window.PS.join(this.roomId);
     }
 
-    if (typeof this.battle.calcdexWinHandler !== 'function') {
-      // hoping that this will fire before the battle is destroy()'d (otherwise we'll have to do that 'classic' jank)
-      this.battle.calcdexWinHandler = (winner) => {
-        // if the calcdexAuthKey doesn't exist, that means the user isn't a player in this battle (i.e., they're a spectator)
-        if (!this.battle.calcdexAuthKey || !formatId(winner)) {
-          return;
-        }
-
-        const { name: authName } = this.battle[this.battle.calcdexAuthKey] || {};
-        const won = formatId(authName) === formatId(winner);
-
-        // note: not providing the forceResult arg will cause the function to lookup the battle's stepQueue[],
-        // which may or may not have the '|win|...' step we're looking for yet
-        this.updateBattleRecord(won ? 'win' : 'loss');
-      };
-    }
-
     l.debug(
       'About to inject some real filth into the CalcdexPreactBattle\'s subscribe()...',
       '\n', 'battleId', this.battleId,
@@ -329,12 +366,12 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
 
     this.prevBattleSubscription = this.battle.subscription?.bind?.(this.battle) as Showdown.Battle['subscription'];
     this.battle.subscribe(this.battleSubscription);
+    this.battle.calcdexInit = true;
 
     if (this.battle.atQueueEnd) {
       this.battle.subscription('atqueueend');
     }
 
-    this.battle.calcdexInit = true;
     this.endTimer('(bootstrap complete)', this.battleId);
   }
 }

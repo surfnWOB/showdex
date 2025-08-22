@@ -3,6 +3,7 @@ export * from './CalcdexBootstrappable';
 export * from './CalcdexClassicBootstrapper';
 export * from './CalcdexPreactBattle';
 export * from './CalcdexPreactBattlePanel';
+export * from './CalcdexPreactBattleSide';
 export * from './CalcdexPreactBootstrapper';
 export * from './CalcdexPreactPanel';
 export * from './CalcdexRenderer';
