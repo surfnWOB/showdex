@@ -1,3 +1,9 @@
+/**
+ * @file `syncBattle.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.3
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   type AbilityName,
@@ -1312,7 +1318,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     if (battleState.gen > 8) {
       // find the name of the Pokemon that Terastallized
       const teraStep = battle.stepQueue.find((q) => q.startsWith('|-terastallize|') && q.includes(`|${playerKey}`));
-      const [, name] = /p\d+[a-z]:\x20(.+)\|/.exec(teraStep) || [];
+      let name = /p\d+[a-z]:\x20(.+)\|/.exec(teraStep)?.[1];
 
       // if we found a name (e.g., 'p2a: Walking Wake' -> name = 'Walking Wake'), then toggle off
       // `terastallized` for any *other* *Terastallized* Pokemon (not the one referenced in `name`)
@@ -1320,6 +1326,15 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       // (also, multiple Terastallized Pokemon could exist when the user manually toggles them on,
       // but probably will forget to turn it off, so that's where this bit comes in)
       if (name) {
+        // update (2025/08/23): can't forget about my boy Zorak :c
+        // e.g., '|-terastallize|p2a: Iron Bundle|Poison' where the Iron Bundle is actually the Zoroark,
+        // but fortunately the Showdown client seems to know, so we'll double-check for that here
+        const teraPokemon = playerState.pokemon.find((p) => p.terastallized && !p.speciesForme.includes(name));
+
+        if (teraPokemon?.speciesForme) {
+          name = teraPokemon.speciesForme;
+        }
+
         // see note in playerState.usedMax for why this still mutates the pokemon `p`, despite using filter()
         playerState.pokemon
           .filter((p) => p.terastallized && !p.name.includes(name) && !p.speciesForme.includes(name))
