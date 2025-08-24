@@ -9,13 +9,14 @@ import { NIL as NIL_UUID } from 'uuid';
 import { calcdexSlice } from '@showdex/redux/store';
 import { detectAuthPlayerKeyFromBattle } from '@showdex/utils/battle';
 import { calcBattleCalcdexNonce } from '@showdex/utils/calc';
-import { logger } from '@showdex/utils/debug';
+import { logger, wtf } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import { BootdexManager as Manager } from '../Bootdex/BootdexManager';
 import { BootdexPreactAdapter as Adapter } from '../Bootdex/BootdexPreactAdapter';
 import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappable';
 import { type CalcdexBootstrappable } from './CalcdexBootstrappable';
 // import { CalcdexPreactBattleSide } from './CalcdexPreactBattleSide';
+import { type CalcdexPreactRoom } from './CalcdexPreactPanel';
 
 const l = logger('@showdex/pages/Calcdex/CalcdexPreactBattle');
 
@@ -38,13 +39,13 @@ const { Battle } = window;
 export class CalcdexPreactBattle extends Battle {
   public static readonly scope = l.scope;
 
-  /** `RoomID` of the `CalcdexPreactPanel`, only used when the `calcdexAsOverlay` is `false` (i.e., `'panel'` mode). */
+  /** `RoomID` of the `CalcdexPreactPanel`, only used when the `calcdexAsOverlay` is `false` (i.e., `'panel'` `renderMode`). */
   public calcdexRoomId?: Showdown.RoomID = null;
-  /** Populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
+  /** Populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` `renderMode`). */
   public calcdexReactRoot?: ReactDOM.Root = null;
-  /** Also populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
+  /** Also populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` `renderMode`). */
   public calcdexReactRef?: React.RefObject<HTMLDivElement> = { current: null };
-  /** Also also populated by the `CalcdexPreactBattlePanel` when the `calcdexAsOverlay` is `true` (i.e., `'overlay'` mode). */
+  /** Populated by the `CalcdexPreactBootstrapper` & invoked by the `CalcdexPreactBattlePanel` for Calcdexes of any `renderMode`. */
   public calcdexReactRenderer?: () => void = null;
   public calcdexAsOverlay = false;
   /** Whether the Calcdex shouldn't initialize (like AT ALL!) for this battle :o */
@@ -61,6 +62,8 @@ export class CalcdexPreactBattle extends Battle {
    */
   public calcdexDestroyed = false;
   public calcdexSheetsAccepted = false;
+  /** Whether this battle was already recorded into the Hellodex battle win/loss record. */
+  public calcdexBattleRecorded = false;
 
   /** Populated by the `CalcdexPreactBootstrapper`'s `patchCalcdexIdentifier()` & invoked by the `CalcdexPreactBattleSide`'s `addPokemon()`. */
   public calcdexClientIdPatcher?: CalcdexBootstrappable['patchClientCalcdexIdentifier'] = null;
@@ -90,12 +93,11 @@ export class CalcdexPreactBattle extends Battle {
     super(options);
 
     // note: other instance props like calcdexReady 'n such will be directly mutated from the outside
-    const { calcdex: calcdexSettings } = Adapter.rootState?.showdex?.settings || {};
     const { hasSinglePanel } = BootdexPreactBootstrappable;
 
-    this.calcdexDisabled = calcdexSettings?.openOnStart === 'never'
-      || (calcdexSettings?.openOnStart === 'playing' && !this.calcdexAuthPlayerKey)
-      || (calcdexSettings?.openOnStart === 'spectating' && !!this.calcdexAuthPlayerKey);
+    this.calcdexDisabled = this.calcdexSettings?.openOnStart === 'never'
+      || (this.calcdexSettings?.openOnStart === 'playing' && !this.calcdexAuthPlayerKey)
+      || (this.calcdexSettings?.openOnStart === 'spectating' && !!this.calcdexAuthPlayerKey);
 
     if (this.calcdexDisabled) {
       return;
@@ -111,8 +113,8 @@ export class CalcdexPreactBattle extends Battle {
     this.farSide = this.p2;
     this.resetStep(); */
 
-    this.calcdexAsOverlay = calcdexSettings?.openAs === 'overlay'
-      || (calcdexSettings?.openAs !== 'showdown' && hasSinglePanel());
+    this.calcdexAsOverlay = this.calcdexSettings?.openAs === 'overlay'
+      || (this.calcdexSettings?.openAs !== 'showdown' && hasSinglePanel());
 
     // this.runCalcdex();
 
@@ -136,6 +138,18 @@ export class CalcdexPreactBattle extends Battle {
 
   public get calcdexState() {
     return Adapter.rootState?.calcdex?.[this.id];
+  }
+
+  public get calcdexSettings() { // eslint-disable-line class-methods-use-this
+    return Adapter.rootState?.showdex?.settings?.calcdex;
+  }
+
+  public get calcdexRoom() {
+    if (!detectPreactHost(window)) {
+      return null;
+    }
+
+    return window.PS.rooms?.[this.calcdexRoomId] as CalcdexPreactRoom;
   }
 
   public runCalcdex() {
@@ -195,8 +209,24 @@ export class CalcdexPreactBattle extends Battle {
     // this.runCalcdex();
   } */
 
+  /**
+   * Unmounts & clears any references to DOM elements associated w/ rendering this battle's Calcdex.
+   *
+   * @since 1.3.0
+   */
   public destroyCalcdexDom() {
-    if (!detectPreactHost(window) || typeof this.calcdexReactRoot?.unmount !== 'function') {
+    if (!detectPreactHost(window)) {
+      return;
+    }
+
+    l.debug(
+      'destroyCalcdexDom()', 'for the CalcdexPreactBattle', this.id,
+      '\n', 'calcdexReactRoot', this.calcdexReactRoot,
+      '\n', 'calcdexReactRef', this.calcdexReactRef,
+      '\n', 'calcdexReactRenderer', '(typeof)', wtf(this.calcdexReactRenderer),
+    );
+
+    if (typeof this.calcdexReactRoot?.unmount !== 'function') {
       return;
     }
 
@@ -206,8 +236,33 @@ export class CalcdexPreactBattle extends Battle {
     this.calcdexReactRenderer = null;
   }
 
-  public destroyCalcdexState() {
-    if (!detectPreactHost(window) || !this.id || !this.calcdexStateInit) {
+  /**
+   * Destroys the Redux `CalcdexSliceState` of this battle's Calcdex.
+   *
+   * * Not `force`'ing will respect the user's `calcdexSettings`, specifically `destroyOnClose`,
+   *   when the `renderMode` of this battle's Calcdex is `'panel'`.
+   * * `force` has no effect when the Calcdex's `renderMode` is `'overlay'`.
+   *
+   * @since 1.3.0
+   */
+  public destroyCalcdexState(force?: boolean) {
+    if (!detectPreactHost(window)) {
+      return;
+    }
+
+    l.debug(
+      'destroyCalcdexState()', 'for the CalcdexPreactBattle', this.id,
+      '\n', 'force?', force,
+      '\n', 'calcdexStateInit?', this.calcdexStateInit,
+      '\n', 'calcdexAsOverlay?', this.calcdexAsOverlay,
+      '\n', 'settings.destroyOnClose?', this.calcdexSettings?.destroyOnClose,
+    );
+
+    if (
+      !this.id
+        || !this.calcdexStateInit
+        || (!this.calcdexAsOverlay && !force && !this.calcdexSettings?.destroyOnClose)
+    ) {
       return;
     }
 
@@ -215,19 +270,27 @@ export class CalcdexPreactBattle extends Battle {
     this.calcdexStateInit = false;
   }
 
-  public override destroy(): void {
-    if (!detectPreactHost(window) || !this.calcdexDestroyed) {
+  /**
+   * Destroys data for this battle & its associated Calcdex from memory.
+   *
+   * * `force` (defaults to `true` when this is called w/out any args) is passed to the `destroyCalcdexState()`.
+   *
+   * @since 1.3.0
+   */
+  public override destroy(force = true): void {
+    if (!detectPreactHost(window) || this.calcdexDestroyed) {
       return void super.destroy();
     }
 
     l.debug(
-      'destroy()', 'called for the CalcdexPreactBattle of id', this.id,
+      'destroy()', 'called for the CalcdexPreactBattle', this.id,
+      '\n', 'force?', force,
       '\n', 'battle', this,
     );
 
     this.destroyCalcdexDom();
-    this.destroyCalcdexState();
-    this.calcdexDestroyed = true;
+    this.destroyCalcdexState(force);
+    this.calcdexDestroyed = !this.calcdexReactRoot && !this.calcdexStateInit;
 
     // this basically calls destroy() on this.sprite (if it exists), then nulls both that & this.side
     super.destroy();

@@ -148,7 +148,8 @@ declare namespace Showdown {
     public override render(): Preact.VNode;
   }
 
-  class BattleForfeitPanel extends PSRoomPanel {
+  // note: as is the case w/ the BattlePanel's TRoom generic, this TRoom generic has the same *typing* effect only
+  class BattleForfeitPanel<TRoom extends PSRoom = PSRoom> extends PSRoomPanel<TRoom> {
     public static readonly id = 'forfeit';
     public static readonly routes = ['forfeitbattle'];
     public static readonly location = 'semimodal-popup';

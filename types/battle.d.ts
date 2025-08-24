@@ -172,18 +172,19 @@ declare namespace Showdown {
     public paused: boolean;
 
     // Showdex-injected custom properties
-    calcdexDisabled?: boolean;
-    calcdexAsOverlay?: boolean;
-    calcdexInit?: boolean;
-    calcdexStateInit?: boolean;
-    calcdexIdPatched?: boolean;
-    calcdexDestroyed?: boolean;
+    public calcdexDisabled?: boolean;
+    public calcdexAsOverlay?: boolean;
+    public calcdexInit?: boolean;
+    public calcdexStateInit?: boolean;
+    public calcdexIdPatched?: boolean;
+    public calcdexDestroyed?: boolean;
     /** note: for `'classic'` (i.e., Backbone.js) Showdown client `__SHOWDEX_HOST`'s only !! */
-    calcdexRoom?: ClientHtmlRoom;
-    calcdexRoomId?: RoomID;
-    calcdexReactRoot?: import('react-dom/client').Root;
-    calcdexSheetsAccepted?: boolean;
-    nonce?: string;
+    public calcdexHtmlRoom?: ClientHtmlRoom;
+    public calcdexRoomId?: RoomID;
+    public calcdexReactRoot?: import('react-dom/client').Root;
+    public calcdexSheetsAccepted?: boolean;
+    public calcdexBattleRecorded?: boolean;
+    public nonce?: string;
 
     public subscription?: (state: BattleSubscriptionState) => void;
     public onResize: () => void;

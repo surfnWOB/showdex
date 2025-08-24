@@ -11,6 +11,7 @@ import * as ReactDOM from 'react-dom/client';
 import cx from 'classnames';
 import { calcdexSlice } from '@showdex/redux/store';
 import { tRef } from '@showdex/utils/app';
+import { nonEmptyObject } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 // import { BootdexManager as Manager } from '../Bootdex/BootdexManager';
@@ -69,18 +70,11 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
             return;
           }
 
-          const visible = !this.calcdexState?.overlayVisible;
-
           Adapter.store.dispatch(calcdexSlice.actions.update({
             scope: `${l.scope}:CalcdexPreactBattleRoom:clientCommands.calcdex()`,
             battleId: this.battle.id,
-            // overlayVisible: !this.calcdexState?.overlayVisible,
-            overlayVisible: visible,
+            overlayVisible: !this.calcdexState?.overlayVisible,
           }));
-
-          /* if (visible) {
-            this.battle.calcdexReactRenderer?.();
-          } */
 
           this.update(null);
         },
@@ -92,14 +86,21 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
     return Adapter.rootState?.calcdex?.[this.battle?.id];
   }
 
-  protected get calcdexSettings() { // eslint-disable-line class-methods-use-this
-    return Adapter?.rootState?.showdex?.settings?.calcdex;
+  public get calcdexSettings() { // eslint-disable-line class-methods-use-this
+    return Adapter.rootState?.showdex?.settings?.calcdex;
   }
 
-  // update (2025/08/22): actually not reliable when the user leaves the room since it'll be received by PS.receive()
-  // instead, while the CalcdexPreactBattleRoom (i.e., this) is already destroy()'d, so this wouldn't fire :o
-  /* public override receiveLine(args: Showdown.Args): void {
-    l.debug('CalcdexPreactBattleRoom:receiveLine()', args);
+  // note: actually not reliable when the user leaves the room since it'll be received by PS.receive() instead,
+  // while the CalcdexPreactBattleRoom (i.e., this) is already destroy()'d, so this wouldn't fire :o
+  // update (2025/08/22): just ended up creating a CalcdexPreactBattleForfeitPanel instead, so this here primarily
+  // handles the winning case since the user would typically remain in the room for a bit after
+  // (also wow these CalcdexPreactBattle* class names are getting kinda -vvv lol yolo)
+  public override receiveLine(args: Showdown.Args): void {
+    l.debug(
+      'CalcdexPreactBattleRoom:receiveLine()', args,
+      '\n', 'battle', this.battle?.id, this.battle,
+      '\n', 'room', this.id, this,
+    );
 
     // e.g., '|win|showdex_testee' -> args = ['win', 'showdex_testee']
     if (args[0] === 'win' && typeof this.battle?.calcdexWinHandler === 'function') {
@@ -109,7 +110,7 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
     // when args[0] is 'win' / 'tie', this will call this.receiveRequest(null),
     // which will nullify this.request & this.choices
     super.receiveLine(args);
-  } */
+  }
 
   public override destroy(): void {
     if (!detectPreactHost(window)) {
@@ -117,23 +118,19 @@ export class CalcdexPreactBattleRoom extends PSBattleRoom {
     }
 
     l.debug(
-      'destroy()', 'called for the CalcdexPreactBattleRoom of battle.id', this.battle.id,
-      '\n', 'room', this,
+      'destroy()', 'called for the CalcdexPreactBattleRoom of', this.battle.id,
+      '\n', 'room', this.id, this,
       '\n', 'battle', this.battle,
       '\n', 'state', this.calcdexState,
       '\n', 'settings', this.calcdexSettings,
     );
 
-    if (this.battle.calcdexStateInit) {
-      if (this.calcdexSettings?.closeOn === 'battle-tab' && window.PS.rooms[this.battle.calcdexRoomId]?.id) {
+    if (this.battle.calcdexInit) {
+      if (this.calcdexSettings?.closeOn === 'battle-tab' && this.battle.calcdexRoom?.id) {
         window.PS.leave(this.battle.calcdexRoomId); // -> CalcdexPreactRoom:destroy()
       }
 
-      if (this.battle.calcdexAsOverlay || this.calcdexSettings?.destroyOnClose) {
-        Adapter.store.dispatch(calcdexSlice.actions.destroy(this.battle.id));
-      }
-
-      this.battle.destroy();
+      this.battle.destroy(false);
     }
 
     super.destroy();
@@ -147,15 +144,28 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
 
   // only used for Calcdexes w/ the 'overlay' renderMode
   // (note: ReactDOM.Root is inside the CalcdexPreactBattle)
-  private readonly __calcdexRef = preact?.createRef<HTMLDivElement>();
+  // private readonly __calcdexRef = preact?.createRef<HTMLDivElement>(); // moved to CalcdexPreactBattle:calcdexReactRef
   // private __calcdexVNode?: Showdown.Preact.VNode = null;
 
-  protected get renderAsOverlay() {
-    const { room } = this.props;
-    const { renderMode } = room?.calcdexState || {};
-
-    return room?.battle?.calcdexAsOverlay || renderMode === 'overlay';
+  protected get battleRoom() {
+    return this.props.room;
   }
+
+  protected get battle() {
+    return this.battleRoom?.battle;
+  }
+
+  protected get battleRequest() {
+    return this.battleRoom?.request;
+  }
+
+  protected get battleState() {
+    return this.battleRoom?.calcdexState;
+  }
+
+  /* protected get renderAsOverlay() {
+    return this.battle?.calcdexAsOverlay || this.battleState?.renderMode === 'overlay';
+  } */
 
   /* public override componentDidMount() {
     const { room } = this.props;
@@ -178,67 +188,62 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
   } */
 
   public override componentWillUnmount() {
-    const { room } = this.props;
-
-    if (this.renderAsOverlay && room?.battle?.calcdexStateInit) {
+    if (this.battle?.calcdexInit && this.battle.calcdexAsOverlay) {
       this.lockMobileZoom(false);
-      room.battle.destroy();
+      this.battle.destroy(true);
     }
 
     super.componentWillUnmount();
   }
 
   public override receiveRequest(request: Showdown.BattleRequest): void {
-    const { room } = this.props;
-
-    /* if (
+    if (
       !detectPreactHost(window)
         || !nonEmptyObject(request?.side)
-        || typeof room?.calcdexServerIdPatcher !== 'function'
+        // || typeof room?.calcdexServerIdPatcher !== 'function'
     ) {
       return void super.receiveRequest(request);
-    } */
+    }
 
     // note: this internally sets battle.myPokemon[] to request.side.pokemon[], but similar to the CalcdexClassicBootstrapper,
     // we'll want the version of myPokemon[] w/ a lil less valhalla (good song & VSTs tho)
-    const myPokemon = [...(request?.side?.pokemon || [])];
+    const myPokemon = [...(request.side.pokemon || [])];
 
     super.receiveRequest(request);
 
-    if (room.battle?.id && myPokemon?.length && !room.battle.myPokemon?.length) {
-      room.battle.myPokemon = myPokemon;
+    if (this.battle?.id && myPokemon?.length && !this.battle.myPokemon?.length) {
+      this.battle.myPokemon = myPokemon;
     }
 
     // note: this case is entirely possible in 'panel' renderMode's if the user refreshed the page mid-battle &
     // the CalcdexPreactBattleRoom loads before the CalcdexPanelRoom, typically when the first command received
     // from the server is to '/join' the CalcdexPreactBattleRoom; however, it's also entirely possible Showdex
     // couldn't swap out Showdown's Battle classes in time (e.g., Battle, BattleRequest, Side), so at that point oof
-    if (!room.battle?.calcdexInit) {
-      room.battle.runCalcdex?.();
+    if (!this.battle?.calcdexInit) {
+      this.battle.runCalcdex();
     }
 
-    room.calcdexServerIdPatcher?.(myPokemon);
+    this.battleRoom.calcdexServerIdPatcher?.(myPokemon);
 
     l.debug(
-      'CalcdexPreactBattlePanel:receiveRequest()', 'for', room.battle?.id,
-      '\n', 'myPokemon[]', myPokemon,
-      '\n', 'request', '(post-super)', request,
-      '\n', 'room.request', room.request,
-      '\n', 'room.battle.myPokemon[]', room.battle?.myPokemon,
-      '\n', 'room.battle.calcdexInit?', room.battle?.calcdexInit, 'calcdexStateInit?', room.battle?.calcdexStateInit,
-      // '\n', 'room.battle', room.battle,
-      '\n', 'room', room.id, room,
+      'CalcdexPreactBattlePanel:receiveRequest()', 'for room', this.battleRoom?.id,
+      '\n', 'myPokemon[]', '(argv:0)', myPokemon,
+      '\n', '->', 'battle.myPokemon[]', this.battle?.myPokemon,
+      '\n', 'request', '(super)', request,
+      '\n', '->', 'room.request', this.battleRequest,
+      '\n', 'battle.calcdexInit?', this.battle?.calcdexInit, 'calcdexStateInit?', this.battle?.calcdexStateInit,
+      '\n', 'battle', this.battle?.id, this.battle,
+      '\n', 'room', this.battleRoom,
     );
 
     // force a re-syncCalcdex() (via the injected room.battle.subscription()) w/ the new `request` data
-    room.battle.subscription('callback');
+    this.battle.subscription('callback');
   }
 
   protected lockMobileZoom(forceLock?: boolean): void {
-    const { room } = this.props;
-    const { overlayVisible } = room?.calcdexState || {};
+    const { overlayVisible } = this.battleState || {};
 
-    if (!this.renderAsOverlay || typeof $ !== 'function') {
+    if (!this.battle?.calcdexAsOverlay || typeof $ !== 'function') {
       return;
     }
 
@@ -265,10 +270,9 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
   }
 
   protected renderToggleButton(): Showdown.Preact.VNode {
-    const { room } = this.props;
-    const { overlayVisible } = room?.calcdexState || {};
+    const { overlayVisible } = this.battleState || {};
 
-    if (!this.renderAsOverlay) {
+    if (!this.battle?.calcdexAsOverlay) {
       return null;
     }
 
@@ -291,7 +295,7 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
       },
       name: 'toggleCalcdexOverlay',
       'data-cmd': '/calcdex overlay toggle',
-      disabled: !room.battle?.calcdexInit,
+      disabled: !this.battle?.calcdexInit,
     }, ...[
       preact.h('i', { class: cx('fa', `fa-${toggleButtonIcon}`), 'aria-hidden': true }),
       preact.h('span', null, toggleButtonLabel),
@@ -299,23 +303,32 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
   }
 
   protected renderCalcdexOverlay(): Showdown.Preact.VNode {
-    const { room } = this.props;
-    const { overlayVisible } = room?.calcdexState || {};
+    const { overlayVisible } = this.battleState || {};
 
-    if (!this.renderAsOverlay) {
+    if (!detectPreactHost(window) || !this.battle?.id || !this.battle.calcdexAsOverlay) {
       return null;
     }
 
-    // if (room?.battle?.id && !room.battle.calcdexReactRoot && this.__calcdexRef.current) {
-    if (overlayVisible && room?.battle?.id && this.__calcdexRef.current) {
-    // if (room?.battle?.id && !room.battle.calcdexReactRoot && room?.battle?.calcdexReactRef?.current) {
-      if (!room.battle.calcdexReactRoot) {
-        room.battle.calcdexReactRoot = ReactDOM.createRoot(this.__calcdexRef.current);
+    // if (overlayVisible && room?.battle?.id && this.__calcdexRef.current) {
+    /* if (overlayVisible) {
+      if (!this.battle?.calcdexReactRoot && this.battle?.calcdexReactRef?.current) {
+        // room.battle.calcdexReactRoot = ReactDOM.createRoot(this.__calcdexRef.current);
+        this.battle.calcdexReactRoot = ReactDOM.createRoot(this.battle.calcdexReactRef.current, {
+          identifierPrefix: CalcdexPreactBattlePanel.scope,
+        });
       }
 
       // room.battle.calcdexReactRoot = ReactDOM.createRoot(room.battle.calcdexReactRef.current);
-      room.battle.calcdexReactRenderer?.();
+      this.battle.calcdexReactRenderer?.();
+    } */
+
+    if (!this.battle?.calcdexReactRoot && this.battle?.calcdexReactRef?.current) {
+      this.battle.calcdexReactRoot = ReactDOM.createRoot(this.battle.calcdexReactRef.current, {
+        identifierPrefix: CalcdexPreactBattlePanel.scope,
+      });
     }
+
+    this.battle.calcdexReactRenderer?.();
 
     /* if (!this.__calcdexVNode) {
       this.__calcdexVNode = preact.h('div', {
@@ -335,7 +348,8 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
     return this.__calcdexVNode; */
 
     return preact.h('div', {
-      ref: this.__calcdexRef,
+      // ref: this.__calcdexRef,
+      ref: this.battle?.calcdexReactRef,
       class: styles.overlayContainer,
       ...(!overlayVisible && { style: { display: 'none' } }),
       // style: overlayVisible ? {} : { display: 'none' },
@@ -351,7 +365,7 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
   // wrap them in a <div> w/ the same absolute positioning & add the original buttons into it + our Calcdex button
   public override render() {
     const { room } = this.props;
-    const { overlayVisible } = room?.calcdexState || {};
+    const { overlayVisible } = this.battleState || {};
 
     const panel = super.render();
     // const panelChildren = preact.toChildArray(panel.props.children);
@@ -360,7 +374,7 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
     // (also note: panel.props.children wouldn't be an array if it was only rendering a single child, which if we're expecting
     // the proper virtual DOM for this BattlePanel, wouldn't be the case! [we're expecting lots of children, i.e., an array])
     // if (!this.renderAsOverlay || !Array.isArray(panel.props.children)) {
-    if (!this.renderAsOverlay) {
+    if (!this.battle?.calcdexAsOverlay) {
       return panel;
     }
 
@@ -436,8 +450,9 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
           alignItems: 'center',
           columnGap: 6,
         },
+        'data-showdex': 'calcdex',
         'data-calcdex': 'overlay-controls',
-        'data-calcdex-target': 'battle-options',
+        'data-calcdex-controls': 'battle-options',
       }, ...[
         optionsButton,
         this.renderToggleButton(),
@@ -466,15 +481,28 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
         && (c?.props as Record<'class', string>)?.class === 'battle-controls'
     )) as Showdown.Preact.VNode;
 
-    const battleControlsChildren = preact.toChildArray(battleControls?.props?.children);
+    /* const battleControlsChildren = preact.toChildArray(battleControls?.props?.children);
 
     if (!battleControlsChildren?.length) {
       return panel;
+    } */
+
+    if (!battleControls?.props?.children) {
+      return panel;
     }
 
+    if (!Array.isArray(battleControls.props.children)) {
+      battleControls.props.children = [battleControls.props.children];
+    }
+
+    // there may be some sneaky nulls amongst the children[], which would produce an invalid findNamedIndex()
+    // since -- in my testing, at least -- the preact.toChildArray() used in that aforementioned helper func
+    // basically does that; without filter(Boolean)'ing, you could accidentally mutate the wrong VNode!! :o
+    battleControls.props.children = battleControls.props.children.filter(Boolean);
+
     // note: timerButton will be undefined if timerButtonIndex is -1
-    const timerButtonIndex = findNamedIndex(battleControlsChildren, 'TimerButton');
-    const timerButton = battleControlsChildren[timerButtonIndex] as Showdown.Preact.VNode;
+    const timerButtonIndex = findNamedIndex(battleControls.props.children, 'TimerButton');
+    const timerButton = battleControls.props.children[timerButtonIndex] as Showdown.Preact.VNode;
 
     if (timerButtonIndex > -1) {
       delete (timerButton.props as Record<'style', React.CSSProperties>).style;
@@ -493,8 +521,9 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
         alignItems: 'center',
         columnGap: 6,
       },
+      'data-showdex': 'calcdex',
       'data-calcdex': 'overlay-controls',
-      'data-calcdex-target': 'battle-timer',
+      'data-calcdex-controls': 'battle-timer',
     }, ...[
       timerButton,
       this.renderToggleButton(),
@@ -502,7 +531,12 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
 
     battleControls.props.children = [
       wrappedOverlayControls,
-      ...(Array.isArray(battleControls.props.children) ? battleControls.props.children : [battleControls.props.children]),
+      /* ...(
+        Array.isArray(battleControls.props.children)
+          ? battleControls.props.children
+          : [battleControls.props.children]
+      ), */
+      ...battleControls.props.children,
     ];
 
     return panel;

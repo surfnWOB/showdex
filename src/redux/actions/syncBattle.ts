@@ -342,14 +342,14 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         && (!Array.isArray(player.pokemon) || !player.pokemon.length)
     ) {
       if (__DEV__) {
-        l.warn(
+        l.debug(
           'Ignoring Pokemon updates for', playerKey, 'since they don\'t have any Pokemon!',
           ...(isMyPokemonSide ? ['\n', 'myPokemon[]', myPokemon] : []),
           '\n', 'pokemon[]', '(battle)', player.pokemon,
           '\n', 'pokemon[]', '(state)', playerState.pokemon,
           '\n', 'battle', battleId, battle,
           '\n', 'state', battleState,
-          '\n', '(you\'ll only see this warning in __DEV__)',
+          // '\n', '(you\'ll only see this warning in __DEV__)',
         );
       }
 

@@ -31,6 +31,7 @@ declare namespace Showdown {
      */
     public chooseParentValue(value: string): void;
     public focus(): void;
+    public render(): Preact.VNode;
   }
 
   type PSRoomPanelSubclass<TRoom extends PSRoom = PSRoom> = (new () => PSRoomPanel<TRoom>) & {

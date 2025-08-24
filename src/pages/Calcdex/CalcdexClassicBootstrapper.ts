@@ -97,7 +97,7 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       const battle = (window.app.rooms?.[battleId] as Showdown.ClientBattleRoom)?.battle;
 
       if (battle?.id) {
-        delete battle.calcdexRoom;
+        delete battle.calcdexHtmlRoom;
       }
 
       // unmount the reactRoot we created earlier
@@ -228,9 +228,9 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
 
     // create the calcdexRoom if it doesn't already exist (shouldn't tho)
     // update (2023/04/22): createCalcdexRoom() will also create a ReactDOM.Root under reactRoot
-    if (!this.battle.calcdexRoom) {
-      this.battle.calcdexRoom = CalcdexClassicBootstrapper.createCalcdexRoom(this.battleId, true);
-      this.battle.calcdexRoomId = this.battle.calcdexRoom?.id as Showdown.RoomID; // bacc compat w/ the new v1.3.0 bootloader system for preact
+    if (!this.battle.calcdexHtmlRoom) {
+      this.battle.calcdexHtmlRoom = CalcdexClassicBootstrapper.createCalcdexRoom(this.battleId, true);
+      this.battle.calcdexRoomId = this.battle.calcdexHtmlRoom?.id as Showdown.RoomID; // bacc compat w/ the new v1.3.0 bootloader system for preact
     }
 
     if (!this.battle.calcdexRoomId) {
@@ -634,7 +634,7 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
       // if the battleRoom exists, attach the created room to the battle object
       if (this.battleRoom?.battle?.id) {
         this.battleRoom.battle.calcdexDestroyed = false; // just in case
-        this.battleRoom.battle.calcdexRoom = calcdexRoom;
+        this.battleRoom.battle.calcdexHtmlRoom = calcdexRoom;
       }
     }
 
@@ -838,7 +838,7 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
     // update (2023/04/22): nope -- we still do! we have to call calcdexReactRoot.unmount(),
     // which obviously won't be available on subsequent bootstrapper invocations as a local var,
     // so... back in the `battle` (for overlays) or `calcdexRoom` (for tabs) you go!
-    const calcdexReactRoot = this.battle.calcdexReactRoot || this.battle.calcdexRoom?.reactRoot;
+    const calcdexReactRoot = this.battle.calcdexReactRoot || this.battle.calcdexHtmlRoom?.reactRoot;
 
     if (!calcdexReactRoot) {
       l.error(

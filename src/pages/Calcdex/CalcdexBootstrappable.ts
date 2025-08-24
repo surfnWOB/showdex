@@ -25,7 +25,7 @@ import {
 } from '@showdex/utils/battle';
 import { calcBattleCalcdexNonce } from '@showdex/utils/calc';
 import { clamp, formatId } from '@showdex/utils/core';
-import { logger } from '@showdex/utils/debug';
+import { logger, wtf } from '@showdex/utils/debug';
 import { detectGenFromFormat } from '@showdex/utils/dex';
 import { detectClassicHost } from '@showdex/utils/host';
 import { BootdexBootstrappable } from '../Bootdex/BootdexBootstrappable';
@@ -580,12 +580,22 @@ export const MixinCalcdexBootstrappable = <
     protected updateBattleRecord(forceResult?: BattleRecordResult): void {
       const { authUsername, store } = CalcdexBootstrappableMixin.Adapter;
 
-      if (typeof store?.dispatch !== 'function') {
+      if (typeof store?.dispatch !== 'function' || this.battle?.calcdexBattleRecorded) {
         return;
       }
 
       if (forceResult && ['win', 'loss'].includes(forceResult)) {
-        return void store.dispatch(hellodexSlice.actions[battleRecordReducerNameFor(forceResult)]());
+        const reducerName = battleRecordReducerNameFor(forceResult);
+
+        l.debug(
+          'updateBattleRecord()', forceResult, 'for', authUsername, 'in', this.battleId,
+          // '\n', 'forceResult', forceResult,
+          // '\n', 'authUsername', authUsername,
+          '\n', '->', `hellodexSlice.actions.${reducerName}()`,
+          '\n', 'battle', '(typeof)', wtf(this.battle), this.battle,
+        );
+
+        return void store.dispatch(hellodexSlice.actions[reducerName]());
       }
 
       if (!authUsername || !this.battle?.id) {
@@ -602,15 +612,29 @@ export const MixinCalcdexBootstrappable = <
 
       // note: winStep might be '|win|showdex_testee' or '|\n|win|showdex_testee'
       const winStep = this.battle?.stepQueue?.find((s) => winStepRegex().test(s));
-      const winnerName = winStep?.replace?.(winStepRegex(), ''); // e.g., '|win|sumfuk' -> 'sumfuk'
+      const winnerName = winStep?.replace?.(winStepRegex(), ''); // e.g., '|win|showdex_testee' -> 'showdex_testee'
+      const winnerNameId = (!!winnerName && formatId(winnerName)) || null; // e.g., -> 'showdextestee'
 
-      if (!winnerName) {
+      if (!winnerNameId) {
         return;
       }
 
-      const didWin = formatId(winnerName) === authUsernameId;
+      const didWin = winnerNameId === authUsernameId;
+      const reducerName = battleRecordReducerNameFor(didWin);
 
-      store.dispatch(hellodexSlice.actions[battleRecordReducerNameFor(didWin)]());
+      l.debug(
+        'updateBattleRecord()', 'for', this.battleId,
+        '\n', 'authUsername', authUsername, '->', 'authUsernameId', authUsernameId,
+        '\n', 'playerNames[]', playerNames,
+        '\n', '->', 'playerNameIds[]', playerNameIds,
+        '\n', 'winStep', winStep,
+        '\n', '->', 'winnerName', winnerName, '->', 'winnerNameId', winnerNameId,
+        '\n', 'didWin?', didWin, '->', `hellodexSlice.actions.${reducerName}()`,
+        '\n', 'battle', '(typeof)', wtf(this.battle), this.battle,
+      );
+
+      store.dispatch(hellodexSlice.actions[reducerName]());
+      this.battle.calcdexBattleRecorded = true;
     }
 
     /**

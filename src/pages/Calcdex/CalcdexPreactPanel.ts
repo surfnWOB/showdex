@@ -8,49 +8,60 @@
 
 import * as ReactDOM from 'react-dom/client';
 import cx from 'classnames';
-import { calcdexSlice } from '@showdex/redux/store';
+// import { calcdexSlice } from '@showdex/redux/store';
+import { logger } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import {
-  BootdexPreactBootstrappable,
+  // BootdexPreactBootstrappable,
   preact,
   PSPanelWrapper,
   PSRoom,
   PSRoomPanel,
 } from '../Bootdex/BootdexPreactBootstrappable';
-import { type CalcdexPreactBattleRoom } from './CalcdexPreactBattlePanel';
-import { CalcdexDomRenderer } from './CalcdexRenderer';
+import { CalcdexPreactBattleRoom } from './CalcdexPreactBattlePanel';
+// import { CalcdexDomRenderer } from './CalcdexRenderer';
+
+const l = logger('@showdex/pages/Calcdex/CalcdexPreactRoom');
 
 export class CalcdexPreactRoom extends PSRoom {
+  public static readonly scope = l.scope;
+
   public override title = 'Calcdex';
   public override type = 'calcdex';
   public override readonly classType = 'calcdex';
   public override location = 'right' as const;
   public override noURL = true;
 
-  public override destroy() {
-    if (!detectPreactHost(window)) {
-      return void super.destroy();
-    }
-
-    const { Adapter } = BootdexPreactBootstrappable;
-    const { calcdex: calcdexSettings } = Adapter.rootState?.showdex?.settings || {};
-    const battleId = this.id.replace('calcdex-', '');
-    const battleRoom = window.PS.rooms[battleId as Showdown.RoomID] as CalcdexPreactBattleRoom;
-
-    if (calcdexSettings?.destroyOnClose && battleId) {
-      if (battleRoom?.battle?.calcdexStateInit) {
-        battleRoom.battle.calcdexStateInit = false;
-        battleRoom.battle.calcdexDestroyed = true;
-      }
-
-      Adapter.store.dispatch(calcdexSlice.actions.destroy(battleId));
-    }
-
-    super.destroy();
+  public get battleId() {
+    return this.id?.replace(/^calcdex-/i, '');
   }
+
+  public get battleRoom() {
+    if (!detectPreactHost(window)) {
+      return null;
+    }
+
+    return window.PS.rooms?.[this.battleId as Showdown.RoomID] as CalcdexPreactBattleRoom;
+  }
+
+  public get battle() {
+    return this.battleRoom?.battle;
+  }
+
+  /* public get calcdexSettings() { // eslint-disable-line class-methods-use-this
+    return BootdexPreactBootstrappable.Adapter.rootState?.showdex?.settings?.calcdex;
+  }
+
+  public override destroy() {
+    // note: the `false` arg below signifies the Redux CalcdexSliceState for 'panel' renderMode's
+    // should only be destroyed depending on the user's calcdexSettings
+    this.battle?.destroy(false);
+    super.destroy();
+  } */
 }
 
 export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
+  public static readonly scope = l.scope;
   public static readonly id = 'calcdex';
   public static readonly routes = ['calcdex', 'calcdex-*'];
   public static readonly Model = CalcdexPreactRoom;
@@ -59,10 +70,12 @@ export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
   public static readonly title = 'Calcdex';
 
   // see Hellodex for more info on these shenanigans
-  private readonly __calcdexRef = preact?.createRef<HTMLDivElement>();
-  private __reactRoot?: ReactDOM.Root = null;
+  // update (2025/08/22): now using the calcdexReact* ones from the CalcdexPanelBattle for consistency w/
+  // the 'overlay' Calcdex renderMode, i.e., the CalcdexPanelBattleRoom
+  // private readonly __calcdexRef = preact?.createRef<HTMLDivElement>();
+  // private __reactRoot?: ReactDOM.Root = null;
 
-  public override componentDidMount() {
+  /* public override componentDidMount() {
     super.componentDidMount();
 
     if (!detectPreactHost(window) || !this.__calcdexRef?.current || this.__reactRoot) {
@@ -91,6 +104,35 @@ export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
     }
 
     super.componentWillUnmount();
+  } */
+
+  protected get calcdexPanelRoom() {
+    return this.props.room;
+  }
+
+  protected get battle() {
+    return this.calcdexPanelRoom?.battle;
+  }
+
+  protected renderCalcdexPanel(): Showdown.Preact.VNode {
+    if (!detectPreactHost(window) || !this.battle?.id || this.battle.calcdexAsOverlay) {
+      return null;
+    }
+
+    if (!this.battle.calcdexReactRoot && this.battle.calcdexReactRef?.current) {
+      this.battle.calcdexReactRoot = ReactDOM.createRoot(this.battle.calcdexReactRef.current, {
+        identifierPrefix: CalcdexPreactPanel.scope,
+      });
+    }
+
+    this.battle.calcdexReactRenderer?.();
+
+    return preact.h('div', {
+      // ref: this.__calcdexRef,
+      ref: this.battle.calcdexReactRef,
+      'data-showdex': 'calcdex',
+      'data-calcdex': 'panel',
+    });
   }
 
   public override render(): Showdown.Preact.VNode {
@@ -100,10 +142,6 @@ export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
       return null;
     }
 
-    return preact.h(PSPanelWrapper, { room }, preact.h('div', {
-      ref: this.__calcdexRef,
-      'data-showdex': 'calcdex',
-      'data-calcdex': 'panel',
-    }));
+    return preact.h(PSPanelWrapper, { room }, this.renderCalcdexPanel());
   }
 }
