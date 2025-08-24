@@ -78,7 +78,8 @@ declare namespace Showdown {
     /** Preact virtual node. */
     interface VNode<TProps = unknown> {
       key?: string | number;
-      type?: ComponentFactory | string;
+      type?: ComponentFactory<TProps> | string;
+      constructor?: ComponentConstructor<TProps>;
       ref?: React.RefObject<Element>;
       props: TProps & { children?: ComponentChildren; };
       __?: VNode;

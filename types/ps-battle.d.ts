@@ -57,6 +57,8 @@ declare namespace Showdown {
 
   class BattleDiv extends Preact.Component<BattleDivProps> {
     public override shouldComponentUpdate(): false;
+    public override componentDidMount(): void;
+    public override render(): Preact.VNode;
   }
 
   interface TimerButtonProps {
@@ -66,7 +68,9 @@ declare namespace Showdown {
   class TimerButton extends Preact.Component<TimerButtonProps> {
     public timerInterval?: number = null;
 
+    public override componentWillUnmount(): void;
     public secondsToTime(seconds: number | true): string;
+    public override render(): Preact.VNode;
   }
 
   // note: TRoom generic doesn't actually exist in the original class declaration, but exists here for TypeScript lol

@@ -13,7 +13,7 @@ import { logger, wtf } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import { BootdexManager as Manager } from '../Bootdex/BootdexManager';
 import { BootdexPreactAdapter as Adapter } from '../Bootdex/BootdexPreactAdapter';
-import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappable';
+import { BootdexPreactBootstrappable, preact } from '../Bootdex/BootdexPreactBootstrappable';
 import { type CalcdexBootstrappable } from './CalcdexBootstrappable';
 // import { CalcdexPreactBattleSide } from './CalcdexPreactBattleSide';
 import { type CalcdexPreactRoom } from './CalcdexPreactPanel';
@@ -103,22 +103,12 @@ export class CalcdexPreactBattle extends Battle {
       return;
     }
 
-    /* this.p1 = new CalcdexPreactBattleSide(this, 1);
-    this.p2 = new CalcdexPreactBattleSide(this, 2);
-    this.sides = [this.p1, this.p2];
-    this.p2.foe = this.p1;
-    this.p1.foe = this.p2;
-    this.nearSide = this.p1;
-    this.mySide = this.p1;
-    this.farSide = this.p2;
-    this.resetStep(); */
-
     this.calcdexAsOverlay = this.calcdexSettings?.openAs === 'overlay'
       || (this.calcdexSettings?.openAs !== 'showdown' && hasSinglePanel());
 
-    // this.runCalcdex();
-
     if (this.calcdexAsOverlay) {
+      this.calcdexReactRef = preact.createRef<HTMLDivElement>();
+
       return;
     }
 
@@ -160,13 +150,6 @@ export class CalcdexPreactBattle extends Battle {
         || !this.id
         || this.calcdexInit
         || typeof this.subscription !== 'function'
-        // || !this.p1?.pokemon?.length
-        // || !this.p2?.pokemon?.length
-        // || (
-        //   !this.p1?.pokemon?.length
-        //     && !this.p2?.pokemon?.length
-        //     && !this.myPokemon?.length
-        // )
     ) {
       return;
     }
@@ -183,31 +166,6 @@ export class CalcdexPreactBattle extends Battle {
 
     this.runCalcdex();
   }
-
-  /* public override runMajor(
-    args: Showdown.Args,
-    kwArgs: Showdown.KwArgs,
-    preempt?: boolean,
-  ): void {
-    if (!detectPreactHost(window)) {
-      return super.runMajor(args, kwArgs, preempt);
-    }
-
-    const hadP3 = !!this.p3?.sideid;
-    const hadP4 = !!this.p4?.sideid;
-
-    super.runMajor(args, kwArgs, preempt);
-
-    if (!hadP3 && !!this.p3?.sideid) {
-      this.p3 = new CalcdexPreactBattleSide(this, 3);
-    }
-
-    if (!hadP4 && !!this.p4?.sideid) {
-      this.p4 = new CalcdexPreactBattleSide(this, 4);
-    }
-
-    // this.runCalcdex();
-  } */
 
   /**
    * Unmounts & clears any references to DOM elements associated w/ rendering this battle's Calcdex.

@@ -5,6 +5,7 @@ export * from './CalcdexPreactBattle';
 export * from './CalcdexPreactBattleForfeitPanel';
 export * from './CalcdexPreactBattlePanel';
 export * from './CalcdexPreactBattleSide';
+export * from './CalcdexPreactBattleTimerButton';
 export * from './CalcdexPreactBootstrapper';
 export * from './CalcdexPreactPanel';
 export * from './CalcdexRenderer';

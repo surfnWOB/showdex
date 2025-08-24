@@ -15,6 +15,7 @@ import { CalcdexPreactBattle } from './CalcdexPreactBattle';
 import { CalcdexPreactBattleForfeitPanel } from './CalcdexPreactBattleForfeitPanel';
 import { CalcdexPreactBattlePanel, CalcdexPreactBattleRoom } from './CalcdexPreactBattlePanel';
 import { CalcdexPreactBattleSide } from './CalcdexPreactBattleSide';
+import { CalcdexPreactBattleTimerButton } from './CalcdexPreactBattleTimerButton';
 import { type CalcdexPreactRoom, CalcdexPreactPanel } from './CalcdexPreactPanel';
 import { CalcdexDomRenderer } from './CalcdexRenderer';
 
@@ -86,7 +87,16 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
   }
 
   protected renderCalcdex(dom: ReactDOM.Root): void {
-    if (!detectPreactHost(window) || !this.battleId || !dom) {
+    if (!detectPreactHost(window)) {
+      return;
+    }
+
+    l.debug(
+      'renderCalcdex()', 'for', this.battleId,
+      '\n', 'dom', dom,
+    );
+
+    if (!this.battleId || !dom) {
       return;
     }
 
@@ -212,6 +222,9 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       l.debug('Hard-swapping the Showdown.Side for the CalcdexPreactBattleSide...');
       window.Side = CalcdexPreactBattleSide;
 
+      l.debug('Hard-swapping the Showdown.TimerButton for the CalcdexPreactBattleTimerButton...');
+      window.TimerButton = CalcdexPreactBattleTimerButton;
+
       // this panel is for 'overlay' renderMode's
       l.debug(
         'Swapping the Showdown.BattlePanel for the CalcdexPreactBattlePanel',
@@ -230,6 +243,8 @@ export class CalcdexPreactBootstrapper extends MixinCalcdexBootstrappable(Bootde
       // this panel is for 'panel' renderMode's (lol)
       l.debug('Adding the CalcdexPreactPanel to the PS.roomTypes...');
       window.PS.addRoomType(CalcdexPreactPanel);
+
+      /** @todo ... insert routine to rejoin any existing vanilla `Showdown.BattleRoom`'s here ... */
 
       l.debug(
         'Bootstrapped the Calcdex Preact pre-bootstrap!',
