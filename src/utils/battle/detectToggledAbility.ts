@@ -1,3 +1,9 @@
+/**
+ * @file `detectToggledAbility.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.2
+ */
+
 import {
   type AbilityName,
   type GameType,
@@ -95,7 +101,7 @@ export const detectToggledAbility = (
 
   // handle Slow Start
   if (ability === 'Slow Start' as AbilityName) {
-    return volatiles.includes('slowstart');
+    return volatiles.includes('slowstart') || !pokemon.active;
   }
 
   // handle Unburden
