@@ -18,6 +18,7 @@ import { BootdexPreactAdapter as Adapter } from '../Bootdex/BootdexPreactAdapter
 import { preact } from '../Bootdex/BootdexPreactBootstrappable';
 import { type CalcdexBootstrappable } from './CalcdexBootstrappable';
 import { CalcdexPreactBattle } from './CalcdexPreactBattle';
+import { CalcdexPreactBattleTimerButton } from './CalcdexPreactBattleTimerButton';
 import styles from './Calcdex.module.scss';
 
 const PSBattleRoom = detectPreactHost(window) ? window.BattleRoom : null;
@@ -511,8 +512,8 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
     battleControls.props.children = battleControls.props.children.filter(Boolean);
 
     // note: timerButton will be undefined if timerButtonIndex is -1
-    const timerButtonIndex = findNamedIndex(battleControls.props.children, 'CalcdexPreactBattleTimerButton');
-    const timerButton = battleControls.props.children[timerButtonIndex] as Showdown.Preact.VNode;
+    const timerButtonIndex = findNamedIndex(battleControls.props.children, 'TimerButton');
+    // const timerButton = battleControls.props.children[timerButtonIndex] as Showdown.Preact.VNode;
 
     if (timerButtonIndex > -1) {
       // delete (timerButton.props as Record<'style', React.CSSProperties>).style;
@@ -532,7 +533,7 @@ export class CalcdexPreactBattlePanel extends PSBattlePanel<CalcdexPreactBattleR
       'data-calcdex': 'overlay-controls',
       'data-calcdex-controls': 'battle-timer',
     }, ...[
-      timerButton,
+      preact.h(CalcdexPreactBattleTimerButton, { room }),
       this.renderToggleButton(),
     ].filter(Boolean));
 
