@@ -4,7 +4,7 @@
     "version": "1.0.2",
     "locale": "en",
     "created": "2024-01-07T00:59:01.639Z",
-    "updated": "2024-09-28T22:20:41.390Z"
+    "updated": "2025-08-26T10:15:23.831Z"
   },
 
   "pane": {
@@ -242,7 +242,7 @@
         },
         "randoms": {
           "label": "Randoms",
-          "tooltip": "Downloads freshly updated Randoms sets for official Randoms formats, which are specialized sets from a rotating pool, with some gens featuring role-based sets. Support may be limited or nonexistent for non-official format, such as those from the Randomized Format Spotlight.<br /><br />Disabling this may <em>slightly</em> improve performance on lower-spec machines."
+          "tooltip": "Downloads freshly updated Randoms sets for official Randoms formats, which are specialized sets from a rotating pool, with some gens featuring role-based sets. Support may be limited or nonexistent for non-official formats, such as those from the Randomized Format Spotlight.<br /><br />Disabling this may <em>slightly</em> improve performance on lower-spec machines."
         },
         "usage": {
           "label": "Usage",
@@ -612,7 +612,7 @@
 
     "alwaysShowGenetics": {
       "label": "Always Show Stats",
-      "tooltip": "Always shows the $t(pokedex:stats.base_other.0), $t(pokedex:stats.ivs_other.1) &amp; $t(pokedex:stats.evs_other.1) in the Pokémon's stats table. $t(pokedex:stats.evs_other.1) may still be hidden in legacy gens, unless the <em>$t(calcdex.showLegacyEvs.label)</em> $t(common:products.calcdex_one) setting is enabled.<br /><br />Disabling this will revert to the configured <em>$t(calcdex.showAuthGenetics.label)</em> &amp; <em>$t(calcdex.showPlayerGenetics.label)</em> $t(common:products.calcdex_one) settings."
+      "tooltip": "Always shows the $t(pokedex:stats.base_other.0), $t(pokedex:stats.ivs_other.1) &amp; $t(pokedex:stats.evs_other.1) in the Pokémon's stats table. $t(pokedex:stats.evs_other.1) may still be hidden in legacy gens, unless the <em>$t(calcdex.showLegacyEvs.label)</em> $t(common:products.calcdex_one) setting is enabled.<br /><br />Disabling this will revert to the configured <em>$t(calcdex.lockAuthGenetics.label)</em> &amp; <em>$t(calcdex.lockPlayerGenetics.label)</em> $t(common:products.calcdex_one) settings."
     }
   },
 

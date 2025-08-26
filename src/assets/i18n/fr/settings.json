@@ -4,7 +4,7 @@
     "version": "1.0.2",
     "locale": "fr",
     "created": "2024-01-08T19:45:21.842Z",
-    "updated": "2024-09-28T22:20:22.835Z"
+    "updated": "2025-08-26T10:15:22.803Z"
   },
 
   "pane": {
@@ -611,7 +611,7 @@
 
     "alwaysShowGenetics": {
       "label": "Toujours Afficher les Stats",
-      "tooltip": "Affiche toujours les $t(pokedex:stats.base_other.0), $t(pokedex:stats.ivs_other.1) & $t(pokedex:stats.evs_other.1) dans le tableau des stats du Pokémon. Les $t(pokedex:stats.evs_other.1) peuvent toujours être cachés dans les générations anciennes, à moins que le paramètre <em>$t(calcdex.showLegacyEvs.label)</em> de $t(common:products.calcdex_one) ne soit activé.<br /><br />La désactivation rétablira la configuration des paramètres <em>$t(calcdex.showAuthGenetics.label)</em> & <em>$t(calcdex.showPlayerGenetics.label)</em> de $t(common:products.calcdex_one)."
+      "tooltip": "Affiche toujours les $t(pokedex:stats.base_other.0), $t(pokedex:stats.ivs_other.1) & $t(pokedex:stats.evs_other.1) dans le tableau des stats du Pokémon. Les $t(pokedex:stats.evs_other.1) peuvent toujours être cachés dans les générations anciennes, à moins que le paramètre <em>$t(calcdex.showLegacyEvs.label)</em> de $t(common:products.calcdex_one) ne soit activé.<br /><br />La désactivation rétablira la configuration des paramètres <em>$t(calcdex.lockAuthGenetics.label)</em> & <em>$t(calcdex.lockPlayerGenetics.label)</em> de $t(common:products.calcdex_one)."
     }
   },
 
