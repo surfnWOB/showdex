@@ -821,9 +821,8 @@ export class CalcdexClassicBootstrapper extends MixinCalcdexBootstrappable(Bootd
     // battle.calcdexReactRoot for battle overlays (potentially could rename it to calcdexOverlayReactRoot... LOL)
     // let calcdexReactRoot: ReactDOM.Root;
 
-    this.battle.calcdexAsOverlay = !this.calcdexSettings?.openAs
-      || this.calcdexSettings.openAs === 'panel'
-      || (this.calcdexSettings.openAs === 'showdown' && !hasSinglePanel());
+    this.battle.calcdexAsOverlay = this.calcdexSettings.openAs === 'overlay'
+      || (this.calcdexSettings.openAs !== 'showdown' && hasSinglePanel());
 
     if (!this.battle.calcdexStateInit) {
       this.initCalcdexState();

@@ -109,7 +109,7 @@ export const MixinCalcdexBootstrappable = <
     protected abstract get battleRequest(): Showdown.BattleRequest;
 
     protected get battleState() {
-      return CalcdexBootstrappableMixin.Adapter?.rootState?.calcdex?.[this.battle?.id];
+      return CalcdexBootstrappableMixin.Adapter?.rootState?.calcdex?.[this.battle?.id || this.battleId];
     }
 
     protected get calcdexSettings() { // eslint-disable-line class-methods-use-this
