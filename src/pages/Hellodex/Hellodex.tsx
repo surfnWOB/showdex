@@ -31,10 +31,9 @@ import {
   useHellodexSettings,
   useHellodexState,
   useHonkdexSettings,
-  useShowdexBundles,
   useUpdateSettings,
 } from '@showdex/redux/store';
-import { findPlayerTitle } from '@showdex/utils/app';
+import { usePlayerTitle } from '@showdex/utils/app';
 import { env, getResourceUrl } from '@showdex/utils/core';
 import { useRandomUuid, useRoomNavigation } from '@showdex/utils/hooks';
 import { BattleRecord } from './BattleRecord';
@@ -56,9 +55,9 @@ export interface HellodexProps {
 
 const packageVersion = `v${env('package-version', 'X.X.X')}`;
 const versionSuffix = env('package-version-suffix');
+const __TEST__ = versionSuffix?.startsWith('test.');
 const buildDate = env('build-date');
 const buildSuffix = env('build-suffix');
-const __TEST__ = buildSuffix?.startsWith('test.');
 const forumUrl = env('hellodex-forum-url');
 const repoUrl = env('hellodex-repo-url');
 const communityUrl = env('hellodex-community-url');
@@ -89,22 +88,21 @@ export const Hellodex = ({
   const calcdexSettings = useCalcdexSettings();
   const honkdexSettings = useHonkdexSettings();
   const updateSettings = useUpdateSettings();
-  const bundles = useShowdexBundles();
 
   const authName = useAuthUsername();
-  const authTitle = React.useMemo(
-    () => findPlayerTitle(authName, { showdownUser: true, titles: bundles.titles, tiers: bundles.tiers }),
-    [authName, bundles.tiers, bundles.titles],
-  );
+  const authTitle = usePlayerTitle(authName, { showdownUser: true });
 
   const state = useHellodexState();
   const calcdexState = useCalcdexState();
   const neverOpens = calcdexSettings?.openOnStart === 'never';
 
-  const instances = Object.values(calcdexState).reverse().filter((b) => (
+  const instances = React.useMemo(() => Object.values(calcdexState).reverse().filter((b) => (
     !!b?.battleId
       && (b.operatingMode === 'battle' || honkdexSettings?.visuallyEnabled)
-  ));
+  )), [
+    calcdexState,
+    honkdexSettings?.visuallyEnabled,
+  ]);
 
   const instancesEmpty = !instances.length;
   const showDonateButton = settings?.showDonateButton;

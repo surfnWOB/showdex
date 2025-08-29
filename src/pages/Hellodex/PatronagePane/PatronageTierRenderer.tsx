@@ -1,3 +1,9 @@
+/**
+ * @file `PatronageTierRenderer.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.1.5
+ */
+
 import * as React from 'react';
 import cx from 'classnames';
 import { type HomieButtonProps, HomieButton } from '@showdex/components/app';
@@ -47,18 +53,20 @@ export const PatronageTierRenderer = (
 
   const containerKey = `PatronagePane:${key}:${formatId(title)}`;
   const notFirstTier = index > 0;
-  const membersCount = members.length;
 
   // note: we're not checking if `members[]` is empty since we render an mdash if it is
   if (!title || !Array.isArray(members)) {
     return null;
   }
 
+  const membersCount = members?.length || 0;
+  const alwaysActive = term === 'once' || members?.every((m) => !!m?.periods?.slice(-1)?.[0]?.[1]);
+
   return (
     <React.Fragment key={containerKey}>
       <div
         className={styles.heading}
-        style={notFirstTier ? { marginTop: 16 } : undefined}
+        {...(notFirstTier && { style: { marginTop: 16 } })}
       >
         {title}
       </div>
@@ -86,6 +94,7 @@ export const PatronageTierRenderer = (
                 homie={member}
                 term={term}
                 showTitles={showTitles}
+                alwaysActive={alwaysActive}
                 updated={updated}
                 onUserPopup={onUserPopup}
               />

@@ -1,3 +1,9 @@
+/**
+ * @file `PlayerInfo.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.2.0
+ */
+
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import cx from 'classnames';
@@ -6,8 +12,8 @@ import { type DropdownOption, Dropdown } from '@showdex/components/form';
 import { Button, ToggleButton, Tooltip } from '@showdex/components/ui';
 import { type CalcdexPlayerKey } from '@showdex/interfaces/calc';
 import { useUserLadderQuery } from '@showdex/redux/services';
-import { useColorScheme, useShowdexBundles } from '@showdex/redux/store';
-import { findPlayerTitle } from '@showdex/utils/app';
+import { useColorScheme } from '@showdex/redux/store';
+import { usePlayerTitle } from '@showdex/utils/app';
 import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { capitalize } from '@showdex/utils/humanize';
@@ -39,7 +45,6 @@ export const PlayerInfo = ({
 }: PlayerInfoProps): JSX.Element => {
   const { t } = useTranslation('calcdex');
   const colorScheme = useColorScheme();
-  const bundles = useShowdexBundles();
 
   const {
     state,
@@ -64,10 +69,7 @@ export const PlayerInfo = ({
   } = state[playerKey] || {};
 
   const playerId = React.useMemo(() => formatId(name), [name]);
-  const playerTitle = React.useMemo(
-    () => findPlayerTitle(playerId, { showdownUser: true, titles: bundles.titles, tiers: bundles.tiers }),
-    [bundles.titles, bundles.tiers, playerId],
-  );
+  const playerTitle = usePlayerTitle(playerId, { showdownUser: true });
 
   const playerLabelColor = playerTitle?.color?.[colorScheme];
   // const playerIconColor = playerTitle?.iconColor?.[colorScheme];
