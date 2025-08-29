@@ -23,7 +23,7 @@ const focusClassicRoomBy = (amount: number): void => {
   }
 
   // l.debug('moving current room', currentRoom?.id, 'by', amount, currentRoom);
-  window.app.moveRoomBy(currentRoom, amount);
+  window.app.focusRoomBy(currentRoom, amount);
 };
 
 const moveRoomBy = (amount: number): void => {
