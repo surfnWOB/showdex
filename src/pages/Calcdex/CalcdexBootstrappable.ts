@@ -588,22 +588,22 @@ export const MixinCalcdexBootstrappable = <
         const reducerName = battleRecordReducerNameFor(forceResult);
 
         l.debug(
-          'updateBattleRecord()', forceResult, 'for', authUsername, 'in', this.battleId,
+          'updateBattleRecord()', 'forcing', forceResult, 'for', authUsername, 'in', this.battleId,
           // '\n', 'forceResult', forceResult,
           // '\n', 'authUsername', authUsername,
-          '\n', '->', `hellodexSlice.actions.${reducerName}()`,
+          '\n', '->', `hellodexSlice.actions.${reducerName}(`, this.battleId, ')',
           '\n', 'battle', '(typeof)', wtf(this.battle), this.battle,
         );
 
-        return void store.dispatch(hellodexSlice.actions[reducerName]());
+        return void store.dispatch(hellodexSlice.actions[reducerName](this.battleId));
       }
 
-      if (!authUsername || !this.battle?.id) {
+      if (!authUsername || !this.battleId) {
         return;
       }
 
       const authUsernameId = formatId(authUsername);
-      const playerNames = AllPlayerKeys.map((k) => this.battle[k]?.name).filter(Boolean);
+      const playerNames = AllPlayerKeys.map((k) => this.battle?.[k]?.name).filter(Boolean);
       const playerNameIds = playerNames.map(formatId).filter(Boolean);
 
       if (playerNameIds.length && !playerNameIds.includes(authUsernameId)) {
@@ -611,7 +611,7 @@ export const MixinCalcdexBootstrappable = <
       }
 
       // note: winStep might be '|win|showdex_testee' or '|\n|win|showdex_testee'
-      const winStep = this.battle?.stepQueue?.find((s) => winStepRegex().test(s));
+      const winStep = this.battle.stepQueue?.find((s) => winStepRegex().test(s));
       const winnerName = winStep?.replace?.(winStepRegex(), ''); // e.g., '|win|showdex_testee' -> 'showdex_testee'
       const winnerNameId = (!!winnerName && formatId(winnerName)) || null; // e.g., -> 'showdextestee'
 
@@ -629,11 +629,11 @@ export const MixinCalcdexBootstrappable = <
         '\n', '->', 'playerNameIds[]', playerNameIds,
         '\n', 'winStep', winStep,
         '\n', '->', 'winnerName', winnerName, '->', 'winnerNameId', winnerNameId,
-        '\n', 'didWin?', didWin, '->', `hellodexSlice.actions.${reducerName}()`,
+        '\n', 'didWin?', didWin, '->', `hellodexSlice.actions.${reducerName}(`, this.battleId, ')',
         '\n', 'battle', '(typeof)', wtf(this.battle), this.battle,
       );
 
-      store.dispatch(hellodexSlice.actions[reducerName]());
+      store.dispatch(hellodexSlice.actions[reducerName](this.battleId));
       this.battle.calcdexBattleRecorded = true;
     }
 
