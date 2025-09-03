@@ -1,3 +1,9 @@
+/**
+ * @file `locales.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.2.1
+ */
+
 import { type ShowdexLocaleBundle } from '@showdex/interfaces/app';
 
 /**
@@ -16,7 +22,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'BOT Keith',
     desc: '(i18n)',
     created: '2024-01-05T12:18:35.813Z',
-    updated: '2025-08-26T10:15:23.831Z',
+    updated: '2025-09-01T15:23:36.608Z',
     disabled: false,
   },
   {
@@ -29,7 +35,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'Sykless, Betcheg, ChatGPT & Google Translate',
     desc: '(i18n)',
     created: '2024-01-08T16:46:10.432Z',
-    updated: '2025-08-26T10:15:22.803Z',
+    updated: '2025-09-01T15:23:48.371Z',
     disabled: false,
   },
 ];

@@ -1,3 +1,9 @@
+/**
+ * @file `CalcdexSettingsPane.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.2.3
+ */
+
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Field } from 'react-final-form';
@@ -381,6 +387,42 @@ export const CalcdexSettingsPane = ({
             <Trans
               t={t}
               i18nKey="calcdex.expandFieldControls.tooltip"
+              parent="div"
+              className={styles.tooltipContent}
+              shouldUnescape
+            />
+          )}
+        />
+
+        <div className={styles.settingsGroupTitle}>
+          {t('pane.sections.secondary.experimental', 'Experimental')}
+        </div>
+
+        <Field<ShowdexCalcdexSettings['includeHazardsDamage']>
+          name="calcdex.includeHazardsDamage"
+          component={Switch}
+          className={cx(styles.field, styles.switchField)}
+          label={t('calcdex.includeHazardsDamage.label') as React.ReactNode}
+          tooltip={(
+            <Trans
+              t={t}
+              i18nKey="calcdex.includeHazardsDamage.tooltip"
+              parent="div"
+              className={styles.tooltipContent}
+              shouldUnescape
+            />
+          )}
+        />
+
+        <Field<ShowdexCalcdexSettings['includeEotDamage']>
+          name="calcdex.includeEotDamage"
+          component={Switch}
+          className={cx(styles.field, styles.switchField)}
+          label={t('calcdex.includeEotDamage.label') as React.ReactNode}
+          tooltip={(
+            <Trans
+              t={t}
+              i18nKey="calcdex.includeEotDamage.tooltip"
               parent="div"
               className={styles.tooltipContent}
               shouldUnescape

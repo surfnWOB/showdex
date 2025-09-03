@@ -1,3 +1,9 @@
+/**
+ * @file `settings.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.2.0
+ */
+
 import {
   type ShowdexCalcdexSettings,
   type ShowdexHellodexSettings,
@@ -49,6 +55,8 @@ export const DefaultShowdexSettings: ShowdexSettings = {
     showAllOptions: false,
     showSpreadsFirst: false,
     showNonDamageRanges: true,
+    includeHazardsDamage: false,
+    includeEotDamage: false,
     downloadSmogonPresets: true,
     downloadRandomsPresets: true,
     downloadUsageStats: true,
@@ -126,6 +134,8 @@ export const DefaultShowdexSettings: ShowdexSettings = {
     showAllFormats: false,
     alwaysEditTypes: true,
     alwaysShowGenetics: true,
+    includeHazardsDamage: true,
+    includeEotDamage: true,
   },
 
   showdown: {
@@ -196,6 +206,8 @@ export const DehydratedCalcdexSettingsMap: Record<keyof ShowdexCalcdexSettings, 
   showAllOptions: 'sao',
   showSpreadsFirst: 'ssf',
   showNonDamageRanges: 'snd',
+  includeHazardsDamage: 'ihd',
+  includeEotDamage: 'ied',
   downloadSmogonPresets: 'dsp',
   downloadRandomsPresets: 'drp',
   downloadUsageStats: 'dus',
@@ -249,6 +261,8 @@ export const DehydratedHonkdexSettingsMap: Record<keyof ShowdexHonkdexSettings, 
   showAllFormats: 'saf',
   alwaysEditTypes: 'aet',
   alwaysShowGenetics: 'asg',
+  includeHazardsDamage: 'ihd',
+  includeEotDamage: 'ied',
 };
 
 /**
