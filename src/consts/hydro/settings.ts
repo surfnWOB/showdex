@@ -55,7 +55,7 @@ export const DefaultShowdexSettings: ShowdexSettings = {
     showAllOptions: false,
     showSpreadsFirst: false,
     showNonDamageRanges: true,
-    includeHazardsDamage: false,
+    includeHazardsDamage: true,
     includeEotDamage: false,
     downloadSmogonPresets: true,
     downloadRandomsPresets: true,

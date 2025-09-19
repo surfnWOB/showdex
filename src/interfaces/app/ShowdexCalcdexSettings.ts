@@ -207,10 +207,9 @@ export interface ShowdexCalcdexSettings {
   /**
    * Whether to include damage from stage hazards (e.g., *Stealth Rock*) in the NHKO chance.
    *
-   * * Disabled by default due to user experience reports of the KO% being potentially misleading during battles.
    * * Doesn't affect the damage ranges since they're of the attacker's move itself.
    *
-   * @default false
+   * @default true
    * @since 1.3.0
    */
   includeHazardsDamage: boolean;
