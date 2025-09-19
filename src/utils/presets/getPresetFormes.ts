@@ -1,3 +1,9 @@
+/**
+ * @file `getPresetFormes.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.1.2
+ */
+
 import { type GenerationNum } from '@smogon/calc';
 import { PokemonPresetFuckedBaseFormes, PokemonPresetFuckedBattleFormes } from '@showdex/consts/dex';
 import { type CalcdexPokemonPresetSource } from '@showdex/interfaces/calc';
@@ -8,8 +14,8 @@ import { getDexForFormat, hasMegaForme } from '@showdex/utils/dex';
  * Returns an array of possible formes for the provided `speciesForme` that the `speciesFormes` of each
  * `CalcdexPokemonPreset` should match against.
  *
- * * As of v1.1.7, the `config` object was added to address certain edge cases, particularly the `source` option, which
- *   if it's `'server'` or `'sheet'`, will return all of the `otherFormes[]` for the provided `speciesForme`.
+ * * As of v1.1.7, the `config` object was added to address certain edge cases, particularly the `source` option,
+ *   which if it's `'server'` or `'sheet'`, will return all of the `otherFormes[]` for the provided `speciesForme`.
  *   - This was done primarily to address mismatching `speciesForme`'s in OTS presets & the Calcdex state, namely for
  *     a pre-initialized `'Urshifu'` in the state not matching with an OTS preset for `'Urshifu-Rapid-Strike'`.
  * * Guaranteed to at least return an empty array (i.e., `[]`) if building the formes fails at any point.
@@ -146,8 +152,8 @@ export const getPresetFormes = (
   if (PokemonPresetFuckedBattleFormes.includes(name) && (battleOnly || changesFrom)) {
     const battleFormes = (
       Array.isArray(battleOnly)
-        ? battleOnly // e.g., name = 'Necrozma-Ultra' -> ['Necrozma-Dawn-Wings', 'Necrozma-Dusk-Mane']
-        : [battleOnly] // e.g., name = 'Ogerpon-Wellspring' -> ['Ogerpon-Wellspring'] (sorry Darmanitan)
+        ? battleOnly as string[] // e.g., name = 'Necrozma-Ultra' -> ['Necrozma-Dawn-Wings', 'Necrozma-Dusk-Mane']
+        : [battleOnly as string] // e.g., name = 'Ogerpon-Wellspring' -> ['Ogerpon-Wellspring'] (sorry Darmanitan)
     ).filter(Boolean);
 
     if (battleFormes.length) {
