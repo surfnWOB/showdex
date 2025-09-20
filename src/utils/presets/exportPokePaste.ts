@@ -73,25 +73,31 @@ const exportStatsTable = (
     prev,
     [stat, value],
   ) => {
+    const statMapping = PokemonPokePasteStatMap[stat];
+
+    if (!statMapping) {
+      return prev;
+    }
+
     const shouldIgnore = ignored.includes(stat)
       || typeof value !== 'number'
       || (typeof ignoreValue === 'number' && value === ignoreValue);
 
-    const statBoost = (stat !== 'hp' && boosts.includes(stat) && (stat === boosts[0] ? '+' : '-')) || '';
+    const statBoost = (
+      stat !== 'hp'
+        && boosts.includes(stat)
+        && (stat === boosts[0] ? '+' : '-')
+    ) || '';
 
     if (shouldIgnore) {
       if (statBoost) {
-        prev.push(`${statBoost} ${stat}`);
+        prev.push(`${statBoost} ${statMapping}`);
       }
 
       return prev;
     }
 
-    const statMapping = PokemonPokePasteStatMap[stat];
-
-    if (statMapping) {
-      prev.push(`${value}${statBoost} ${statMapping}`);
-    }
+    prev.push(`${value}${statBoost} ${statMapping}`);
 
     return prev;
   }, []).join(' / ');
@@ -135,10 +141,10 @@ const exportStatsTable = (
  * // 'classic' syntax (default)
  * `Smogonbirb (Kingambit) (F) @ Air Balloon
  * Ability: Supreme Overlord
- * Tera Type: Flying
- * IVs: 0 SpA
  * EVs: 252 Atk / 4 Def / 252 Spe
+ * IVs: 0 SpA
  * Level: 99
+ * Tera Type: Flying
  * Adamant Nature
  * - Swords Dance
  * - Sucker Punch
@@ -263,31 +269,6 @@ export const exportPokePaste = (
     output.push(...moveLines);
   }
 
-  // Shiny: <Yes/No>
-  if (shiny) {
-    output.push(syntax === 'preact' ? 'Shiny' : 'Shiny: Yes'); // lol
-  }
-
-  // Tera Type: <teraType>
-  // (<teraType> shouldn't print when '???' or matches the default Tera type, i.e., the first type of the Pokemon)
-  const teraType = dirtyTeraType || revealedTeraType;
-
-  if (teraType && teraType !== '???' && teraType !== (types?.[0] || dexCurrentForme.types?.[0])) {
-    output.push(`Tera Type: ${teraType}`);
-  }
-
-  // Gigantamax: <Yes/No>
-  if (hasGmaxForme) {
-    output.push('Gigantamax: Yes');
-  }
-
-  // Level: <value> (where <value> is not 100)
-  if (typeof level === 'number' && level !== 100) {
-    output.push(`Level: ${level}`);
-  }
-
-  // Happiness: <value> (where <value> is not 255)
-
   // EVs: <value> <stat> ...[/ <value> <stat>] (where <value> is not 0) -- only in non-legacy
   // IVs: <value> <stat> ...[/ <value> <stat>] (where <value> is not 31 [or 30, if legacy])
   // (where <stat> is HP, Atk, Def, SpA, SpD, or Spe)
@@ -318,14 +299,41 @@ export const exportPokePaste = (
     }
   }
 
-  // <nature> Nature
-  if (nature) {
-    output.push(`${nature} Nature`);
+  // Level: <value> (where <value> is not 100)
+  if (typeof level === 'number' && level !== 100) {
+    output.push(`Level: ${level}`);
   }
 
-  // - <moveName> (at this point if using the 'classic' syntax)
-  if (syntax === 'classic' && moveLines.length) {
-    output.push(...moveLines);
+  // Tera Type: <teraType>
+  // (<teraType> shouldn't print when '???' or matches the default Tera type, i.e., the first type of the Pokemon)
+  const teraType = dirtyTeraType || revealedTeraType;
+
+  if (teraType && teraType !== '???' && teraType !== (types?.[0] || dexCurrentForme.types?.[0])) {
+    output.push(`Tera Type: ${teraType}`);
+  }
+
+  // Gigantamax: <Yes/No>
+  if (hasGmaxForme) {
+    output.push(syntax === 'preact' ? 'Gigantamax' : 'Gigantamax: Yes'); // untested; not 100% about this one
+  }
+
+  // Shiny: <Yes/No>
+  if (shiny) {
+    output.push(syntax === 'preact' ? 'Shiny' : 'Shiny: Yes'); // lol
+  }
+
+  // Happiness: <value> (where <value> is not 255)
+
+  if (syntax === 'classic') {
+    // <nature> Nature
+    if (nature) {
+      output.push(`${nature} Nature`);
+    }
+
+    // - <moveName>
+    if (moveLines.length) {
+      output.push(...moveLines);
+    }
   }
 
   return output.join('\n') || null;
