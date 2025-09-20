@@ -152,8 +152,8 @@ export const getPresetFormes = (
   if (PokemonPresetFuckedBattleFormes.includes(name) && (battleOnly || changesFrom)) {
     const battleFormes = (
       Array.isArray(battleOnly)
-        ? battleOnly as string[] // e.g., name = 'Necrozma-Ultra' -> ['Necrozma-Dawn-Wings', 'Necrozma-Dusk-Mane']
-        : [battleOnly as string] // e.g., name = 'Ogerpon-Wellspring' -> ['Ogerpon-Wellspring'] (sorry Darmanitan)
+        ? battleOnly // e.g., name = 'Necrozma-Ultra' -> ['Necrozma-Dawn-Wings', 'Necrozma-Dusk-Mane']
+        : [battleOnly] // e.g., name = 'Ogerpon-Wellspring' -> ['Ogerpon-Wellspring'] (sorry Darmanitan)
     ).filter(Boolean);
 
     if (battleFormes.length) {

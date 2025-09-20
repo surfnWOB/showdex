@@ -43,13 +43,13 @@ declare namespace Showdown {
     public readonly gender: GenderName;
     public readonly color: string;
     public readonly genderRatio?: Readonly<Record<Exclude<GenderName, 'N'>, number>>;
-    public readonly eggGroups: readonly string[];
-    public readonly tags: readonly string[];
+    public readonly eggGroups: string[];
+    public readonly tags: string[];
 
     // format data
-    public readonly otherFormes?: readonly string[];
-    public readonly cosmeticFormes?: readonly string[];
-    public readonly evos?: readonly string[];
+    public readonly otherFormes?: string[];
+    public readonly cosmeticFormes?: string[];
+    public readonly evos?: string[];
     public readonly prevo: string;
     public readonly evoType: SpeciesEvoType | '';
     public readonly evoLevel: number;
@@ -57,7 +57,7 @@ declare namespace Showdown {
     public readonly evoItem: string;
     public readonly evoCondition: string;
     public readonly nfe: boolean; // i.e., Not Fully Evolved
-    public readonly requiredItems: readonly string[];
+    public readonly requiredItems: string[];
     public readonly tier: string;
     public readonly isTotem: boolean;
     public readonly isMega: boolean;
@@ -65,7 +65,7 @@ declare namespace Showdown {
     public readonly canGigantamax: boolean;
     public readonly cannotDynamax: boolean;
     public readonly requiredTeraType: TypeName;
-    public readonly battleOnly?: string | readonly string[];
+    public readonly battleOnly?: string | string[];
     public readonly isNonstandard?: string;
     public readonly unreleasedHidden: boolean | 'Past';
     public readonly changesFrom?: string;
