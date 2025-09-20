@@ -328,6 +328,39 @@ export const CalcdexSettingsPane = ({
           }))}
         />
 
+        <Field<ShowdexCalcdexSettings['presetDisplaySyntax']>
+          name="calcdex.presetDisplaySyntax"
+          component={Segmented}
+          className={cx(
+            styles.field,
+            !inBattle && styles.singleColumn,
+          )}
+          label={t('calcdex.presetDisplaySyntax.label') as React.ReactNode}
+          labelPosition={inBattle ? 'top' : 'left'}
+          options={[
+            'classic',
+            'preact',
+            'auto',
+          ].map((option) => ({
+            label: t(`calcdex.presetDisplaySyntax.options.${option}.label`),
+            tooltip: (
+              <Trans
+                t={t}
+                i18nKey={`calcdex.presetDisplaySyntax.options.${option}.tooltip`}
+                parent="div"
+                className={styles.tooltipContent}
+                shouldUnescape
+                {...(option === 'auto' && {
+                  values: {
+                    host: t(`calcdex.presetDisplaySyntax.options.${option}.hosts.${window.__SHOWDEX_HOST || 'bad'}`, 'dafuq'),
+                  },
+                })}
+              />
+            ),
+            value: option,
+          }))}
+        />
+
         <Field<ShowdexCalcdexSettings['forceNonVolatile']>
           name="calcdex.forceNonVolatile"
           component={Switch}

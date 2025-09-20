@@ -1,3 +1,9 @@
+/**
+ * @file `PokeInfo.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.2
+ */
+
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import cx from 'classnames';
@@ -441,15 +447,29 @@ export const PokeInfo = ({
   const exportFailedBadgeRef = React.useRef<BadgeInstance>(null);
   const [exportedCount, setExportedCount] = React.useState(0);
 
-  const pokePaste = React.useMemo(
-    () => exportPokePaste(pokemon, format),
-    [format, pokemon],
-  );
+  const pokePasteSyntax = React.useMemo(() => (
+    (settings?.presetDisplaySyntax !== 'auto' && settings?.presetDisplaySyntax)
+      || (window.__SHOWDEX_HOST || 'classic')
+  ), [
+    settings?.presetDisplaySyntax,
+  ]);
 
-  const handlePokePasteExport = () => void (async () => {
+  const pokePaste = React.useMemo(() => exportPokePaste(pokemon, {
+    format,
+    syntax: pokePasteSyntax,
+  }), [
+    format,
+    pokemon,
+    pokePasteSyntax,
+  ]);
+
+  const handlePokePasteExport = React.useCallback(() => void (async () => {
     // note: using `gen` instead of `format` (just for what's actually copied to the user's clipboard) to not omit the EVs
     // in Randoms, where they're all (usually) 85, but the PokePaste will omit them when passing the full `format`
-    const fullPaste = exportPokePaste(pokemon, gen);
+    const fullPaste = exportPokePaste(pokemon, {
+      format: gen,
+      syntax: pokePasteSyntax,
+    });
 
     if (!fullPaste) {
       return;
@@ -473,15 +493,24 @@ export const PokeInfo = ({
 
       exportFailedBadgeRef.current?.show();
     }
-  })();
+  })(), [
+    gen,
+    pokemon,
+    pokePasteSyntax,
+  ]);
 
-  const handleMultiPokePasteExport = () => void (async () => {
+  const handleMultiPokePasteExport = React.useCallback(() => void (async () => {
     if ((operatingMode === 'battle' && battleActive) || !player?.pokemon?.length) {
       return;
     }
 
     const delimiter = '\n\n' as const;
-    const paste = exportMultiPokePaste(player.pokemon, { format, delimiter });
+    const paste = exportMultiPokePaste(player.pokemon, {
+      format,
+      syntax: pokePasteSyntax,
+      delimiter,
+    });
+
     const count = paste?.split(delimiter).length || 0;
 
     try {
@@ -492,7 +521,13 @@ export const PokeInfo = ({
     } catch (error) {
       exportFailedBadgeRef.current?.show();
     }
-  })();
+  })(), [
+    battleActive,
+    format,
+    operatingMode,
+    player?.pokemon,
+    pokePasteSyntax,
+  ]);
 
   return (
     <div

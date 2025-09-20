@@ -4,7 +4,7 @@
     "version": "1.0.3",
     "locale": "en",
     "created": "2024-01-07T00:59:01.639Z",
-    "updated": "2025-09-01T15:23:36.608Z"
+    "updated": "2025-09-20T07:14:46.978Z"
   },
 
   "pane": {
@@ -248,6 +248,29 @@
         "usage": {
           "label": "Usage",
           "tooltip": "Downloads freshly updated $t(common:products.showdown) usage stats for standard formats &amp; pool probabilities for Randoms, which will be displayed next to abilities, items &amp; moves.<br /><br />Also in non-Randoms formats, an additional set derived from the usage stats called <em>Showdown Usage</em> will be available.<br /><br />Disabling this may <em>slightly</em> improve performance on lower-spec machines."
+        }
+      }
+    },
+
+    "presetDisplaySyntax": {
+      "label": "Show PokéPastes in",
+      "options": {
+        "classic": {
+          "label": "Old Syntax",
+          "tooltip": "Shows &amp; exports PokéPastes in the old syntax used in the original Showdown client before the rewrite. Importing PokéPastes in the <strong>$t(calcdex.presetDisplaySyntax.options.preact.label)</strong> will still be possible."
+        },
+        "preact": {
+          "label": "New Syntax",
+          "tooltip": "Shows &amp; exports PokéPastes in the new syntax used in the Showdown client rewrite. Importing PokéPastes in the <strong>$t(calcdex.presetDisplaySyntax.options.classic.label)</strong> will still be possible."
+        },
+        "auto": {
+          "label": "$t(common:labels.auto)",
+          "tooltip": "Shows &amp; exports PokéPaste in either the <strong>$t(calcdex.presetDisplaySyntax.options.classic.label)</strong> or the <strong>$t(calcdex.presetDisplaySyntax.options.preact.label)</strong> depending on the detected Showdown client. Importing PokéPastes in either syntax will still be possible.<br /><br />(By the way, you're on the {{host}}!)",
+          "hosts": {
+            "bad": "bad client",
+            "classic": "original Showdown client",
+            "preact": "Showdown client rewrite"
+          }
         }
       }
     },

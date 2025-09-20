@@ -260,6 +260,22 @@ export interface ShowdexCalcdexSettings {
   downloadUsageStats: boolean;
 
   /**
+   * Which syntax format to display & export PokePastes in.
+   *
+   * * `'classic'` will use the old syntax format used in `'classic'` `__SHOWDEX_HOST`'s & `'preact'` will use the
+   *   new syntax format used in `'preact'` `__SHOWDEX_HOST`'s.
+   *   - `'auto'` (default) will select either `'classic'` or `'preact'` depending on the detected `__SHOWDEX_HOST`.
+   * * Importing PokePastes in the old & new syntaxes will still be possible regardless of this setting.
+   *
+   * @default
+   * ```ts
+   * 'auto'
+   * ```
+   * @since 1.3.0
+   */
+  presetDisplaySyntax: 'classic' | 'preact' | 'auto';
+
+  /**
    * Maximum age of cached presets in *days*.
    *
    * @default

@@ -4,7 +4,7 @@
     "version": "1.0.3",
     "locale": "fr",
     "created": "2024-01-08T19:45:21.842Z",
-    "updated": "2025-09-01T15:23:48.371Z"
+    "updated": "2025-09-20T07:14:49.973Z"
   },
 
   "pane": {
@@ -247,6 +247,29 @@
         "usage": {
           "label": "Usage",
           "tooltip": "Télécharge les statistiques d'utilisation de $t(common:products.showdown) récemment mises à jour pour les formats standards & les probabilités de pool pour Randoms, qui seront affichées à côté des talents, objets & capacités.<br /><br />Aussi dans les formats non-Randoms, un set supplémentaire dérivé des statistiques d'utilisation appelé <em>Showdown Usage</em> sera disponible.<br /><br />Désactiver cela peut <em>légèrement</em> améliorer les performances sur des machines moins performantes."
+        }
+      }
+    },
+
+    "presetDisplaySyntax": {
+      "label": "Afficher les PokéPastes en",
+      "options": {
+        "classic": {
+          "label": "Ancienne syntaxe",
+          "tooltip": "Affiche et exporte les PokéPastes dans l'ancienne syntaxe utilisée dans le client Showdown original avant la réécriture. L'importation de PokéPastes dans la <strong>$t(calcdex.presetDisplaySyntax.options.preact.label)</strong> restera possible."
+        },
+        "preact": {
+          "label": "Nouvelle syntaxe",
+          "tooltip": "Affiche et exporte les PokéPastes dans la nouvelle syntaxe utilisée dans la réécriture du client Showdown. L'importation de PokéPastes dans la <strong>$t(calcdex.presetDisplaySyntax.options.classic.label)</strong> restera possible."
+        },
+        "auto": {
+          "label": "$t(common:labels.auto)",
+          "tooltip": "Affiche et exporte les PokéPastes dans soit la <strong>$t(calcdex.presetDisplaySyntax.options.classic.label)</strong>, soit la <strong>$t(calcdex.presetDisplaySyntax.options.preact.label)</strong>, en fonction du client Showdown détecté. L'importation de PokéPastes dans l'une ou l'autre syntaxe restera possible.<br /><br />(Au fait, vous êtes sur {{host}} !)",
+          "hosts": {
+            "bad": "mauvais client",
+            "classic": "client Showdown original",
+            "preact": "réécriture du client Showdown"
+          }
         }
       }
     },
