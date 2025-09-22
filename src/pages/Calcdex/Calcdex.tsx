@@ -18,19 +18,12 @@ import {
 } from '@showdex/components/calc';
 import { BuildInfo } from '@showdex/components/debug';
 import { type DropdownOption } from '@showdex/components/form';
-import { PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
-import {
-  ContextMenu,
-  BaseButton,
-  Scrollable,
-  useContextMenu,
-} from '@showdex/components/ui';
+import { PageContainer, PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
+import { BaseButton, ContextMenu, useContextMenu } from '@showdex/components/ui';
 import { type CalcdexPlayerKey, CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
 import {
   useCalcdexDuplicator,
   useColorScheme,
-  useColorTheme,
-  useGlassyTerrain,
   useHonkdexSettings,
   useShowdexBundles,
 } from '@showdex/redux/store';
@@ -61,8 +54,6 @@ export const Calcdex = ({
 
   const { t } = useTranslation('calcdex');
   const colorScheme = useColorScheme();
-  const colorTheme = useColorTheme();
-  const glassyTerrain = useGlassyTerrain();
   const bundles = useShowdexBundles();
   const mobile = useMobileViewport();
 
@@ -168,91 +159,85 @@ export const Calcdex = ({
 
   return (
     <PiconRackProvider dndMuxId={battleId}>
-      <div
+      <PageContainer
         ref={containerRef}
+        name="calcdex"
         className={cx(
-          'showdex-module',
           styles.container,
-          !!colorScheme && styles[colorScheme],
-          !!colorTheme && styles[colorTheme],
-          glassyTerrain && styles.glassy,
+          renderAsOverlay && styles.overlay,
           mobile && styles.mobile,
           containerSize === 'xs' && styles.verySmol,
           containerWidth < 380 && styles.skinnyBoi,
-          renderAsOverlay && styles.overlay,
         )}
-        onContextMenu={(e) => showContextMenu({
+        contentClassName={styles.content}
+        prefix={<BuildInfo position="top-right" />}
+        contentScrollable
+        onContextMenu={(e) => void showContextMenu({
           event: e,
           id: contextMenuId,
         })}
       >
-        <Scrollable className={styles.content}>
-          <BuildInfo
-            position="top-right"
+        {
+          (renderAsOverlay && !mobile) &&
+          <BaseButton
+            className={styles.overlayCloseButton}
+            display="block"
+            aria-label="Close Calcdex"
+            onPress={onCloseOverlay}
+          >
+            <i className="fa fa-close" />
+          </BaseButton>
+        }
+
+        {
+          (renderAsOverlay && mobile) &&
+          <CloseButton
+            className={cx(styles.mobileCloseButton, styles.top)}
+            onPress={onCloseOverlay}
           />
+        }
 
-          {
-            (renderAsOverlay && !mobile) &&
-            <BaseButton
-              className={styles.overlayCloseButton}
-              display="block"
-              aria-label="Close Calcdex"
-              onPress={onCloseOverlay}
-            >
-              <i className="fa fa-close" />
-            </BaseButton>
-          }
-
-          {
-            (renderAsOverlay && mobile) &&
-            <CloseButton
-              className={cx(styles.mobileCloseButton, styles.top)}
-              onPress={onCloseOverlay}
-            />
-          }
-
-          <PiconRackSortableContext playerKey={topKey}>
-            <PlayerCalc
-              className={styles.playerCalc}
-              position="top"
-              playerKey={topKey}
-              defaultName={t('player.user.defaultName', { index: 1 })}
-              playerOptions={playerOptions}
-              mobile={mobile}
-              onUserPopup={onUserPopup}
-            />
-          </PiconRackSortableContext>
-
-          <FieldCalc
-            className={cx(
-              styles.fieldCalc,
-              (settings?.expandFieldControls || state?.gameType === 'Doubles') && styles.expanded,
-            )}
+        <PiconRackSortableContext playerKey={topKey}>
+          <PlayerCalc
+            className={styles.playerCalc}
+            position="top"
             playerKey={topKey}
-            opponentKey={bottomKey}
+            defaultName={t('player.user.defaultName', { index: 1 })}
+            playerOptions={playerOptions}
+            mobile={mobile}
+            onUserPopup={onUserPopup}
           />
+        </PiconRackSortableContext>
 
-          <PiconRackSortableContext playerKey={bottomKey}>
-            <PlayerCalc
-              className={styles.opponentCalc}
-              position="bottom"
-              playerKey={bottomKey}
-              defaultName={t('player.user.defaultName', { index: 2 })}
-              playerOptions={playerOptions}
-              mobile={mobile}
-              onUserPopup={onUserPopup}
-            />
-          </PiconRackSortableContext>
+        <FieldCalc
+          className={cx(
+            styles.fieldCalc,
+            (settings?.expandFieldControls || state?.gameType === 'Doubles') && styles.expanded,
+          )}
+          playerKey={topKey}
+          opponentKey={bottomKey}
+        />
 
-          {
-            (renderAsOverlay && mobile) &&
-            <CloseButton
-              className={cx(styles.mobileCloseButton, styles.bottom)}
-              onPress={onCloseOverlay}
-            />
-          }
-        </Scrollable>
-      </div>
+        <PiconRackSortableContext playerKey={bottomKey}>
+          <PlayerCalc
+            className={styles.opponentCalc}
+            position="bottom"
+            playerKey={bottomKey}
+            defaultName={t('player.user.defaultName', { index: 2 })}
+            playerOptions={playerOptions}
+            mobile={mobile}
+            onUserPopup={onUserPopup}
+          />
+        </PiconRackSortableContext>
+
+        {
+          (renderAsOverlay && mobile) &&
+          <CloseButton
+            className={cx(styles.mobileCloseButton, styles.bottom)}
+            onPress={onCloseOverlay}
+          />
+        }
+      </PageContainer>
 
       <ContextMenu
         id={contextMenuId}

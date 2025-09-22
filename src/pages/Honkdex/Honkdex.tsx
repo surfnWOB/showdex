@@ -6,7 +6,6 @@
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import cx from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 import {
   type BattleInfoProps,
@@ -17,14 +16,9 @@ import {
   useCalcdexSize,
 } from '@showdex/components/calc';
 import { BuildInfo } from '@showdex/components/debug';
-import { PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
-import { ContextMenu, Scrollable, useContextMenu } from '@showdex/components/ui';
-import {
-  useCalcdexDuplicator,
-  useColorScheme,
-  useColorTheme,
-  useGlassyTerrain,
-} from '@showdex/redux/store';
+import { PageContainer, PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
+import { ContextMenu, useContextMenu } from '@showdex/components/ui';
+import { useCalcdexDuplicator } from '@showdex/redux/store';
 import { useRandomUuid } from '@showdex/utils/hooks';
 import styles from './Honkdex.module.scss';
 
@@ -44,9 +38,6 @@ export const Honkdex = ({
   useCalcdexSize(containerRef);
 
   const { t } = useTranslation('honkdex');
-  const colorScheme = useColorScheme();
-  const colorTheme = useColorTheme();
-  const glassyTerrain = useGlassyTerrain();
   const { state, saving, saveHonk } = useCalcdexContext();
   const dupeCalcdex = useCalcdexDuplicator();
 
@@ -71,55 +62,45 @@ export const Honkdex = ({
 
   return (
     <PiconRackProvider dndMuxId={state?.battleId}>
-      <div
+      <PageContainer
         ref={containerRef}
-        className={cx(
-          'showdex-module',
-          styles.container,
-          !!colorScheme && styles[colorScheme],
-          !!colorTheme && styles[colorTheme],
-          glassyTerrain && styles.glassy,
-        )}
-        onContextMenu={(e) => showContextMenu({
+        name="honkdex"
+        prefix={<BuildInfo position="top-right" />}
+        contentScrollable
+        onContextMenu={(e) => void showContextMenu({
           event: e,
           id: contextMenuId,
         })}
       >
-        <Scrollable className={styles.content}>
-          <BuildInfo
-            position="top-right"
-          />
+        <BattleInfo
+          className={styles.battleInfo}
+          onRequestHonkdex={onRequestHonkdex}
+        />
 
-          <BattleInfo
-            className={styles.battleInfo}
-            onRequestHonkdex={onRequestHonkdex}
-          />
-
-          <PiconRackSortableContext playerKey={topKey}>
-            <PlayerCalc
-              className={styles.playerCalc}
-              position="top"
-              playerKey={topKey}
-              defaultName="Side A"
-            />
-          </PiconRackSortableContext>
-
-          <FieldCalc
-            className={styles.fieldCalc}
+        <PiconRackSortableContext playerKey={topKey}>
+          <PlayerCalc
+            className={styles.playerCalc}
+            position="top"
             playerKey={topKey}
-            opponentKey={bottomKey}
+            defaultName="Side A"
           />
+        </PiconRackSortableContext>
 
-          <PiconRackSortableContext playerKey={bottomKey}>
-            <PlayerCalc
-              className={styles.opponentCalc}
-              position="bottom"
-              playerKey={bottomKey}
-              defaultName="Side B"
-            />
-          </PiconRackSortableContext>
-        </Scrollable>
-      </div>
+        <FieldCalc
+          className={styles.fieldCalc}
+          playerKey={topKey}
+          opponentKey={bottomKey}
+        />
+
+        <PiconRackSortableContext playerKey={bottomKey}>
+          <PlayerCalc
+            className={styles.opponentCalc}
+            position="bottom"
+            playerKey={bottomKey}
+            defaultName="Side B"
+          />
+        </PiconRackSortableContext>
+      </PageContainer>
 
       <ContextMenu
         id={contextMenuId}
