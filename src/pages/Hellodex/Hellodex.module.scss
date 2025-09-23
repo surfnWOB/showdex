@@ -287,9 +287,8 @@
 
 .instanceButton {
   grid-area: span 1 / span 1;
-}
-
-div.newHonkButton {
+  @include flex.row-center;
+  column-gap: 8px;
   border-radius: 12px;
   @include aria.outline($radius: 12px);
 

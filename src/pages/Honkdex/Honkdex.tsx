@@ -65,7 +65,7 @@ export const Honkdex = ({
       <PageContainer
         ref={containerRef}
         name="honkdex"
-        prefix={<BuildInfo position="top-right" />}
+        prefix={<BuildInfo className={styles.buildInfo} position="top-right" />}
         contentScrollable
         onContextMenu={(e) => void showContextMenu({
           event: e,

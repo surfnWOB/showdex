@@ -133,7 +133,7 @@ export interface HellodexSliceReducers extends SliceCaseReducers<HellodexSliceSt
 
 const l = logger('@showdex/redux/store/hellodexSlice');
 
-export const hellodexSlice = createSlice<HellodexSliceState, HellodexSliceReducers, string>({
+export const hellodexSlice = createSlice<HellodexSliceState, HellodexSliceReducers, 'hellodex'>({
   name: 'hellodex',
 
   initialState: {

@@ -1,4 +1,10 @@
 /**
+ * @file `detectPreactHost.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.3.0
+ */
+
+/**
  * Detects if the provided `host` is running the rewritten Showdown Preact (i.e., Puny/Petite React.js) client.
  *
  * * Mostly for TypeScript lol.

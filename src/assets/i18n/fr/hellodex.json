@@ -1,14 +1,15 @@
 {
   "--meta": {
     "name": "hellodex",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "locale": "fr",
     "created": "2024-01-08T19:34:00.026Z",
-    "updated": "2024-07-25T17:14:33.391Z"
+    "updated": "2025-09-23T08:35:36.561Z"
   },
 
   "contextMenu": {
     "newHonk": "Nouveau Honk",
+    "newNote": "Nouvelle Note",
     "spectate": "Assisterez à Batailles",
     "settings": "$t(common:labels.setting_other)",
     "close": "$t(common:labels.close)"
@@ -43,7 +44,16 @@
       },
       "orSeparator": "ou",
       "newLabel": ["<strong>Nouveau</strong>", "<strong>Honk</strong>dex"],
-      "newAria": "Créer un Nouveau $t(common:products.honk_one)"
+      "newAria": "Créer un nouveau $t(common:products.honk_one)"
+    },
+    "notedex": {
+      "contextMenu": {
+        "open": "$t(common:labels.open)",
+        "dupe": "$t(common:labels.duplicate)",
+        "remove": "$t(common:labels.delete)"
+      },
+      "newLabel": "<strong>Note</strong>dex",
+      "newAria": "Créer une nouvelle $t(common:products.note_one)"
     }
   },
 

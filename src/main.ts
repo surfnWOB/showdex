@@ -6,14 +6,16 @@
 
 import {
   BootdexClassicAdapter,
-  BootdexPreactAdapter,
   BootdexManager,
+  BootdexPreactAdapter,
   CalcdexClassicBootstrapper,
   CalcdexPreactBootstrapper,
   HellodexClassicBootstrapper,
   HellodexPreactBootstrapper,
   HonkdexClassicBootstrapper,
   HonkdexPreactBootstrapper,
+  NotedexClassicBootstrapper,
+  NotedexPreactBootstrapper,
   TeamdexClassicBootstrapper,
   TeamdexPreactBootstrapper,
 } from '@showdex/pages';
@@ -62,54 +64,64 @@ window.__SHOWDEX_INIT = env('build-name', 'showdex');
 
 // determine if we're in that new new preact mode or nahhhhh
 // ("new" at the time of me writing this on 2025/08/08, anyway)
-window.__SHOWDEX_HOST = window.PS?.startTime ? 'preact' : 'classic';
+window.__SHOWDEX_HOST = (detectPreactHost(window) && 'preact')
+  || (detectClassicHost(window) && 'classic')
+  || null;
 
 // note: don't inline await, otherwise, there'll be a race condition with the login
 // (also makes the Hellodex not appear immediately when Showdown first opens)
 void (async () => {
-  const yay = () => void l.success(window.__SHOWDEX_INIT, 'for', window.__SHOWDEX_HOST, 'initialized!');
+  switch (window.__SHOWDEX_HOST) {
+    case 'preact': {
+      l.silly(
+        'welcome to Showdex for pre\'s react edition !!!',
+        '\n', 'PS', '(typeof)', wtf(window.PS), '(start)', window.PS.startTime,
+        '\n', '__SHOWDEX_HOST', window.__SHOWDEX_HOST,
+        '\n', '__SHOWDEX_INIT', window.__SHOWDEX_INIT,
+        '\n', '(note: no relation to @pre ... that was for the punies hehe)', // fun fact: puny + react = preact (punny huh)
+      );
 
-  if (detectPreactHost(window)) {
-    l.silly(
-      'welcome to Showdex for pre\'s react edition !!!',
-      '\n', 'PS', '(typeof)', wtf(window.PS), '(start)', window.PS.startTime,
-      '\n', '__SHOWDEX_HOST', window.__SHOWDEX_HOST,
-      '\n', '__SHOWDEX_INIT', window.__SHOWDEX_INIT,
-      '\n', '(note: no relation to @pre ... that was for the punies hehe)', // fun fact: puny + react = preact (punny huh)
-    );
+      BootdexManager.register('calcdex', CalcdexPreactBootstrapper);
+      BootdexManager.register('hellodex', HellodexPreactBootstrapper);
+      BootdexManager.register('honkdex', HonkdexPreactBootstrapper);
+      BootdexManager.register('notedex', NotedexPreactBootstrapper);
 
-    BootdexManager.register('calcdex', CalcdexPreactBootstrapper);
-    BootdexManager.register('hellodex', HellodexPreactBootstrapper);
-    BootdexManager.register('honkdex', HonkdexPreactBootstrapper);
+      await BootdexPreactAdapter.run();
+      new CalcdexPreactBootstrapper().run();
+      new TeamdexPreactBootstrapper().run();
+      new HellodexPreactBootstrapper().run();
+      new HonkdexPreactBootstrapper().run();
+      new NotedexPreactBootstrapper().run();
 
-    await BootdexPreactAdapter.run();
-    new CalcdexPreactBootstrapper().run();
-    new TeamdexPreactBootstrapper().run();
-    new HellodexPreactBootstrapper().run();
-    new HonkdexPreactBootstrapper().run();
+      break;
+    }
 
-    return void yay();
+    case 'classic': {
+      BootdexManager.register('calcdex', CalcdexClassicBootstrapper);
+      BootdexManager.register('hellodex', HellodexClassicBootstrapper);
+      BootdexManager.register('honkdex', HonkdexClassicBootstrapper);
+      BootdexManager.register('notedex', NotedexClassicBootstrapper);
+      BootdexClassicAdapter.receiverFactory = (roomId) => () => void new CalcdexClassicBootstrapper(roomId).run();
+
+      await BootdexClassicAdapter.run();
+      new TeamdexClassicBootstrapper().run();
+      new HellodexClassicBootstrapper().run();
+      new HonkdexClassicBootstrapper().run();
+      new NotedexClassicBootstrapper().run();
+
+      break;
+    }
+
+    default: {
+      l.error(
+        'Couldn\'t determine what __SHOWDEX_HOST we\'re in rn o_O',
+        '\n', '__SHOWDEX_HOST', window.__SHOWDEX_HOST,
+        '\n', '__SHOWDEX_INIT', window.__SHOWDEX_INIT,
+      );
+
+      throw new Error('Showdex attempted to run in an unsupported Showdown host.');
+    }
   }
 
-  if (detectClassicHost(window)) {
-    BootdexManager.register('calcdex', CalcdexClassicBootstrapper);
-    BootdexManager.register('hellodex', HellodexClassicBootstrapper);
-    BootdexManager.register('honkdex', HonkdexClassicBootstrapper);
-    BootdexClassicAdapter.receiverFactory = (roomId) => () => void new CalcdexClassicBootstrapper(roomId).run();
-
-    await BootdexClassicAdapter.run();
-    new TeamdexClassicBootstrapper().run();
-    new HellodexClassicBootstrapper().run();
-    new HonkdexClassicBootstrapper().run();
-
-    return void yay();
-  }
-
-  l.error(
-    'Couldn\'t determine what __SHOWDEX_HOST we\'re in rn o_O',
-    '\n', '__SHOWDEX_HOST', window.__SHOWDEX_HOST,
-    '\n', '__SHOWDEX_INIT', window.__SHOWDEX_INIT,
-  );
-
-  throw new Error('Showdex attempted to run in an unsupported Showdown host.');
+  l.success(window.__SHOWDEX_INIT, 'for', window.__SHOWDEX_HOST, 'initialized!');
 })();

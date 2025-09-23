@@ -157,16 +157,18 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
   const { state, saving, presets: battlePresets } = ctx;
   const saveRequestTimeout = React.useRef<NodeJS.Timeout>(null);
 
-  const saveHonk = () => void (async () => {
-    await dispatch(saveHonkdex({
-      battleId: state.battleId,
-    }));
+  const saveHonk = React.useCallback(() => void (async () => {
+    await dispatch(saveHonkdex({ battleId: state.battleId }));
 
     saving[1](false);
     saveRequestTimeout.current = null;
-  })();
+  })(), [
+    dispatch,
+    saving,
+    state.battleId,
+  ]);
 
-  const queueHonkSave = () => {
+  const queueHonkSave = React.useCallback(() => {
     // this seemingly redundant check is for calls outside of this hook, such as in BattleInfo
     if (state.operatingMode !== 'standalone') {
       return;
@@ -180,8 +182,12 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
       saving[1](true);
     }
 
-    saveRequestTimeout.current = setTimeout(saveHonk, 3000);
-  };
+    saveRequestTimeout.current = setTimeout(saveHonk, 1000);
+  }, [
+    saveHonk,
+    saving,
+    state?.operatingMode,
+  ]);
 
   const applyAutoBoostEffects = (
     playersPayload: Partial<Record<CalcdexPlayerKey, Partial<CalcdexPlayer>>>,

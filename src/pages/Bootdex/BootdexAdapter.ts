@@ -8,12 +8,18 @@ import {
   type RootState,
   calcdexSlice,
   createStore,
+  notedexSlice,
   showdexSlice,
 } from '@showdex/redux/store';
 import { bakeBakedexBundles, loadI18nextLocales } from '@showdex/utils/app';
 import { nonEmptyObject } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
-import { openIndexedDb, readHonksDb, readSettingsDb } from '@showdex/utils/storage';
+import {
+  openIndexedDb,
+  readHonksDb,
+  readNotesDb,
+  readSettingsDb,
+} from '@showdex/utils/storage';
 
 const l = logger('@showdex/pages/Bootdex/BootdexAdapter');
 
@@ -51,13 +57,21 @@ export abstract class BootdexAdapter {
       }));
     }
 
-    const honks = await readHonksDb(this.db);
-
-    if (nonEmptyObject(honks)) {
-      this.store.dispatch(calcdexSlice.actions.restore(honks));
-    }
-
     void bakeBakedexBundles({ db: this.db, store: this.store });
+    void (async () => {
+      const honks = await readHonksDb(this.db);
+
+      if (nonEmptyObject(honks)) {
+        this.store.dispatch(calcdexSlice.actions.restore(honks));
+      }
+
+      const notes = await readNotesDb(this.db);
+
+      if (nonEmptyObject(notes)) {
+        this.store.dispatch(notedexSlice.actions.restore({ scope: l.scope, notes }));
+      }
+    })();
+
     this.__initialized = true;
   }
 

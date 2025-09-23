@@ -1,3 +1,9 @@
+/**
+ * @file `calcdexSlice.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.3
+ */
+
 import {
   type Draft,
   type PayloadAction,
@@ -167,7 +173,7 @@ export interface CalcdexSliceReducers extends SliceCaseReducers<CalcdexSliceStat
 const defaultMaxPokemon = env.int('calcdex-player-max-pokemon');
 const l = logger('@showdex/redux/store/calcdexSlice');
 
-export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers, string>({
+export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers, 'calcdex'>({
   name: 'calcdex',
 
   initialState: {},
@@ -176,12 +182,12 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     init: (state, action) => {
       const endTimer = runtimer(`calcdexSlice.init() via ${action.payload?.scope || '(anon)'}`, l);
 
-      // l.debug(
-      //   'RECV', action.type, 'from', action.payload?.scope || '(anon)',
-      //   '\n', 'battleId', action.payload?.battleId || '???',
-      //   '\n', 'payload', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type, 'from', action.payload?.scope || '(anon)',
+        '\n', 'battleId', action.payload?.battleId || '???',
+        '\n', 'payload', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
       const {
         scope, // used for debugging; not used here, but destructuring it from `...payload`
@@ -221,7 +227,7 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
           l.warn(
             'CalcdexBattleState for battleId', battleId, 'already exists.',
             'This dispatch will be ignored (no-op).',
-            '\n', '(You will only see this warning on development.)',
+            '\n', '(you\'ll only see this warning in __DEV__)',
           );
         }
 
@@ -331,12 +337,12 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     update: (state, action) => {
       const endTimer = runtimer(`calcdexSlice.update() via ${action.payload?.scope || '(anon)'}`, l);
 
-      // l.debug(
-      //   'RECV', action.type, 'from', action.payload?.scope || '(anon)',
-      //   '\n', 'battleId', action.payload?.battleId || '???',
-      //   '\n', 'payload', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type, 'from', action.payload?.scope || '(anon)',
+        '\n', 'battleId', action.payload?.battleId || '???',
+        '\n', 'payload', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
       const {
         battleId,
@@ -458,12 +464,12 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     updateField: (state, action) => {
       const endTimer = runtimer(`calcdexSlice.updateField() via ${action.payload?.scope || '(anon)'}`, l);
 
-      // l.debug(
-      //   'RECV', action.type, 'from', action.payload?.scope || '(anon)',
-      //   '\n', 'battleId', action.payload?.battleId || '???',
-      //   '\n', 'payload', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type, 'from', action.payload?.scope || '(anon)',
+        '\n', 'battleId', action.payload?.battleId || '???',
+        '\n', 'payload', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
       const {
         battleId,
@@ -506,12 +512,12 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     updatePlayer: (state, action) => {
       const endTimer = runtimer(`calcdexSlice.updatePlayer() via ${action.payload?.scope || '(anon)'}`, l);
 
-      // l.debug(
-      //   'RECV', action.type, 'from', action.payload?.scope || '(anon)',
-      //   '\n', 'battleId', action.payload?.battleId || '???',
-      //   '\n', 'payload', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type, 'from', action.payload?.scope || '(anon)',
+        '\n', 'battleId', action.payload?.battleId || '???',
+        '\n', 'payload', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
       const { battleId } = action.payload;
 
@@ -564,12 +570,12 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     updatePokemon: (state, action) => {
       const endTimer = runtimer(`calcdexSlice.updatePokemon() via ${action.payload?.scope || '(anon)'}`, l);
 
-      // l.debug(
-      //   'RECV', action.type, 'from', action.payload?.scope || '(anon)',
-      //   '\n', 'battleId', action.payload?.battleId || '???',
-      //   '\n', 'payload', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type, 'from', action.payload?.scope || '(anon)',
+        '\n', 'battleId', action.payload?.battleId || '???',
+        '\n', 'payload', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
       const {
         battleId,
@@ -639,14 +645,13 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     },
 
     destroy: (state, action) => {
-      // l.debug(
-      //   'RECV', action.type,
-      //   '\n', 'battleId (payload)', action.payload,
-      //   '\n', 'state', __DEV__ && current(state),
-      // );
+      /* l.debug(
+        'RECV', action.type,
+        '\n', 'battleId (payload)', action.payload,
+        '\n', 'state', __DEV__ && current(state),
+      ); */
 
-      /*
-      if (!action.payload || !(action.payload in state)) {
+      /* if (!action.payload || !(action.payload in state)) {
         if (__DEV__) {
           l.warn(
             'Attempted to destroy a Calcdex that does not exist in state.',
@@ -657,8 +662,7 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         }
 
         return;
-      }
-      */
+      } */
 
       const battleIds = [...(Array.isArray(action.payload) ? action.payload : [action.payload])].filter(Boolean);
 
@@ -718,11 +722,9 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       };
 
       // update (2024/07/23): leaving the player keys as-is within the data layer; just fixed it visually in SideControls
-      /*
-      if (state[newId].playerKey === 'p2') {
+      /* if (state[newId].playerKey === 'p2') {
         state[newId].opponentKey = 'p1';
-      }
-      */
+      } */
 
       // perform additional processing on the players if this was originally a battle
       if (state[battleId].operatingMode === 'battle') {

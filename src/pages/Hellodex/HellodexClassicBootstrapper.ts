@@ -102,8 +102,10 @@ export class HellodexClassicBootstrapper extends BootdexClassicBootstrappable {
       onRequestBattles: openBattlesRoom,
       onRequestCalcdex: (id) => void Manager?.openCalcdex(id),
       onRequestHonkdex: (id) => void Manager?.openHonkdex(id),
-      onRemoveHonkdex: (id) => void Manager?.destroyHonkdex(id),
+      onRequestNotedex: (id) => void Manager?.openNotedex(id),
       onCloseCalcdex: (id) => void Manager?.closeCalcdex(id),
+      onRemoveHonkdex: (id) => void Manager?.destroyHonkdex(id),
+      onRemoveNotedex: (id) => void Manager?.destroyNotedex(id),
     });
   }
 

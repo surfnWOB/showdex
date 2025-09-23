@@ -8,7 +8,6 @@ import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useDebouncyFn } from 'use-debouncy';
 import cx from 'classnames';
-import { formatDistanceToNow } from 'date-fns';
 import { type GenerationNum } from '@smogon/calc';
 import {
   createAliasFilter,
@@ -24,6 +23,7 @@ import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { buildFormatOptions, determineColorScheme } from '@showdex/utils/ui';
 import { useCalcdexContext } from '../CalcdexContext';
+import { useDurationFormatter } from './useDurationFormatter';
 import styles from './BattleInfo.module.scss';
 
 export interface BattleInfoProps {
@@ -70,37 +70,8 @@ export const BattleInfo = ({
 
   const saved = !!cached && !saving?.[0];
 
-  // quick 'n dirty baby lessgo LOL
-  const savedAgo = React.useMemo<string>(() => {
-    if (!cached) {
-      return null;
-    }
-
-    const raw = formatDistanceToNow(cached)?.replace('about ', '');
-    const [, distGroup, unitGroup] = /([.,\d]+)?\s+([a-z]+[^s])s?$/i.exec(raw) || [];
-
-    if (!distGroup || !unitGroup) {
-      return raw;
-    }
-
-    const distValue = parseInt(distGroup, 10) || 0;
-    const distUnit = formatId(unitGroup);
-
-    if (!distValue || !distUnit) {
-      return raw;
-    }
-
-    const distUnitLabel = t(`common:time.${distUnit}`, { count: distValue });
-
-    if (!distUnitLabel) {
-      return raw;
-    }
-
-    return `${distValue} ${distUnitLabel}`;
-  }, [
-    cached,
-    t,
-  ]);
+  const formatDuration = useDurationFormatter();
+  const savedAgo = React.useMemo(() => formatDuration(cached), [cached, formatDuration]);
 
   const formatOptions = React.useMemo(() => buildFormatOptions(
     gen,
@@ -187,7 +158,7 @@ export const BattleInfo = ({
             value: name,
             onChange: (value: string) => debouncyUpdate({
               name: value,
-            }, `${l.scope}:Dropdown~Format:input.onChange()`),
+            }, `${l.scope}:${battleId}:Name~InlineField:input.onChange()`),
           }}
         />
 
@@ -200,7 +171,7 @@ export const BattleInfo = ({
               value: format,
               onChange: (value: string) => updateBattle({
                 format: value,
-              }, `${l.scope}:Dropdown~Format:input.onChange()`),
+              }, `${l.scope}:${battleId}:Format~Dropdown:input.onChange()`),
             }}
             options={formatOptions}
             noOptionsMessage={t('battle.format.empty') as React.ReactNode}

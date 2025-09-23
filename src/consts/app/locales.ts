@@ -22,7 +22,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'BOT Keith',
     desc: '(i18n)',
     created: '2024-01-05T12:18:35.813Z',
-    updated: '2025-09-20T07:14:46.978Z',
+    updated: '2025-09-23T08:50:02.228Z',
     disabled: false,
   },
   {
@@ -32,10 +32,10 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     name: '(i18n)',
     label: 'FR',
     locale: 'fr',
-    author: 'Sykless, Betcheg, ChatGPT & Google Translate',
+    author: 'Sykless, Betcheg, ChatGPT-4, Google Translate & Grok-3',
     desc: '(i18n)',
     created: '2024-01-08T16:46:10.432Z',
-    updated: '2025-09-20T07:14:49.973Z',
+    updated: '2025-09-23T08:50:13.203Z',
     disabled: false,
   },
 ];

@@ -5,10 +5,17 @@
 /// @since 1.2.0
 ///
 
+@use 'mixins/position';
 @use 'mixins/spacing';
 
+.buildInfo {
+  z-index: 6;
+}
+
 .battleInfo {
+  @include position.sticky($x: 12px, $t: 16px);
   @include spacing.mx(12px);
+  z-index: 5;
 }
 
 .playerCalc {

@@ -89,14 +89,12 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   const showdownSettings = rootState?.showdex?.settings?.showdown;
   const state = rootState?.calcdex;
 
-  /*
-  l.debug(
+  /* l.debug(
     'RECV', SyncBattleActionType, 'for', battle?.id || '(missing battle.id)',
     '\n', 'payload', payload,
     '\n', 'settings', settings,
     '\n', 'state', state,
-  );
-  */
+  ); */
 
   const {
     id: battleId,
@@ -203,14 +201,6 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   // find out which side myPokemon[] belongs to
   const detectedPlayerKey = battleState.authPlayerKey || detectPlayerKeyFromBattle(battle);
 
-  /* if (detectedPlayerKey && !battleState.playerKey) {
-    battleState.playerKey = detectedPlayerKey;
-  }
-
-  if (!battleState.opponentKey) {
-    battleState.opponentKey = battleState.playerKey === 'p2' ? 'p1' : 'p2';
-  } */
-
   if (detectedPlayerKey) {
     battleState.playerKey = detectedPlayerKey;
     battleState.opponentKey = battleState.playerKey === 'p2' ? 'p1' : 'p2';
@@ -255,13 +245,11 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
   const sheetsNonce = (!!sheetStepQueues.length && calcCalcdexId(sheetStepQueues.join(';'))) || null;
 
-  /*
-  l.debug(
+  /* l.debug(
     '\n', 'sheetsNonce', sheetsNonce,
     '\n', 'sheetStepQueues', sheetStepQueues,
     '\n', 'stepQueue', battle.stepQueue,
-  );
-  */
+  ); */
 
   if (sheetsNonce && battleState.sheetsNonce !== sheetsNonce) {
     const playerNames = AllPlayerKeys.reduce((prev, key) => {
@@ -300,16 +288,14 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     // l.debug('Processing player', playerKey);
 
     if (!(playerKey in battle) || battle[playerKey]?.sideid !== playerKey) {
-      /*
-      if (__DEV__) {
+      /* if (__DEV__) {
         l.warn(
           'Ignoring updates for player', playerKey, 'since they don\'t exist in the battle state',
           '\n', 'battle', battleId, battle,
           '\n', 'state', battleState,
           '\n', '(you\'ll only see this warning in __DEV__)',
         );
-      }
-      */
+      } */
 
       continue;
     }
@@ -416,15 +402,13 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     ) => {
       const clientSourced = 'getIdent' in pokemon;
 
-      /*
-      l.debug(
+      /* l.debug(
         'Ordering', pokemon.speciesForme, 'for player', playerKey,
         '\n', 'isMyPokemonSide?', isMyPokemonSide, 'hasMyPokemon?', hasMyPokemon,
         '\n', clientSourced ? 'client' : 'server', pokemon.calcdexId, pokemon,
         '\n', 'battle', battleId, battle,
         '\n', 'state', battleState,
-      );
-      */
+      ); */
 
       if (!pokemon.calcdexId) {
         // update (2022/10/18): found a case where the client Pokemon was given before
@@ -781,14 +765,12 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           }
         }));
 
-        /*
-        l.debug(
+        /* l.debug(
           'Applied pendingMutations[] for', syncedPokemon.ident,
           '\n', 'pendingMutations[]', pendingMutations,
           '\n', 'futureMutations', futureMutations,
           '\n', 'syncedPokemon', syncedPokemon,
-        );
-        */
+        ); */
       }
 
       // extract Gmax/Tera info from the BattleRoom's `request` object, if available
@@ -815,8 +797,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
             || (!!reqCalcdexId && syncedPokemon.calcdexId !== reqCalcdexId)
             || (syncedPokemon.ident !== reqIdent && syncedPokemon.details !== reqDetails);
 
-          /*
-          l.debug(
+          /* l.debug(
             'Processing move request for', reqIdent || reqDetails,
             '\n', 'shouldIgnore?', shouldIgnore,
             '\n', 'moveData', moveData,
@@ -826,8 +807,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
             '\n', 'request', request,
             '\n', 'battle', battleId, battle,
             '\n', 'state', battleState,
-          );
-          */
+          ); */
 
           if (shouldIgnore) {
             continue;
@@ -895,10 +875,10 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
           // update (2023/10/08): if not level 100, the searchid will include the level (e.g., 'p1: Zikachu|Zoroark, L84, M'),
           // which is commonly a thing in Randoms, where Zoroark also runs rampant lmao
-          // const {
-          //   calcdexId: syncedId,
-          //   // searchid: syncedSearchId,
-          // } = syncedPokemon;
+          /* const {
+            calcdexId: syncedId,
+            // searchid: syncedSearchId,
+          } = syncedPokemon; */
 
           // note: purposefully ignoring level here
           // update (2023/10/18): doing so might be yeeting
@@ -911,10 +891,10 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           for (let j = 0; j < player.pokemon.length; j++) {
             const pokemonA = player.pokemon[j];
 
-            // const {
-            //   calcdexId: idA,
-            //   // searchid: pokemon1SearchId,
-            // } = pokemonA || {};
+            /* const {
+              calcdexId: idA,
+              // searchid: pokemon1SearchId,
+            } = pokemonA || {}; */
 
             const idA = detectPokemonDetails(pokemonA, {
               format: battleState.format,
@@ -933,10 +913,10 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
             const indexB = existingTable[idA];
             const pokemonB = player.pokemon[indexB];
 
-            // const {
-            //   calcdexId: idB,
-            //   // searchid: pokemon2SearchId,
-            // } = pokemonB || {};
+            /* const {
+              calcdexId: idB,
+              // searchid: pokemon2SearchId,
+            } = pokemonB || {}; */
 
             const idB = detectPokemonDetails(pokemonB, {
               format: battleState.format,
@@ -948,8 +928,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
               continue;
             }
 
-            /*
-            if (syncedSearchId === pokemon1SearchId) {
+            /* if (syncedSearchId === pokemon1SearchId) {
               removalId = pokemon2SearchId;
             } else if (syncedSearchId === pokemon2SearchId) {
               removalId = pokemon1SearchId;
@@ -961,8 +940,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
               removalId = pokemon2SearchId;
             } else {
               removalId = pokemon1SearchId;
-            }
-            */
+            } */
 
             // check if we should remove pokemonB
             const targetB = syncedId === idA
@@ -976,16 +954,13 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
           // note: unlike in addPokemon() of Showdown.Side, we don't care about updating the Illusion Pokemon,
           // only removing it so that the real Pokemon can be tracked in the Calcdex
-          const removalIndex = playerState.pokemon
-            .findIndex((p) => detectPokemonDetails(p, {
-              format: battleState.format,
-              normalizeForme: true,
-              ignoreLevel: true,
-            }) === removalId);
+          const removalIndex = playerState.pokemon.findIndex((p) => detectPokemonDetails(p, {
+            format: battleState.format,
+            normalizeForme: true,
+            ignoreLevel: true,
+          }) === removalId);
 
-          const removalPokemon = removalIndex > -1
-            ? playerState.pokemon[removalIndex]
-            : null;
+          const removalPokemon = playerState.pokemon[removalIndex];
 
           if (removalPokemon?.speciesForme) {
             playerState.pokemon.splice(removalIndex, 1);

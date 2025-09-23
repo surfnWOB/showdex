@@ -1,4 +1,10 @@
 /**
+ * @file `detectClassicHost.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 1.3.0
+ */
+
+/**
  * Detects if the provided `host` is running the classic Showdown Backbone.js client.
  *
  * * Mostly for TypeScript lol.

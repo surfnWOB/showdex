@@ -29,6 +29,7 @@ import {
   useHellodexSettings,
   useHellodexState,
   useHonkdexSettings,
+  useNotedexState,
   useUpdateSettings,
 } from '@showdex/redux/store';
 import { usePlayerTitle } from '@showdex/utils/app';
@@ -36,7 +37,12 @@ import { env, getResourceUrl } from '@showdex/utils/core';
 import { useRandomUuid, useRoomNavigation } from '@showdex/utils/hooks';
 import { BattleRecord } from './BattleRecord';
 import { FooterButton } from './FooterButton';
-import { type InstanceButtonRef, InstanceButton } from './InstanceButton';
+import {
+  type InstanceButtonRef,
+  type NoteInstanceButtonRef,
+  InstanceButton,
+  NoteInstanceButton,
+} from './InstanceButton';
 import { PatronagePane } from './PatronagePane';
 import { SettingsPane } from './SettingsPane';
 import { useHellodexSize } from './useHellodexSize';
@@ -47,8 +53,10 @@ export interface HellodexProps {
   onRequestBattles?: () => void;
   onRequestCalcdex?: (battleId: string) => void;
   onRequestHonkdex?: (instanceId?: string) => void;
-  onRemoveHonkdex?: (instanceId: string) => void;
+  onRequestNotedex?: (instanceId?: string) => void;
   onCloseCalcdex?: (battleId: string) => void;
+  onRemoveHonkdex?: (instanceId: string) => void;
+  onRemoveNotedex?: (instanceId: string) => void;
 }
 
 const packageVersion = `v${env('package-version', 'X.X.X')}`;
@@ -65,12 +73,15 @@ export const Hellodex = ({
   onRequestBattles,
   onRequestCalcdex,
   onRequestHonkdex,
-  onRemoveHonkdex,
+  onRequestNotedex,
   onCloseCalcdex,
+  onRemoveHonkdex,
+  onRemoveNotedex,
 }: HellodexProps): JSX.Element => {
   const { t } = useTranslation('hellodex');
   const contentRef = React.useRef<HTMLDivElement>(null);
   const instanceRefs = React.useRef<Record<string, InstanceButtonRef>>({});
+  const noteInstanceRefs = React.useRef<Record<string, NoteInstanceButtonRef>>({});
 
   useHellodexSize(contentRef);
 
@@ -90,6 +101,7 @@ export const Hellodex = ({
 
   const state = useHellodexState();
   const calcdexState = useCalcdexState();
+  const notedexState = useNotedexState();
   const neverOpens = calcdexSettings?.openOnStart === 'never';
 
   const instances = React.useMemo(() => Object.values(calcdexState).reverse().filter((b) => (
@@ -100,7 +112,15 @@ export const Hellodex = ({
     honkdexSettings?.visuallyEnabled,
   ]);
 
-  const instancesEmpty = !instances.length;
+  const noteInstances = React.useMemo(() => (
+    Object.values(notedexState?.notes || {})
+      .reverse()
+      .filter((n) => !!n?.id)
+  ), [
+    notedexState?.notes,
+  ]);
+
+  const instancesEmpty = !instances.length && !noteInstances.length;
   const showDonateButton = settings?.showDonateButton;
 
   const battleRecord = useBattleRecord();
@@ -132,6 +152,7 @@ export const Hellodex = ({
   const paneMenuId = useRandomUuid();
   const calcdexMenuId = useRandomUuid();
   const honkdexMenuId = useRandomUuid();
+  const notedexMenuId = useRandomUuid();
   const recordMenuId = useRandomUuid();
 
   return (
@@ -347,7 +368,7 @@ export const Hellodex = ({
                       className={styles.instanceButton}
                       instance={instance}
                       authName={authName}
-                      onPress={() => (
+                      onPress={() => void (
                         instance.operatingMode === 'standalone'
                           ? onRequestHonkdex
                           : onRequestCalcdex
@@ -365,23 +386,40 @@ export const Hellodex = ({
                     />
                   ))}
 
+                  {noteInstances.map((instance) => (
+                    <NoteInstanceButton
+                      ref={(r) => { noteInstanceRefs.current[instance.id] = r; }}
+                      key={`Hellodex:NoteInstanceButton:${instance.id}`}
+                      className={styles.instanceButton}
+                      instance={instance}
+                      onPress={() => void onRequestNotedex?.(instance.id)}
+                      onRequestRemove={() => onRemoveNotedex?.(instance.id)}
+                      onContextMenu={(e) => {
+                        showContextMenu({
+                          id: notedexMenuId,
+                          event: e,
+                          props: { instanceId: instance.id },
+                        });
+
+                        e.stopPropagation();
+                      }}
+                    />
+                  ))}
+
                   {
                     honkdexSettings?.visuallyEnabled &&
                     <GradientButton
-                      className={cx(styles.instanceButton, styles.newHonkButton)}
+                      className={styles.instanceButton}
                       display="block"
                       aria-label={t('instances.honkdex.newAria')}
                       hoverScale={1}
-                      onPress={() => onRequestHonkdex()}
+                      onPress={() => void onRequestHonkdex()}
                     >
                       <i
                         className="fa fa-plus"
                         style={{ fontSize: 10, lineHeight: 11 }}
                       />
-                      <i
-                        className="fa fa-car"
-                        style={{ padding: '0 8px' }}
-                      />
+                      <i className="fa fa-car" />
                       <Trans
                         t={t}
                         i18nKey="instances.honkdex.newLabel.1"
@@ -389,6 +427,25 @@ export const Hellodex = ({
                       />
                     </GradientButton>
                   }
+
+                  <GradientButton
+                    className={styles.instanceButton}
+                    display="block"
+                    aria-label={t('instances.notedex.newAria')}
+                    hoverScale={1}
+                    onPress={() => void onRequestNotedex()}
+                  >
+                    <i
+                      className="fa fa-plus"
+                      style={{ fontSize: 10, lineHeight: 11 }}
+                    />
+                    <i className="fa fa-sticky-note" />
+                    <Trans
+                      t={t}
+                      i18nKey="instances.notedex.newLabel"
+                      shouldUnescape
+                    />
+                  </GradientButton>
 
                   {
                     settings?.showBattleRecord &&
@@ -565,6 +622,19 @@ export const Hellodex = ({
             },
           },
           {
+            key: 'new-notedex',
+            entity: 'item',
+            props: {
+              label: t('contextMenu.newNotedex', 'New Notedex'),
+              icon: 'fa-sticky-note',
+              onPress: hideAfter(onRequestNotedex),
+            },
+          },
+          {
+            key: 'new-hr',
+            entity: 'separator',
+          },
+          {
             key: 'spectate-battles',
             entity: 'item',
             props: {
@@ -621,7 +691,7 @@ export const Hellodex = ({
               label: t('instances.calcdex.contextMenu.open', 'Open'),
               icon: 'external-link',
               iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
-              onPress: ({ props: p }) => hideAfter(() => {
+              onPress: ({ props: p }) => void hideAfter(() => {
                 const id = (p as Record<'instanceId', string>)?.instanceId;
 
                 if (!id) {
@@ -639,7 +709,7 @@ export const Hellodex = ({
               label: t('instances.calcdex.contextMenu.convertHonk', 'Convert to Honk'),
               icon: 'fa-car',
               hidden: !honkdexSettings?.visuallyEnabled,
-              onPress: ({ props: p }) => hideAfter(() => {
+              onPress: ({ props: p }) => void hideAfter(() => {
                 const id = (p as Record<'instanceId', string>)?.instanceId;
 
                 if (!id) {
@@ -670,7 +740,7 @@ export const Hellodex = ({
               iconStyle: { transform: 'scale(1.2)' },
               disabled: typeof onCloseCalcdex !== 'function',
               hidden: !calcdexSettings?.destroyOnClose,
-              onPress: ({ props: p }) => hideAfter(() => {
+              onPress: ({ props: p }) => void hideAfter(() => {
                 const id = (p as Record<'instanceId', string>)?.instanceId;
 
                 if (!id || typeof onCloseCalcdex !== 'function') {
@@ -695,7 +765,7 @@ export const Hellodex = ({
               label: t('instances.honkdex.contextMenu.open', 'Open'),
               icon: 'external-link',
               iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
-              onPress: ({ props: p }) => hideAfter(() => {
+              onPress: ({ props: p }) => void hideAfter(() => {
                 const id = (p as Record<'instanceId', string>)?.instanceId;
 
                 if (!id) {
@@ -740,7 +810,7 @@ export const Hellodex = ({
               // icon: 'fa-times-circle',
               icon: 'trash-close',
               iconStyle: { transform: 'scale(1.2)' },
-              onPress: ({ props: data }) => hideAfter(() => {
+              onPress: ({ props: data }) => void hideAfter(() => {
                 const id = (data as Record<'instanceId', string>)?.instanceId;
 
                 if (!id) {
@@ -748,6 +818,54 @@ export const Hellodex = ({
                 }
 
                 instanceRefs.current[id]?.queueRemoval();
+              })(),
+            },
+          },
+        ]}
+      />
+
+      <ContextMenu
+        id={notedexMenuId}
+        itemKeyPrefix="InstanceButton:Notedex:ContextMenu"
+        items={[
+          {
+            key: 'open-notedex',
+            entity: 'item',
+            props: {
+              label: t('instances.notedex.contextMenu.open', 'Open'),
+              icon: 'external-link',
+              iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
+              onPress: ({ props: p }) => void hideAfter(() => {
+                const id = (p as Record<'instanceId', string>)?.instanceId;
+
+                if (!id) {
+                  return;
+                }
+
+                onRequestNotedex(id);
+              })(),
+            },
+          },
+          {
+            key: 'remove-hr',
+            entity: 'separator',
+          },
+          {
+            key: 'remove-notedex',
+            entity: 'item',
+            props: {
+              theme: 'error',
+              label: t('instances.notedex.contextMenu.remove', 'Delete'),
+              icon: 'trash-close',
+              iconStyle: { transform: 'scale(1.2)' },
+              onPress: ({ props: data }) => void hideAfter(() => {
+                const id = (data as Record<'instanceId', string>)?.instanceId;
+
+                if (!id) {
+                  return;
+                }
+
+                noteInstanceRefs.current[id]?.queueRemoval();
               })(),
             },
           },

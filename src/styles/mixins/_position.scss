@@ -513,16 +513,20 @@
   $right: null,
   $bottom: null,
   $left: null,
+  $t: null,
+  $r: null,
+  $b: null,
+  $l: null,
 ) {
   @include -position(
     $position: sticky,
     $all: $all,
     $x: $x,
     $y: $y,
-    $top: $top,
-    $right: $right,
-    $bottom: $bottom,
-    $left: $left,
+    $top: if($top, $top, $t),
+    $right: if($right, $right, $r),
+    $bottom: if($bottom, $bottom, $b),
+    $left: if($left, $left, $l),
   );
 }
 

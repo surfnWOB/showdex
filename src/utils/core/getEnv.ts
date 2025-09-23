@@ -1,3 +1,9 @@
+/**
+ * @file `getEnv.ts`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.3
+ */
+
 import { createEnvParser } from './createEnvParser';
 
 /**
@@ -50,6 +56,7 @@ export const env = createEnvParser({
   INDEXED_DB_HONKS_STORE_NAME: process.env.INDEXED_DB_HONKS_STORE_NAME,
   INDEXED_DB_META_STORE_NAME: process.env.INDEXED_DB_META_STORE_NAME,
   INDEXED_DB_NAME: process.env.INDEXED_DB_NAME,
+  INDEXED_DB_NOTES_STORE_NAME: process.env.INDEXED_DB_NOTES_STORE_NAME,
   INDEXED_DB_PRESETS_STORE_NAME: process.env.INDEXED_DB_PRESETS_STORE_NAME,
   INDEXED_DB_SETTINGS_STORE_NAME: process.env.INDEXED_DB_SETTINGS_STORE_NAME,
   INDEXED_DB_VERSION: process.env.INDEXED_DB_VERSION,

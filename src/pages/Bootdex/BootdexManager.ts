@@ -9,12 +9,14 @@ import { logger, wtf } from '@showdex/utils/debug';
 import { BootdexAdapter } from './BootdexAdapter';
 import { type CalcdexBootstrappableLike } from '../Calcdex/CalcdexBootstrappable';
 import { type HonkdexBootstrappableLike } from '../Honkdex/HonkdexBootstrappable';
+import { type NotedexBootstrappableLike } from '../Notedex/NotedexBootstrappable';
 import { type BootdexBootstrappableLike } from './BootdexBootstrappable';
 
 export interface BootdexManagerBootstrappers {
   calcdex: CalcdexBootstrappableLike;
   hellodex: BootdexBootstrappableLike;
   honkdex: HonkdexBootstrappableLike;
+  notedex: NotedexBootstrappableLike;
 }
 
 const l = logger('@showdex/pages/Bootdex/BootdexManager');
@@ -26,6 +28,7 @@ export class BootdexManager {
     calcdex: null,
     hellodex: null,
     honkdex: null,
+    notedex: null,
   };
 
   public static named<
@@ -168,5 +171,40 @@ export class BootdexManager {
     }
 
     new (this.named('honkdex'))(instanceId).destroy();
+  }
+
+  /**
+   * Opens the existing Notedex tab or creates a new one if an `instanceId` wasn't provided.
+   *
+   * @since 1.3.0
+   */
+  public static openNotedex(instanceId?: string): void {
+    new (this.named('notedex'))(instanceId).open();
+  }
+
+  /**
+   * Closes an existing Notedex tab w/ the provided `instanceId`.
+   *
+   * @since 1.3.0
+   */
+  public static closeNotedex(instanceId: string): void {
+    if (!instanceId) {
+      return;
+    }
+
+    new (this.named('notedex'))(instanceId).close();
+  }
+
+  /**
+   * Removes all traces of an existing Notedex w/ the provided `instanceId`.
+   *
+   * @since 1.3.0
+   */
+  public static destroyNotedex(instanceId: string): void {
+    if (!instanceId) {
+      return;
+    }
+
+    new (this.named('notedex'))(instanceId).destroy();
   }
 }
