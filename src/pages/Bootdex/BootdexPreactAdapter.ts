@@ -40,6 +40,8 @@ export class BootdexPreactAdapter extends BootdexAdapter {
       const { user } = window.PS;
 
       if (!user?.named || !user.name) {
+        BootdexPreactAdapter.authUsername = null;
+
         return;
       }
 
@@ -49,13 +51,13 @@ export class BootdexPreactAdapter extends BootdexAdapter {
         '\n', 'PS.user', user,
       );
 
-      if (!user.registered?.name) {
+      if (!user.name) {
         return;
       }
 
       // note: when a registered user is logged in, user.name === user.registered.name &
       // user.userid = user.registered.userid = formatId(user.registered.name)
-      BootdexPreactAdapter.authUsername = user.registered.name;
+      BootdexPreactAdapter.authUsername = user.name;
     });
   }
 
