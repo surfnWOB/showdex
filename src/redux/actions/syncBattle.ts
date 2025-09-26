@@ -100,6 +100,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     id: battleId,
     nonce: battleNonce,
     gen,
+    gameType,
     turn,
     paused,
     ended,
@@ -145,7 +146,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   battleState.rules = detectBattleRules(battle);
 
   // update the battle's active state, but only allow it to go from true -> false
-  // as to avoid updating the HellodexBattleRecord from replays and battle re-inits)
+  // (as to avoid updating the HellodexBattleRecord from replays & battle re-inits)
   if (battleState.active && typeof ended === 'boolean' && ended) {
     battleState.active = !ended;
   }
@@ -153,6 +154,10 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   if (typeof paused === 'boolean' || typeof ended === 'boolean') {
     battleState.paused = paused || ended;
   }
+
+  // note: this bit is here mainly for the 'preact' __SHOWDEX_HOST cause the battle might've not been
+  // fully populated at CalcdexBootstrappable.initCalcdexState()
+  battleState.gameType = gameType === 'doubles' ? 'Doubles' : 'Singles';
 
   // check if the user hit the replay button
   // (we'll use this value later to reset the Pokemon back to full health, kinda like a Pokemon Center,
@@ -210,10 +215,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   battleState.switchPlayers = battle.viewpointSwitched ?? battle.sidesSwitched;
 
   // sync the field first cause we'll need the updated values for some calculations later
-  const syncedField = syncField(
-    battleState,
-    battle,
-  );
+  const syncedField = syncField(battleState, battle);
 
   if (!syncedField) {
     if (__DEV__) {
@@ -315,15 +317,13 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       playerState.active = true;
     }
 
-    /*
-    l.debug(
+    /* l.debug(
       'Updated name to', playerState.name, '& rating to', playerState.rating || '(unrated)', 'for player', playerKey,
       '\n', 'player', '(battle)' player,
       '\n', 'player', '(state)', playerState,
       '\n', 'battle', battleId, battle,
       '\n', 'state', battleState,
-    );
-    */
+    ); */
 
     // determine if `myPokemon[]` belongs to the current player
     const isMyPokemonSide = !!battleState.playerKey && playerKey === battleState.playerKey;
@@ -454,8 +454,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         if (clientPokemon) {
           clientPokemon.calcdexId = pokemon.calcdexId;
 
-          /*
-          l.debug(
+          /* l.debug(
             'Assigned calcdexId to the server', pokemon.speciesForme,
             'from a matching client', clientPokemon.speciesForme, 'for player', playerKey,
             '\n', 'isMyPokemonSide?', isMyPokemonSide, 'hasMyPokemon?', hasMyPokemon,
@@ -463,8 +462,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
             '\n', 'server', pokemon.calcdexId, pokemon,
             '\n', 'battle', battleId, battle,
             '\n', 'state', battleState,
-          );
-          */
+          ); */
         }
       }
 
@@ -515,16 +513,14 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
     if (diffArrays(currentOrder, playerState.pokemonOrder || []).length) {
       playerState.pokemonOrder = currentOrder;
 
-      /*
-      l.debug(
+      /* l.debug(
         'Set Pokemon ordering for player', playerKey,
         '\n', 'isMyPokemonSide?', isMyPokemonSide, 'hasMyPokemon?', hasMyPokemon,
         '\n', 'order[]', playerState.pokemonOrder,
         '\n', 'pokemon[]', '(initial)', initialPokemon,
         '\n', 'battle', battleId, battle,
         '\n', 'state', battleState,
-      );
-      */
+      ); */
     }
 
     // update (2024/09/27): check if we *know* we're getting Zoroark'd right off the bat
@@ -556,15 +552,17 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       }
     }
 
-    l.debug(
-      'Preparing to process', playerPokemon.length, 'of', '(max)', maxPokemon, 'Pokemon for player', playerKey,
-      '\n', 'isMyPokemonSide?', isMyPokemonSide, 'hasMyPokemon?', hasMyPokemon, 'illusionMap', illusionMap,
-      '\n', 'order[]', playerState.pokemonOrder,
-      '\n', 'pokemon[]', '(assembled)', playerPokemon,
-      '\n', 'pokemon[]', '(battle)', player.pokemon,
-      '\n', 'battle', battleId, battle,
-      '\n', 'state', battleState,
-    );
+    if (__DEV__) {
+      l.debug(
+        'Preparing to process', playerPokemon.length, 'of', '(max)', maxPokemon, 'Pokemon for player', playerKey,
+        '\n', 'isMyPokemonSide?', isMyPokemonSide, 'hasMyPokemon?', hasMyPokemon, 'illusionMap', illusionMap,
+        '\n', 'order[]', playerState.pokemonOrder,
+        '\n', 'pokemon[]', '(assembled)', playerPokemon,
+        '\n', 'pokemon[]', '(battle)', player.pokemon,
+        '\n', 'battle', battleId, battle,
+        '\n', 'state', battleState,
+      );
+    }
 
     // update each pokemon
     // (note that the index `i` should be relatively consistent between turns)
@@ -572,16 +570,18 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       const clientPokemon = playerPokemon[i];
 
       if (!clientPokemon?.calcdexId) {
-        l.debug(
-          'Ignoring untagged Pokemon', clientPokemon?.ident || clientPokemon?.speciesForme, 'w/o calcdexId',
-          'at index', i, 'for player', playerKey,
-          '\n', 'client', clientPokemon?.calcdexId, clientPokemon,
-          '\n', 'order[]', playerState.pokemonOrder,
-          '\n', 'pokemon[]', '(assembled)', playerPokemon,
-          '\n', 'pokemon[]', '(battle)', player.pokemon,
-          '\n', 'battle', battleId, battle,
-          '\n', 'state', battleState,
-        );
+        if (__DEV__) {
+          l.debug(
+            'Ignoring untagged Pokemon', clientPokemon?.ident || clientPokemon?.speciesForme, 'w/o calcdexId',
+            'at index', i, 'for player', playerKey,
+            '\n', 'client', clientPokemon?.calcdexId, clientPokemon,
+            '\n', 'order[]', playerState.pokemonOrder,
+            '\n', 'pokemon[]', '(assembled)', playerPokemon,
+            '\n', 'pokemon[]', '(battle)', player.pokemon,
+            '\n', 'battle', battleId, battle,
+            '\n', 'state', battleState,
+          );
+        }
 
         continue;
       }
@@ -589,17 +589,19 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
       // update (2024/09/27): ignore syncing any "Illusory" Pokemon that is being copied by an active Illusion Pokemon
       // (e.g., Zoroark), otherwise boosts & stuff will be applied to a Pokemon that's not even out in the field!
       if (clientIllusionIds.includes(clientPokemon.calcdexId)) {
-        l.debug(
-          'Ignoring detected Illusory Pokemon', clientPokemon.ident || clientPokemon.speciesForme,
-          'at index', i, 'for player', playerKey,
-          '\n', 'client', clientPokemon.calcdexId, clientPokemon,
-          '\n', 'illusionMap', illusionMap,
-          '\n', 'order[]', playerState.pokemonOrder,
-          '\n', 'pokemon[]', '(assembled)', playerPokemon,
-          '\n', 'pokemon[]', '(battle)', player.pokemon,
-          '\n', 'battle', battleId, battle,
-          '\n', 'state', battleState,
-        );
+        if (__DEV__) {
+          l.debug(
+            'Ignoring detected Illusory Pokemon', clientPokemon.ident || clientPokemon.speciesForme,
+            'at index', i, 'for player', playerKey,
+            '\n', 'client', clientPokemon.calcdexId, clientPokemon,
+            '\n', 'illusionMap', illusionMap,
+            '\n', 'order[]', playerState.pokemonOrder,
+            '\n', 'pokemon[]', '(assembled)', playerPokemon,
+            '\n', 'pokemon[]', '(battle)', player.pokemon,
+            '\n', 'battle', battleId, battle,
+            '\n', 'state', battleState,
+          );
+        }
 
         continue;
       }
@@ -679,14 +681,16 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
         // if the Pokemon is also server-sourced, we can apply some known info as revealed info of the target Pokemon
         if (syncedPokemon.source === 'server' && AllPlayerKeys.includes(targetPlayerKey)) {
-          l.debug(
-            'Adding revealed info to', targetClientPokemon.ident || targetClientPokemon.speciesForme, 'of player', targetPlayerKey,
-            'from transformed', syncedPokemon.ident || syncedPokemon.speciesForme, 'at index', i, 'of player', playerKey,
-            '\n', 'target', targetClientPokemon.calcdexId, targetClientPokemon,
-            '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
-            '\n', 'battle', battleId, battle,
-            '\n', 'state', battleState,
-          );
+          if (__DEV__) {
+            l.debug(
+              'Adding revealed info to', targetClientPokemon.ident || targetClientPokemon.speciesForme, 'of player', targetPlayerKey,
+              'from transformed', syncedPokemon.ident || syncedPokemon.speciesForme, 'at index', i, 'of player', playerKey,
+              '\n', 'target', targetClientPokemon.calcdexId, targetClientPokemon,
+              '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
+              '\n', 'battle', battleId, battle,
+              '\n', 'state', battleState,
+            );
+          }
 
           if (syncedPokemon.ability) {
             mutations.ability = syncedPokemon.ability;
@@ -965,21 +969,23 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           if (removalPokemon?.speciesForme) {
             playerState.pokemon.splice(removalIndex, 1);
 
-            l.debug(
-              'Removed Illusory', removalPokemon.ident || removalPokemon.speciesForme, 'from player', playerKey,
-              '\n', 'length', '(prev)', playerState.pokemon.length + 1,
-              '(now)', playerState.pokemon.length,
-              '(max)', playerState.maxPokemon,
-              '\n', 'removalIndex', removalIndex, 'removalId', removalId,
-              '\n', 'removal', removalPokemon.calcdexId, removalPokemon,
-              '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
-              '\n', 'client', clientPokemon.calcdexId, clientPokemon,
-              '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
-              '\n', 'pokemon[]', '(battle)', player.pokemon,
-              '\n', 'pokemon[]', '(state)', playerState.pokemon,
-              '\n', 'battle', battleId, battle,
-              '\n', 'state', battleState,
-            );
+            if (__DEV__) {
+              l.debug(
+                'Removed Illusory', removalPokemon.ident || removalPokemon.speciesForme, 'from player', playerKey,
+                '\n', 'length', '(prev)', playerState.pokemon.length + 1,
+                '(now)', playerState.pokemon.length,
+                '(max)', playerState.maxPokemon,
+                '\n', 'removalIndex', removalIndex, 'removalId', removalId,
+                '\n', 'removal', removalPokemon.calcdexId, removalPokemon,
+                '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
+                '\n', 'client', clientPokemon.calcdexId, clientPokemon,
+                '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
+                '\n', 'pokemon[]', '(battle)', player.pokemon,
+                '\n', 'pokemon[]', '(state)', playerState.pokemon,
+                '\n', 'battle', battleId, battle,
+                '\n', 'state', battleState,
+              );
+            }
           }
         }
 
@@ -1026,32 +1032,36 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
 
         const size = playerState.pokemon.push(syncedPokemon);
 
-        l.debug(
-          'Added', syncedPokemon.ident || syncedPokemon.speciesForme, 'to index', size - 1, 'for player', playerKey,
-          '\n', 'length', '(now)', playerState.pokemon.length, '(max)', playerState.maxPokemon,
-          '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
-          '\n', 'client', clientPokemon.calcdexId, clientPokemon,
-          ...(clientIllusionPokemon?.calcdexId ? ['\n', 'illusion', clientIllusionPokemon.calcdexId, clientIllusionPokemon] : []),
-          '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
-          '\n', 'pokemon[]', '(battle)', player.pokemon,
-          '\n', 'pokemon[]', '(state)', playerState.pokemon,
-          '\n', 'battle', battleId, battle,
-          '\n', 'state', battleState,
-        );
+        if (__DEV__) {
+          l.debug(
+            'Added', syncedPokemon.ident || syncedPokemon.speciesForme, 'to index', size - 1, 'for player', playerKey,
+            '\n', 'length', '(now)', playerState.pokemon.length, '(max)', playerState.maxPokemon,
+            '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
+            '\n', 'client', clientPokemon.calcdexId, clientPokemon,
+            ...(clientIllusionPokemon?.calcdexId ? ['\n', 'illusion', clientIllusionPokemon.calcdexId, clientIllusionPokemon] : []),
+            '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
+            '\n', 'pokemon[]', '(battle)', player.pokemon,
+            '\n', 'pokemon[]', '(state)', playerState.pokemon,
+            '\n', 'battle', battleId, battle,
+            '\n', 'state', battleState,
+          );
+        }
       } else {
         playerState.pokemon[matchedPokemonIndex] = syncedPokemon;
 
-        l.debug(
-          'Updated', syncedPokemon.ident || syncedPokemon.speciesForme, 'at index', matchedPokemonIndex, 'for player', playerKey,
-          '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
-          '\n', 'client', clientPokemon.calcdexId, clientPokemon,
-          ...(clientIllusionPokemon?.calcdexId ? ['\n', 'illusion', clientIllusionPokemon.calcdexId, clientIllusionPokemon] : []),
-          '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
-          '\n', 'pokemon[]', '(battle)', player.pokemon,
-          '\n', 'pokemon[]', '(state)', playerState.pokemon,
-          '\n', 'battle', battleId, battle,
-          '\n', 'state', battleState,
-        );
+        if (__DEV__) {
+          l.debug(
+            'Updated', syncedPokemon.ident || syncedPokemon.speciesForme, 'at index', matchedPokemonIndex, 'for player', playerKey,
+            '\n', 'synced', syncedPokemon.calcdexId, syncedPokemon,
+            '\n', 'client', clientPokemon.calcdexId, clientPokemon,
+            ...(clientIllusionPokemon?.calcdexId ? ['\n', 'illusion', clientIllusionPokemon.calcdexId, clientIllusionPokemon] : []),
+            '\n', 'server', serverPokemon?.calcdexId, serverPokemon,
+            '\n', 'pokemon[]', '(battle)', player.pokemon,
+            '\n', 'pokemon[]', '(state)', playerState.pokemon,
+            '\n', 'battle', battleId, battle,
+            '\n', 'state', battleState,
+          );
+        }
       }
     }
 
@@ -1129,16 +1139,14 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
         }
       }
 
-      /*
-      l.debug(
+      /* l.debug(
         'Building activeIndices[] for player', playerKey,
         '\n', 'activeId', activeId,
         '\n', 'activeIndex', activeIndex,
         '\n', 'activePokemon', activePokemon,
         '\n', 'player.active', player.active,
         '\n', `${playerKey}.pokemon`, playerState.pokemon,
-      );
-      */
+      ); */
 
       if (activeIndex > -1 && !processedIds.includes(activeId)) {
         processedIds.push(activeId);
@@ -1204,14 +1212,12 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
           }
         });
 
-        /*
-        l.debug(
+        /* l.debug(
           'Updated faintCounter for some pokemon of player', playerKey,
           '\n', 'faintCounter', '(calc)', faintCounter, '(host)', player.faintCounter,
           '\n', 'playerState.activeIndices', playerState.activeIndices,
           '\n', 'pendingPokemon', pendingPokemon,
-        );
-        */
+        ); */
       }
 
       // exhibit the big smart sync technology by utilizing the power of hardcoded game sense for Protosynthesis/Quark Drive,
@@ -1331,6 +1337,7 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
          * addressing that atm :o (Stakeout was a lot more work an initially anticipated lol)
          */
         p.abilityToggled = detectToggledAbility(p, {
+          format: battleState.format,
           gameType: battleState.gameType,
           pokemonIndex: i,
           opponentPokemon,

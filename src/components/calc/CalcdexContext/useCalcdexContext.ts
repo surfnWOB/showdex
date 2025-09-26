@@ -774,6 +774,7 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
 
       // note: these are now independent of each other & will probably rename abilityToggled to abilityActive soon
       mutated.abilityToggled = detectToggledAbility(mutated, {
+        format: state.format,
         gameType: state.gameType,
         selectionIndex: state[playerKey].selectionIndex,
         weather,
@@ -928,6 +929,7 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
       const terrain = (currentField.dirtyTerrain ?? (currentField.autoTerrain || currentField.terrain)) || null;
 
       newPokemon.abilityToggled = detectToggledAbility(newPokemon, {
+        format: state.format,
         gameType: state.gameType,
         weather,
         terrain,
@@ -1620,6 +1622,7 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
           const retoggle = pokemon[retoggleIndex];
 
           retoggle.abilityToggled = detectToggledAbility(retoggle, {
+            format: state.format,
             gameType: state.gameType,
             pokemonIndex: retoggleIndex,
             selectionIndex: playerState.selectionIndex,
@@ -1865,6 +1868,7 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
         }
 
         const toggled = detectToggledAbility(pokemon, {
+          format: state.format,
           gameType: state.gameType,
           opponentPokemon,
           selectionIndex: pkey === playerKey ? playerPayload.selectionIndex : opponent?.selectionIndex,
