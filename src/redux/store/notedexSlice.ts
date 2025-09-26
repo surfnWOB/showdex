@@ -266,7 +266,7 @@ export const notedexSlice = createSlice<NotedexSliceState, NotedexSliceReducers,
       }
 
       noteIds.forEach((id) => {
-        if (!(id in state)) {
+        if (!(id in state.notes)) {
           return;
         }
 
