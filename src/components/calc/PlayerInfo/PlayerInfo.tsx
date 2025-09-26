@@ -306,7 +306,7 @@ export const PlayerInfo = ({
                     &bull;
                   </span> */}
 
-                  &nbsp;{rating}{containerWidth > 320 && ' ELO'}
+                  &nbsp;{rating}{containerWidth > 360 && ' ELO'}
                 </>
               }
             </div>

@@ -118,7 +118,7 @@ export const PokeInfo = ({
     subFormats,
     legacy,
     active: battleActive,
-    paused: battlePaused,
+    // paused: battlePaused,
     gameType,
     defaultLevel,
   } = state;
@@ -428,15 +428,13 @@ export const PokeInfo = ({
       setImportedCount(count);
       importBadgeRef.current?.show();
     } catch (error) {
-      /*
-      if (__DEV__) {
+      /* if (__DEV__) {
         l.error(
           'Failed to import the set for', pokemon?.ident || pokemon?.speciesForme || '???', 'from clipboard:',
           '\n', error,
-          '\n', '(You will only see this error on development.)',
+          '\n', '(you\'ll only see this error in __DEV__)',
         );
-      }
-      */
+      } */
 
       setImportFailedReason(t('poke.info.preset.failedBadge'));
       importFailedBadgeRef.current?.show();
@@ -481,15 +479,13 @@ export const PokeInfo = ({
       setExportedCount(1);
       exportBadgeRef.current?.show();
     } catch (error) {
-      /*
-      if (__DEV__) {
+      /* if (__DEV__) {
         l.error(
           'Failed to export the set for', pokemon?.ident || pokemon?.speciesForme || '???', 'to clipboard:',
           '\n', error,
-          '\n', '(You will only see this error on development.)',
+          '\n', '(you\'ll only see this error in __DEV__)',
         );
-      }
-      */
+      } */
 
       exportFailedBadgeRef.current?.show();
     }
@@ -815,7 +811,7 @@ export const PokeInfo = ({
                 {t('poke.info.preset.label', 'Set')}
 
                 {
-                  (operatingMode === 'battle' && !battlePaused) &&
+                  (operatingMode === 'battle' && battleActive) &&
                   <ToggleButton
                     className={styles.toggleButton}
                     style={pokemon?.autoPresetId && settings?.nhkoColors?.[0] ? {
@@ -886,7 +882,7 @@ export const PokeInfo = ({
                   />
 
                   {
-                    ((operatingMode === 'standalone' || battlePaused) && (player?.pokemon?.length || 0) > 1) &&
+                    ((operatingMode === 'standalone' || !battleActive) && player?.pokemon?.length > 1) &&
                     <ToggleButton
                       className={cx(styles.toggleButton, styles.exportMultiButton)}
                       label={t('poke.info.preset.exportMultiLabel', 'All')}

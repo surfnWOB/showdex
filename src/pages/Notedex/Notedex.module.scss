@@ -35,6 +35,14 @@
   font-size: 14px;
   letter-spacing: 0.1px;
   line-height: 15px;
+
+  &::before {
+    @include position.inset-x(-8px);
+  }
+
+  &::after {
+    @include position.inset-x(-12px);
+  }
 }
 
 .noteActions {

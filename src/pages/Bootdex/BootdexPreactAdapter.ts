@@ -113,11 +113,12 @@ export class BootdexPreactAdapter extends BootdexAdapter {
       switch (room?.type) {
         case 'hellodex':
         case 'calcdex':
-        case 'honkdex': {
+        case 'honkdex':
+        case 'notedex': {
           return {
             minWidth: 320,
-            width: 640,
-            maxWidth: 1400,
+            width: 628,
+            maxWidth: 628,
           };
         }
 

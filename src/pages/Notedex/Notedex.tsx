@@ -179,15 +179,15 @@ export const Notedex = ({
           <ToggleButton
             className={styles.actionButton}
             label={t('toolbar.close.label')}
-            tooltip={(
-              <Trans
-                t={t}
-                i18nKey="toolbar.close.tooltip"
-                parent="div"
-                className={styles.tooltipContent}
-                shouldUnescape
-              />
-            )}
+            // tooltip={(
+            //   <Trans
+            //     t={t}
+            //     i18nKey="toolbar.close.tooltip"
+            //     parent="div"
+            //     className={styles.tooltipContent}
+            //     shouldUnescape
+            //   />
+            // )}
             absoluteHover
             onPress={onLeaveRoom}
           />

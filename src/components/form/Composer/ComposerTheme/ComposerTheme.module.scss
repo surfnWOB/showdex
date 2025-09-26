@@ -158,7 +158,7 @@ $code-block: map.set(
 );
 
 $list: (
-  indent-spacing: 10px, // margin-left for <ul>'s & <ol>'s
+  indent-spacing: 8px, // margin-left for <ul>'s & <ol>'s
   item: (
     margin-x: 24px,
     margin-y: 8px,
@@ -171,19 +171,19 @@ $paragraph: (
 );
 
 $quote: (
-  indent-spacing: 16px, // margin-left & padding-left
+  indent-padding: 16px, // padding-left
   padding-y: 0.32rem, // increases the "line-height" when quotes are sandwiched together
   font-weight: 500,
   font-size: 16px,
   color: (
-    light: color.alpha(colors.$black, 0.88),
-    dark: color.alpha(colors.$white, 0.88),
+    light: colors.$black,
+    dark: colors.$white,
   ),
   letter-spacing: normal,
   border-width: 3px,
   border-color: (
-    light: color.alpha(colors.$black, 0.32),
-    dark: color.alpha(colors.$white, 0.32),
+    light: color.alpha(colors.$black, 0.24),
+    dark: color.alpha(colors.$white, 0.24),
   ),
 );
 
@@ -322,8 +322,8 @@ $text-code: (
 }
 
 .quote {
-  @include spacing.m($y: 0, $r: 0, $l: map.get($quote, indent-spacing));
-  @include spacing.p($y: map.get($quote, padding-y), $l: map.get($quote, indent-spacing));
+  @include spacing.m-0;
+  @include spacing.p($y: map.get($quote, padding-y), $l: map.get($quote, indent-padding));
   @include font.primary(map.get($quote, font-weight));
   font-size: map.get($quote, font-size);
   letter-spacing: map.get($quote, letter-spacing);
