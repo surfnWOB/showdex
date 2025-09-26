@@ -622,10 +622,10 @@ export const Hellodex = ({
             },
           },
           {
-            key: 'new-notedex',
+            key: 'new-note',
             entity: 'item',
             props: {
-              label: t('contextMenu.newNotedex', 'New Notedex'),
+              label: t('contextMenu.newNote', 'New Note'),
               icon: 'fa-sticky-note',
               onPress: hideAfter(onRequestNotedex),
             },

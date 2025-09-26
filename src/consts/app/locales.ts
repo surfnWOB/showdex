@@ -22,7 +22,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'BOT Keith',
     desc: '(i18n)',
     created: '2024-01-05T12:18:35.813Z',
-    updated: '2025-09-23T08:50:02.228Z',
+    updated: '2025-09-26T11:57:18.400Z',
     disabled: false,
   },
   {
