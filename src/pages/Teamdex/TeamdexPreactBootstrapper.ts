@@ -14,6 +14,28 @@ const l = logger('@showdex/pages/Teamdex/TeamdexPreactBootstrapper');
 export class TeamdexPreactBootstrapper extends MixinTeamdexBootstrappable(BootdexPreactBootstrappable) {
   public static override readonly scope = l.scope;
 
+  protected updateDebounce = 1000; // in ms
+  protected updateTimeout?: NodeJS.Timeout = null;
+
+  protected queuePresetsUpdate(
+    reason?: string,
+  ): void {
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+    }
+
+    this.updateTimeout = setTimeout(() => {
+      l.debug(
+        'PS.teams.update()', '->', 'queuePresetsUpdate()',
+        '\n', 'Updating Teamdex presets due to Teambuilder', reason, 'update',
+        '\n', 'PS.teams', window.PS.teams,
+      );
+
+      this.updateTeambuilderPresets();
+      this.updateTimeout = null;
+    }, this.updateDebounce);
+  }
+
   protected override startTimer(): void {
     super.startTimer(TeamdexPreactBootstrapper.scope);
   }
@@ -49,12 +71,7 @@ export class TeamdexPreactBootstrapper extends MixinTeamdexBootstrappable(Bootde
         return;
       }
 
-      l.debug(
-        'PS.teams.update()', 'Updating Teamdex presets due to Teambuilder', value, 'update',
-        '\n', 'PS.teams', window.PS.teams,
-      );
-
-      this.updateTeambuilderPresets();
+      this.queuePresetsUpdate(value);
     });
 
     this.endTimer('(bootstrap complete)');
