@@ -18,7 +18,7 @@ import {
 import { Card } from '@showdex/components/layout';
 import { ToggleButton } from '@showdex/components/ui';
 import { CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
-import { useColorScheme, useHonkdexSettings } from '@showdex/redux/store';
+import { useCalcdexDuplicator, useColorScheme, useHonkdexSettings } from '@showdex/redux/store';
 import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { buildFormatOptions, determineColorScheme } from '@showdex/utils/ui';
@@ -30,6 +30,7 @@ export interface BattleInfoProps {
   className?: string;
   style?: React.CSSProperties;
   onRequestHonkdex?: (instanceId?: string, gen?: GenerationNum, format?: string) => void;
+  onLeaveRoom?: () => void;
 }
 
 const l = logger('@showdex/components/calc/BattleInfo');
@@ -38,6 +39,7 @@ export const BattleInfo = ({
   className,
   style,
   onRequestHonkdex,
+  onLeaveRoom,
 }: BattleInfoProps): JSX.Element => {
   const { t } = useTranslation('honkdex');
   const colorScheme = useColorScheme();
@@ -72,15 +74,44 @@ export const BattleInfo = ({
 
   const formatDuration = useDurationFormatter();
   const savedAgo = React.useMemo(() => formatDuration(cached), [cached, formatDuration]);
+  const saveLabel = React.useMemo(() => (
+    saving?.[0]
+      ? t('battle.save.saving')
+      : cached > 0
+        ? Date.now() - cached < (60 * 1000) || formatId(savedAgo)?.startsWith('lessthan') // fucc it
+          ? t('battle.save.savedRecently')
+          : t('battle.save.savedAgo', { ago: savedAgo })
+        : t('battle.save.unsaved')
+  ).trim(), [
+    cached,
+    savedAgo,
+    saving,
+    t,
+  ]);
 
-  const formatOptions = React.useMemo(() => buildFormatOptions(
-    gen,
-    {
-      currentFormat: format,
-      showAll: honkdexSettings?.showAllFormats,
-      translateHeader: (v, d) => t(`pokedex:headers.${formatId(v)}`, { ...d, defaultValue: v }),
-    },
-  ), [
+  const dupeCalcdex = useCalcdexDuplicator();
+  const dupeHonk = React.useCallback(() => {
+    // admittedly this is very hacky but yolo 2 lazy 2 make that thunky thunk rn
+    const returnRef = { battleId: null as string };
+
+    dupeCalcdex({
+      scope: `${l.scope}:${battleId}:dupeHonk()`,
+      battleId,
+      returnRef,
+    });
+
+    onRequestHonkdex?.(returnRef?.battleId);
+  }, [
+    battleId,
+    dupeCalcdex,
+    onRequestHonkdex,
+  ]);
+
+  const formatOptions = React.useMemo(() => buildFormatOptions(gen, {
+    currentFormat: format,
+    showAll: honkdexSettings?.showAllFormats,
+    translateHeader: (v, d) => t(`pokedex:headers.${formatId(v)}`, { ...d, defaultValue: v }),
+  }), [
     format,
     gen,
     honkdexSettings?.showAllFormats,
@@ -95,7 +126,7 @@ export const BattleInfo = ({
   // used for the honk name, so it doesn't lag when you type fast af
   const debouncyUpdate = useDebouncyFn(updateBattle, 1000);
 
-  const handleGenChange = (
+  const handleGenChange = React.useCallback((
     value: GenerationNum,
   ) => {
     if (genLocked) {
@@ -105,7 +136,12 @@ export const BattleInfo = ({
     updateBattle({
       gen: value,
     }, `${l.scope}:${battleId}:handleGenChange()`);
-  };
+  }, [
+    battleId,
+    genLocked,
+    onRequestHonkdex,
+    updateBattle,
+  ]);
 
   return (
     <Card
@@ -186,19 +222,35 @@ export const BattleInfo = ({
               styles.honkStatus,
               saved && styles.saved,
             )}
-            label={(
-              saving?.[0]
-                ? t('battle.save.saving')
-                : (cached || 0) > 0
-                  ? Date.now() - cached < (60 * 1000) || formatId(savedAgo)?.startsWith('lessthan') // fucc it
-                    ? t('battle.save.savedRecently')
-                    : t('battle.save.savedAgo', { ago: savedAgo })
-                  : t('battle.save.unsaved')
-            ).trim()}
+            label={saveLabel}
             absoluteHover
             active={saving?.[0]}
             disabled={operatingMode !== 'standalone' || saving?.[0] || !name}
             onPress={saveHonk}
+          />
+
+          <ToggleButton
+            className={styles.toggleButton}
+            label={t('battle.dupe.label')}
+            tooltip={(
+              <Trans
+                t={t}
+                i18nKey="battle.dupe.tooltip"
+                parent="div"
+                className={styles.tooltipContent}
+                shouldUnescape
+              />
+            )}
+            absoluteHover
+            disabled={operatingMode !== 'standalone' || saving?.[0]}
+            onPress={dupeHonk}
+          />
+
+          <ToggleButton
+            className={styles.toggleButton}
+            label={t('battle.close.label')}
+            absoluteHover
+            onPress={onLeaveRoom}
           />
         </div>
       </div>

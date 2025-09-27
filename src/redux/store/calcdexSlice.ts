@@ -4,6 +4,7 @@
  * @since 0.1.3
  */
 
+import * as React from 'react';
 import {
   type Draft,
   type PayloadAction,
@@ -150,12 +151,16 @@ export interface CalcdexSliceReducers extends SliceCaseReducers<CalcdexSliceStat
   /**
    * Duplicates the corresponding `battleId` in the provided partial `CalcdexBattleState`.
    *
+   * * `returnRef`, if provided, will be directly mutated to contain the final unique `battleId`.
+   *
    * @since 1.2.3
    */
   dupe: (
     state: Draft<CalcdexSliceState>,
     action: PayloadAction<PickRequired<Partial<CalcdexBattleState>, 'battleId'> & {
+      scope?: string;
       newId?: string;
+      returnRef?: { battleId?: string; };
     }>,
   ) => void;
 
@@ -693,8 +698,10 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       }
 
       const {
+        scope,
         battleId,
         newId: newIdFromPayload,
+        returnRef,
         ...additionalProperties
       } = action.payload;
 
@@ -703,7 +710,11 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       }
 
       // generate a new battleId
-      const newId = newIdFromPayload || uuidv4();
+      let newId = newIdFromPayload || uuidv4();
+
+      while (newId in state) {
+        newId = uuidv4();
+      }
 
       state[newId] = {
         ...cloneBattleState(state[battleId]),
@@ -788,10 +799,14 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         state[newId].field.terrain = null;
       }
 
+      if (typeof returnRef === 'object') {
+        returnRef.battleId = newId;
+      }
+
       endTimer('(done)');
 
       l.debug(
-        'DONE', action.type,
+        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
         '\n', 'battleId (payload)', action.payload,
         '\n', 'state', __DEV__ && current(state),
       );
@@ -859,32 +874,31 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
     }),
 });
 
-export const useCalcdexState = () => useSelector(
-  (state) => state?.calcdex,
-);
-
-export const useCalcdexBattleState = (
-  battleId: string,
-) => {
-  const battleState = useSelector((state) => state?.calcdex?.[battleId]);
-
-  return battleState || ({} as CalcdexBattleState);
-};
+export const useCalcdexState = () => useSelector((s) => s?.calcdex);
+export const useCalcdexBattleState = (battleId: string) => useSelector((s) => s?.calcdex?.[battleId]);
 
 export const useCalcdexDuplicator = () => {
   const { t } = useTranslation('honkdex');
+  const instances = useCalcdexState();
   const dispatch = useDispatch();
 
-  return (
+  return React.useCallback((
     instance: PickRequired<Partial<CalcdexBattleState>, 'battleId'> & {
+      scope?: string;
       newId?: string;
+      returnRef?: { battleId?: string; };
     },
   ) => {
     if (!instance?.battleId) {
       return;
     }
 
-    let defaultName = (!!instance.name && t('battle.name.dupe', { name: instance.name })) || null;
+    let defaultName = t('battle.name.dupe', {
+      name: instance.name || instances[instance.battleId]?.name || t(
+        'hellodex:instances.honkdex.untitledLabel',
+        'untitled honk',
+      ),
+    });
 
     if (instance.operatingMode === 'battle') {
       // note: since we're just building the title here, there's really no need to make sure if the user specified they're
@@ -900,10 +914,16 @@ export const useCalcdexDuplicator = () => {
     }
 
     dispatch(calcdexSlice.actions.dupe({
+      scope: `${l.scope}:useCalcdexDuplicator() via ${instance.scope || '(anon)'}`,
       battleId: instance.battleId,
       newId: instance.newId,
       name: null,
       defaultName,
+      returnRef: instance.returnRef,
     }));
-  };
+  }, [
+    dispatch,
+    instances,
+    t,
+  ]);
 };

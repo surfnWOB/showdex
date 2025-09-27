@@ -4,15 +4,15 @@
     "version": "1.0.0",
     "locale": "fr",
     "created": "2025-09-23T08:50:13.203Z",
-    "updated": "2025-09-23T08:50:13.203Z"
+    "updated": "2025-09-27T14:10:47.270Z"
   },
 
   "contextMenu": {
     "save": "$t(common:labels.save)",
     "saving": "$t(common:labels.saving)...",
     "saved": "$t(common:labels.saved)",
-    "newNotedex": "$t(common:labels.new) $t(common:products.notedex_one)",
-    "dupeNotedex": "$t(common:labels.duplicate)",
+    "newNotedex": "Nouvelle $t(common:products.note)",
+    "dupeNotedex": "Dupliquer $t(common:products.note_one)",
     "openHellodex": "$t(common:products.hellodex_one)",
     "close": "$t(common:labels.close)"
   },
@@ -31,7 +31,7 @@
     },
     "dupe": {
       "label": "$t(common:labels.duplicate)",
-      "tooltip": "Dupliquer $t(common:products.notedex_one)"
+      "tooltip": "$t(contextMenu.dupeNotedex)"
     },
     "import": {
       "label": "$t(common:labels.import)",

@@ -34,7 +34,11 @@
 
   [data-showdex-scheme='light'] & {
     &.withBackground::before {
-      background-color: color.alpha(colors.$white, 0.72);
+      background-color: color.alpha(colors.$white, 0.64);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(colors.$white, 0.94);
     }
 
     box-shadow: (
@@ -47,11 +51,19 @@
     &.withBackground::before {
       background-color: color.alpha(colors.$white, 0.48);
     }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(colors.$white, 0.72);
+    }
   }
 
   [data-showdex-theme='mina'][data-showdex-scheme='light'] & {
     &.withBackground::before {
-      background-color: color.alpha(#FFF7FA, 0.72);
+      background-color: color.alpha(#FFF7FA, 0.64);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(#FFF7FA, 0.94);
     }
 
     box-shadow: (
@@ -64,11 +76,19 @@
     &.withBackground::before {
       background-color: color.alpha(#FFF7FA, 0.48);
     }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(#FFF7FA, 0.72);
+    }
   }
 
   [data-showdex-scheme='dark'] & {
     &.withBackground::before {
-      background-color: color.alpha(colors.$gray-darkest, 0.72);
+      background-color: color.alpha(colors.$gray-darkest, 0.64);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(colors.$gray-darkest, 0.94);
     }
 
     box-shadow: (
@@ -77,15 +97,23 @@
     );
   }
 
-  [data-showdex-terrain='glassy'][data-showdex-theme='mina'][data-showdex-scheme='dark'] & {
+  [data-showdex-terrain='glassy'][data-showdex-scheme='dark'] & {
     &.withBackground::before {
-      background-color: color.alpha(#100206, 0.48);
+      background-color: color.alpha(colors.$gray-darkest, 0.48);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(colors.$gray-darkest, 0.72);
     }
   }
 
   [data-showdex-theme='mina'][data-showdex-scheme='dark'] & {
     &.withBackground::before {
-      background-color: color.alpha(#100206, 0.72);
+      background-color: color.alpha(#100206, 0.64);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(#100206, 0.94);
     }
 
     box-shadow: (
@@ -97,6 +125,10 @@
   [data-showdex-terrain='glassy'][data-showdex-theme='mina'][data-showdex-scheme='dark'] & {
     &.withBackground::before {
       background-color: color.alpha(#100206, 0.48);
+    }
+
+    &.withBackground:hover::before {
+      background-color: color.alpha(#100206, 0.72);
     }
   }
 }

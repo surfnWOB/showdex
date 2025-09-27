@@ -75,6 +75,7 @@ export const Honkdex = ({
         <BattleInfo
           className={styles.battleInfo}
           onRequestHonkdex={onRequestHonkdex}
+          onLeaveRoom={onLeaveRoom}
         />
 
         <PiconRackSortableContext playerKey={topKey}>

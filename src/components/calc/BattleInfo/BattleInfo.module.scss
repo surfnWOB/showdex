@@ -10,6 +10,7 @@
 @use 'functions/color';
 @use 'mixins/flex';
 @use 'mixins/font';
+@use 'mixins/position';
 @use 'mixins/spacing';
 @use 'mixins/transition';
 
@@ -88,26 +89,36 @@ div.genOptionButton {
 }
 
 .honkInfo {
-  @include flex.column;
+  @include flex.col;
   align-self: center;
-  @include spacing.padding($right: 6px);
+  row-gap: 6px;
+  @include spacing.pr(6px);
 }
 
 .honkProps {
-  @include flex.row($align: center);
-  @include spacing.margin($top: 6px);
+  @include flex.row-start;
+  column-gap: 12px;
+  // @include spacing.margin($top: 6px);
 }
 
 .honkName {
-  @include spacing.padding($x: 4px);
+  @include spacing.px(4px);
   @include font.apply(fonts.$primary, ( font-weight: 500 ));
   font-size: 14px;
   letter-spacing: 0.1px;
   line-height: 15px;
+
+  &::before {
+    @include position.inset-x(-8px);
+  }
+
+  &::after {
+    @include position.inset-x(-12px);
+  }
 }
 
 .honkStatus {
-  @include spacing.margin($left: 12px);
+  // @include spacing.margin($left: 12px);
 
   &.saved {
     .light & {
@@ -118,4 +129,13 @@ div.genOptionButton {
       color: colors.$green;
     }
   }
+}
+
+.tooltipContent {
+  max-width: 248px;
+  font-size: 10px;
+  text-align: center;
+  line-height: 12px;
+  white-space: normal;
+  user-select: none;
 }

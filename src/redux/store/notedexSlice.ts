@@ -4,6 +4,8 @@
  * @since 1.3.0
  */
 
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   type Draft,
   type PayloadAction,
@@ -16,7 +18,7 @@ import { saveNotedex, SaveNotedexActionType } from '@showdex/redux/actions';
 import { nonEmptyObject } from '@showdex/utils/core';
 import { logger, runtimer } from '@showdex/utils/debug';
 import { type ElementSizeLabel } from '@showdex/utils/hooks';
-import { useSelector } from './hooks';
+import { useDispatch, useSelector } from './hooks';
 
 /**
  * State for a single Notedex instance.
@@ -40,6 +42,26 @@ export interface NotedexSliceInstance {
    * @since 1.3.0
    */
   name?: string;
+
+  /**
+   * Notedex's auto-generated name.
+   *
+   * * Indicates if the note should be saved when modified.
+   * * Typically populated when a Notedex is duplicated.
+   * * Falsy values (default) will default to the placeholder text.
+   *   - Otherwise, this value will become the placeholder text.
+   *
+   * @example
+   * ```ts
+   * 'Copy of Copy of Copy of Copy of Copy of Copy of Untitled'
+   * ```
+   * @default null
+   * @since 1.3.0
+   */
+  defaultName?: string;
+
+  /** @todo */
+  // teambuilderId?: string;
 
   /**
    * Stringified Lexical editor state used in the Notedex's `Composer` component.
@@ -149,6 +171,7 @@ export interface NotedexSliceReducers extends SliceCaseReducers<NotedexSliceStat
    * Duplicates the Notedex associated w/ the specified `id`.
    *
    * * `newId` can be specified, otherwise, a random `v4()` UUID will be generated for the new `NotedexSliceInstance`.
+   * * `returnRef`, if provided, will be directly mutated to contain the final unique `id`.
    *
    * @since 1.3.0
    */
@@ -157,6 +180,7 @@ export interface NotedexSliceReducers extends SliceCaseReducers<NotedexSliceStat
     action: PayloadAction<PickRequired<NotedexSliceInstance, 'id'> & {
       scope?: string;
       newId?: string;
+      returnRef?: { id: string; };
     }>,
   ) => void;
 
@@ -289,6 +313,7 @@ export const notedexSlice = createSlice<NotedexSliceState, NotedexSliceReducers,
         scope,
         id,
         newId,
+        returnRef,
         ...payload
       } = action.payload || {};
 
@@ -318,6 +343,10 @@ export const notedexSlice = createSlice<NotedexSliceState, NotedexSliceReducers,
         updated: Date.now(),
         saved: null,
       };
+
+      if (typeof returnRef === 'object') {
+        returnRef.id = noteId;
+      }
 
       endTimer('(done)');
 
@@ -378,4 +407,41 @@ export const notedexSlice = createSlice<NotedexSliceState, NotedexSliceReducers,
 });
 
 export const useNotedexState = () => useSelector((s) => s?.notedex);
+export const useNotedexInstances = () => useSelector((s) => s?.notedex?.notes);
 export const useNotedexInstance = (id: string) => useSelector((s) => s?.notedex?.notes?.[id]);
+
+export const useNotedexDuplicator = () => {
+  const { t } = useTranslation('notedex');
+  const instances = useNotedexInstances();
+  const dispatch = useDispatch();
+
+  return React.useCallback((
+    instance: PickRequired<NotedexSliceInstance, 'id'> & {
+      scope?: string;
+      newId?: string;
+      returnRef?: { id: string; };
+    },
+  ) => {
+    if (!instance?.id) {
+      return;
+    }
+
+    dispatch(notedexSlice.actions.dupe({
+      scope: `${l.scope}:useNotedexDuplicator() via ${instance.scope || '(anon)'}`,
+      id: instance.id,
+      newId: instance.newId,
+      name: null,
+      defaultName: t('toolbar.name.dupe', {
+        name: instance.name || instances[instance.id]?.name || t(
+          'hellodex:instances.notedex.untitledLabel',
+          'untitled note',
+        ),
+      }),
+      returnRef: instance.returnRef,
+    }));
+  }, [
+    dispatch,
+    instances,
+    t,
+  ]);
+};

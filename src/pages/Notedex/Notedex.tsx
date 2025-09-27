@@ -14,7 +14,12 @@ import { Composer, InlineField } from '@showdex/components/form';
 import { Card, PageContainer } from '@showdex/components/layout';
 import { ToggleButton } from '@showdex/components/ui';
 import { saveNotedex } from '@showdex/redux/actions';
-import { notedexSlice, useDispatch, useNotedexInstance } from '@showdex/redux/store';
+import {
+  notedexSlice,
+  useDispatch,
+  useNotedexDuplicator,
+  useNotedexInstance,
+} from '@showdex/redux/store';
 import { formatId, tolerance } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { useElementSize } from '@showdex/utils/hooks';
@@ -24,7 +29,7 @@ export interface NotedexProps {
   instanceId: string;
   saveDebounce?: number;
   updateDebounce?: number;
-  // onRequestHellodex?: () => void;
+  onRequestNotedex?: (instanceId?: string) => void;
   onLeaveRoom?: () => void;
 }
 
@@ -34,7 +39,7 @@ export const Notedex = ({
   instanceId,
   saveDebounce = 3000,
   updateDebounce = 1000,
-  // onRequestHellodex,
+  onRequestNotedex,
   onLeaveRoom,
 }: NotedexProps): JSX.Element => {
   const { t } = useTranslation('notedex');
@@ -112,6 +117,23 @@ export const Notedex = ({
     saveDebounce,
   ]);
 
+  const dupeNotedex = useNotedexDuplicator();
+  const dupeNote = React.useCallback(() => {
+    const returnRef = { id: null as string };
+
+    dupeNotedex({
+      scope: `${l.scope}:${instanceId}:dupeNote()`,
+      id: instanceId,
+      returnRef,
+    });
+
+    onRequestNotedex?.(returnRef?.id);
+  }, [
+    dupeNotedex,
+    instanceId,
+    onRequestNotedex,
+  ]);
+
   const updateNote = React.useCallback((
     payload: Partial<typeof state>,
     scope?: string,
@@ -147,7 +169,7 @@ export const Notedex = ({
       <Card className={styles.toolbar}>
         <InlineField
           className={styles.noteName}
-          hint={t('toolbar.name.hint') as React.ReactNode}
+          hint={state?.defaultName || t('toolbar.name.hint')}
           input={{
             name: `${l.scope}:${instanceId}:Name`,
             value: state?.name,
@@ -178,16 +200,24 @@ export const Notedex = ({
 
           <ToggleButton
             className={styles.actionButton}
+            label={t('toolbar.dupe.label')}
+            tooltip={(
+              <Trans
+                t={t}
+                i18nKey="toolbar.dupe.tooltip"
+                parent="div"
+                className={styles.tooltipContent}
+                shouldUnescape
+              />
+            )}
+            absoluteHover
+            disabled={saving}
+            onPress={dupeNote}
+          />
+
+          <ToggleButton
+            className={styles.actionButton}
             label={t('toolbar.close.label')}
-            // tooltip={(
-            //   <Trans
-            //     t={t}
-            //     i18nKey="toolbar.close.tooltip"
-            //     parent="div"
-            //     className={styles.tooltipContent}
-            //     shouldUnescape
-            //   />
-            // )}
             absoluteHover
             onPress={onLeaveRoom}
           />
@@ -196,6 +226,7 @@ export const Notedex = ({
 
       <Composer
         className={styles.editor}
+        inputClassName="autofocus" // by the PSRoomPanel.focus() method
         hint={t('editor.hint')}
         initialEditorState={state?.editorState}
         input={{

@@ -26,7 +26,8 @@
   @include position.sticky($x: 0, $t: 16px);
   @include flex.col-stretch;
   row-gap: 6px;
-  @include spacing.px(12px);
+  @include spacing.mx(12px);
+  @include spacing.p($x: 16px, $y: 12px);
   z-index: 5;
 }
 
