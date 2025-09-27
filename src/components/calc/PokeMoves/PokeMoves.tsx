@@ -1,3 +1,9 @@
+/**
+ * @file `PokeMoves.tsx`
+ * @author Keith Choison <keith@tize.io>
+ * @since 0.1.2
+ */
+
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import cx from 'classnames';
@@ -1108,9 +1114,9 @@ export const PokeMoves = ({
                       <Tooltip
                         content={matchupTooltip}
                         offset={[0, 10]}
-                        delay={[1000, 50]}
+                        delay={[420, 69]}
                         trigger="mouseenter"
-                        touch={['hold', 500]}
+                        touch="hold"
                         disabled={!showMatchupTooltip || !hasDamageRange}
                       >
                         <div
