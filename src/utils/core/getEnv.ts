@@ -67,6 +67,8 @@ export const env = createEnvParser({
 
   NODE_ENV: process.env.NODE_ENV,
 
+  NOTEDEX_ENABLED: process.env.NOTEDEX_ENABLED,
+
   PACKAGE_AUTHOR_EMAIL: process.env.PACKAGE_AUTHOR_EMAIL,
   PACKAGE_AUTHOR_NAME: process.env.PACKAGE_AUTHOR_NAME,
   PACKAGE_DESCRIPTION: process.env.PACKAGE_DESCRIPTION,

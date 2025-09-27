@@ -5,6 +5,7 @@
  */
 
 import * as ReactDOM from 'react-dom/client';
+import { env } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { detectClassicHost } from '@showdex/utils/host';
 import { BootdexClassicBootstrappable } from '../Bootdex/BootdexClassicBootstrappable';
@@ -102,8 +103,26 @@ export class NotedexClassicBootstrapper extends MixinNotedexBootstrappable(Bootd
   }
 
   public override run(): void { // eslint-disable-line class-methods-use-this
+    this.startTimer();
+
     if (!detectClassicHost(window)) {
-      throw new Error('NotedexClassicBootstrapper can only be run in the classic Showdown Backbone.js client!');
+      return void this.endTimer('(bad classic)', window.__SHOWDEX_HOST);
     }
+
+    l.silly(
+      'Notedex classic bootstrapper was invoked;',
+      'determining if there\'s anything to do...',
+    );
+
+    if (!env.bool('notedex-enabled')) {
+      l.debug(
+        'Notedex classic bootstrap request was ignored',
+        'since it has been disabled by the environment.',
+      );
+
+      return void this.endTimer('(notedex denied)');
+    }
+
+    this.endTimer('(bootstrap complete)');
   }
 }

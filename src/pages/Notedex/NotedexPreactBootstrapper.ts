@@ -5,6 +5,7 @@
  */
 
 import { notedexSlice } from '@showdex/redux/store';
+import { env } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import { BootdexPreactBootstrappable } from '../Bootdex/BootdexPreactBootstrappable';
@@ -74,6 +75,15 @@ export class NotedexPreactBootstrapper extends MixinNotedexBootstrappable(Bootde
       'Notedex Preact bootstrapper was invoked;',
       'determining if there\'s anything to do...',
     );
+
+    if (!env.bool('notedex-enabled')) {
+      l.debug(
+        'Notedex Preact bootstrap request was ignored',
+        'since it has been disabled by the environment.',
+      );
+
+      return void this.endTimer('(notedex denied)');
+    }
 
     l.debug('Adding the NotedexPreactPanel to the PS.roomTypes...');
     window.PS.addRoomType(NotedexPreactPanel);
