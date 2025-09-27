@@ -126,9 +126,6 @@ export const InstanceButton = React.forwardRef<InstanceButtonRef, InstanceButton
       {...props}
       className={cx(
         styles.container,
-        // !!colorScheme && styles[colorScheme],
-        // !!colorTheme && styles[colorTheme],
-        // glassyTerrain && styles.glassy,
         active && styles.active,
         (!!name && !!cached) && styles.saved,
         removalQueued && styles.removing,
@@ -180,7 +177,10 @@ export const InstanceButton = React.forwardRef<InstanceButtonRef, InstanceButton
 
         {operatingMode === 'standalone' ? (
           <div className={styles.honkName}>
-            {name || defaultName || 'untitled honk'}
+            {name || defaultName || t(
+              'hellodex:instances.honkdex.untitledLabel',
+              'untitled honk',
+            )}
           </div>
         ) : (
           <div className={styles.players}>
@@ -262,7 +262,7 @@ export const InstanceButton = React.forwardRef<InstanceButtonRef, InstanceButton
       {
         (operatingMode === 'standalone' && removalQueued) &&
         <div className={styles.undoOverlay}>
-          Undo?
+          {t('hellodex:instances.honkdex.undoLabel')}
         </div>
       }
     </BaseButton>

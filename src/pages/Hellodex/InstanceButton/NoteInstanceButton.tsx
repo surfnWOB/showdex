@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import cx from 'classnames';
 import { type BaseButtonProps, type ButtonElement, BaseButton } from '@showdex/components/ui';
 import { type NotedexSliceInstance } from '@showdex/redux/store';
@@ -29,6 +30,7 @@ export const NoteInstanceButton = React.forwardRef<NoteInstanceButtonRef, NoteIn
   ...props
 }: NoteInstanceButtonProps, forwardedRef): JSX.Element => {
   const containerRef = React.useRef<ButtonElement>(null);
+  const { t } = useTranslation('hellodex');
   const [removalQueued, setRemovalQueued] = React.useState(false);
   const removalRequestTimeout = React.useRef<NodeJS.Timeout>(null);
 
@@ -86,8 +88,19 @@ export const NoteInstanceButton = React.forwardRef<NoteInstanceButtonRef, NoteIn
       </div>
 
       <div className={styles.info}>
+        <Trans
+          t={t}
+          i18nKey="common:products.notedex_one"
+          parent="div"
+          className={styles.format}
+          shouldUnescape
+        />
+
         <div className={styles.honkName}>
-          {instance?.name || 'untitled note'}
+          {instance?.name || instance?.defaultName || t(
+            'instances.notedex.untitledLabel',
+            'untitled note',
+          )}
         </div>
       </div>
 
@@ -105,7 +118,7 @@ export const NoteInstanceButton = React.forwardRef<NoteInstanceButtonRef, NoteIn
       {
         removalQueued &&
         <div className={styles.undoOverlay}>
-          Undo?
+          {t('instances.notedex.undoLabel')}
         </div>
       }
     </BaseButton>

@@ -4,7 +4,7 @@
     "version": "1.0.3",
     "locale": "fr",
     "created": "2024-01-08T19:34:00.026Z",
-    "updated": "2025-09-23T08:35:36.561Z"
+    "updated": "2025-09-27T06:20:28.184Z"
   },
 
   "contextMenu": {
@@ -44,7 +44,9 @@
       },
       "orSeparator": "ou",
       "newLabel": ["<strong>Nouveau</strong>", "<strong>Honk</strong>dex"],
-      "newAria": "Créer un nouveau $t(common:products.honk_one)"
+      "newAria": "Créer un nouveau $t(common:products.honk_one)",
+      "untitledLabel": "$t(common:products.honk_one) sans titre",
+      "undoLabel": "$t(common:labels.undo) ?"
     },
     "notedex": {
       "contextMenu": {
@@ -53,7 +55,9 @@
         "remove": "$t(common:labels.delete)"
       },
       "newLabel": "<strong>Note</strong>dex",
-      "newAria": "Créer une nouvelle $t(common:products.note_one)"
+      "newAria": "Créer une nouvelle $t(common:products.note_one)",
+      "untitledLabel": "$t(common:products.note_one) sans titre",
+      "undoLabel": "$t(instances.honkdex.undoLabel)"
     }
   },
 
@@ -77,6 +81,16 @@
 
   "footer": {
     "created": "créé avec <love /> par",
+
+    "newHonkdex": {
+      "label": "$t(common:products.honkdex_one)",
+      "tooltip": "$t(instances.honkdex.newAria)"
+    },
+
+    "newNotedex": {
+      "label": "$t(common:products.notedex_one)",
+      "tooltip": "$t(instances.notedex.newAria)"
+    },
 
     "settings": {
       "openLabel": "$t(common:labels.setting_other)",

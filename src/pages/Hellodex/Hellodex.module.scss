@@ -231,7 +231,7 @@
     background-color: color.alpha(colors.$black, 0.48);
     box-shadow: (
       0 0 1px color.alpha(colors.$white, 0.32),
-      0 0 16px color.alpha(colors.$black, 0.48),
+      0 0 16px color.alpha(colors.$black, 0.16),
     );
   }
 
@@ -281,7 +281,7 @@
   height: 100%;
 
   .smol & {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -294,6 +294,18 @@
 
   &::before {
     border-radius: 12px;
+  }
+
+  &.newInstanceButton {
+    @include position.sticky($b: 10px);
+  }
+
+  .smol & {
+    grid-column: span 2;
+
+    &.smolSplit {
+      grid-column: span 1;
+    }
   }
 }
 
@@ -473,30 +485,16 @@ button.spectateButton {
 
 .links {
   @include flex.row($align: center);
+  column-gap: 8px;
 
   [data-showdex-scheme='light'] & {
     color: colors.$gray-dark;
   }
 }
 
-.linkItem {
-  &:not(:first-child):not(:last-child) {
-    @include spacing.mr(24px);
-
-    .smol & {
-      @include spacing.mr(16px);
-    }
-  }
-}
-
 .settingsButton {
   min-width: 68px;
   height: 44px;
-  @include spacing.mr(32px);
-
-  .smol & {
-    @include spacing.mr(24px);
-  }
 
   // bad idea, looks weird on non-Retina displays while changing color
   /* .settingsIcon {
@@ -523,7 +521,7 @@ button.spectateButton {
 } */
 
 .linkButton {
-  width: 44px;
+  width: 56px;
   height: 44px;
 
   [data-showdex-scheme='light'] & {
@@ -544,6 +542,11 @@ button.spectateButton {
     }
   }
 
+  i {
+    @include spacing.m($t: 4px, $b: 8px);
+    font-size: 18px;
+  }
+
   .signpostIcon {
     transform: scale(0.9);
   }
@@ -559,11 +562,36 @@ button.spectateButton {
   .clipboardIcon {
     transform: scale(0.85);
   } */
+
+  &.newInstanceButton {
+    color: colors.$transparent;
+    background-image: linear-gradient(65deg, colors.$black, #4A9AC7 48%, #B72D99 94%);
+    background-position: 0 0;
+    background-size: 200% 100%;
+    background-clip: text;
+    @include transition.apply(background-position, box-shadow);
+
+    &:hover {
+      background-position: 100% 0;
+    }
+
+    [data-showdex-scheme='dark'] & {
+      background-image: linear-gradient(65deg, #7ABCE2, #F148CC 94%);
+    }
+
+    [data-showdex-theme='mina'][data-showdex-scheme='light'] & {
+      background-image: linear-gradient(65deg, #770629 40%, #E94489 80%);
+    }
+
+    [data-showdex-theme='mina'][data-showdex-scheme='dark'] & {
+      background-image: linear-gradient(65deg, #F8C8C5 40%, #E94489 80%);
+    }
+  }
 }
 
 .linkButtonLabel {
-  @include spacing.mr(-0.01px);
-  letter-spacing: 0.01px;
+  // @include spacing.mr(-0.01px);
+  letter-spacing: 0.25px;
 }
 
 .credits {

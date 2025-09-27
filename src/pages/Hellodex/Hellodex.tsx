@@ -29,11 +29,13 @@ import {
   useHellodexSettings,
   useHellodexState,
   useHonkdexSettings,
+  useNotedexDuplicator,
   useNotedexState,
   useUpdateSettings,
 } from '@showdex/redux/store';
 import { usePlayerTitle } from '@showdex/utils/app';
 import { env, getResourceUrl } from '@showdex/utils/core';
+import { logger } from '@showdex/utils/debug';
 import { useRandomUuid, useRoomNavigation } from '@showdex/utils/hooks';
 import { BattleRecord } from './BattleRecord';
 import { FooterButton } from './FooterButton';
@@ -67,6 +69,9 @@ const buildSuffix = env('build-suffix');
 const forumUrl = env('hellodex-forum-url');
 const repoUrl = env('hellodex-repo-url');
 const communityUrl = env('hellodex-community-url');
+const notedexEnabled = env.bool('notedex-enabled');
+
+const l = logger('@showdex/pages/Hellodex');
 
 export const Hellodex = ({
   onUserPopup,
@@ -104,6 +109,11 @@ export const Hellodex = ({
   const notedexState = useNotedexState();
   const neverOpens = calcdexSettings?.openOnStart === 'never';
 
+  const smolContainer = React.useMemo(
+    () => ['xs', 'sm'].includes(state?.containerSize),
+    [state?.containerSize],
+  );
+
   const instances = React.useMemo(() => Object.values(calcdexState).reverse().filter((b) => (
     !!b?.battleId
       && (b.operatingMode === 'battle' || honkdexSettings?.visuallyEnabled)
@@ -113,9 +123,11 @@ export const Hellodex = ({
   ]);
 
   const noteInstances = React.useMemo(() => (
-    Object.values(notedexState?.notes || {})
-      .reverse()
-      .filter((n) => !!n?.id)
+    notedexEnabled
+      ? Object.values(notedexState?.notes || {})
+        .reverse()
+        .filter((n) => !!n?.id)
+      : []
   ), [
     notedexState?.notes,
   ]);
@@ -125,7 +137,8 @@ export const Hellodex = ({
 
   const battleRecord = useBattleRecord();
   const resetBattleRecord = useBattleRecordReset();
-  const dupeInstance = useCalcdexDuplicator();
+  const dupeCalcdex = useCalcdexDuplicator();
+  const dupeNotedex = useNotedexDuplicator();
 
   // pane visibilities
   const {
@@ -161,7 +174,7 @@ export const Hellodex = ({
       name="hellodex"
       contentClassName={cx(
         styles.content,
-        ['xs', 'sm'].includes(state.containerSize) && styles.smol,
+        smolContainer && styles.smol,
         state.containerSize === 'xs' && styles.verySmol,
       )}
       prefix={<BuildInfo position="top-right" />}
@@ -373,7 +386,7 @@ export const Hellodex = ({
                           ? onRequestHonkdex
                           : onRequestCalcdex
                       )?.(instance.battleId)}
-                      onRequestRemove={() => onRemoveHonkdex?.(instance.battleId)}
+                      onRequestRemove={() => void onRemoveHonkdex?.(instance.battleId)}
                       onContextMenu={(e) => {
                         showContextMenu({
                           id: instance.operatingMode === 'battle' ? calcdexMenuId : honkdexMenuId,
@@ -393,7 +406,7 @@ export const Hellodex = ({
                       className={styles.instanceButton}
                       instance={instance}
                       onPress={() => void onRequestNotedex?.(instance.id)}
-                      onRequestRemove={() => onRemoveNotedex?.(instance.id)}
+                      onRequestRemove={() => void onRemoveNotedex?.(instance.id)}
                       onContextMenu={(e) => {
                         showContextMenu({
                           id: notedexMenuId,
@@ -409,7 +422,11 @@ export const Hellodex = ({
                   {
                     honkdexSettings?.visuallyEnabled &&
                     <GradientButton
-                      className={styles.instanceButton}
+                      className={cx(
+                        styles.instanceButton,
+                        styles.newInstanceButton,
+                        notedexEnabled && styles.smolSplit,
+                      )}
                       display="block"
                       aria-label={t('instances.honkdex.newAria')}
                       hoverScale={1}
@@ -428,24 +445,31 @@ export const Hellodex = ({
                     </GradientButton>
                   }
 
-                  <GradientButton
-                    className={styles.instanceButton}
-                    display="block"
-                    aria-label={t('instances.notedex.newAria')}
-                    hoverScale={1}
-                    onPress={() => void onRequestNotedex()}
-                  >
-                    <i
-                      className="fa fa-plus"
-                      style={{ fontSize: 10, lineHeight: 11 }}
-                    />
-                    <i className="fa fa-sticky-note" />
-                    <Trans
-                      t={t}
-                      i18nKey="instances.notedex.newLabel"
-                      shouldUnescape
-                    />
-                  </GradientButton>
+                  {
+                    notedexEnabled &&
+                    <GradientButton
+                      className={cx(
+                        styles.instanceButton,
+                        styles.newInstanceButton,
+                        honkdexSettings?.visuallyEnabled && styles.smolSplit,
+                      )}
+                      display="block"
+                      aria-label={t('instances.notedex.newAria')}
+                      hoverScale={1}
+                      onPress={() => void onRequestNotedex()}
+                    >
+                      <i
+                        className="fa fa-plus"
+                        style={{ fontSize: 10, lineHeight: 11 }}
+                      />
+                      <i className="fa fa-sticky-note" />
+                      <Trans
+                        t={t}
+                        i18nKey="instances.notedex.newLabel"
+                        shouldUnescape
+                      />
+                    </GradientButton>
+                  }
 
                   {
                     settings?.showBattleRecord &&
@@ -529,57 +553,88 @@ export const Hellodex = ({
             onPress={toggleSettingsPane}
           />
 
-          {/*
-            (forumUrl || repoUrl || communityUrl).startsWith('https://') &&
-            <div
-              className={cx(
-                styles.linkItem,
-                styles.linkSeparator,
-              )}
-            />
-          */}
-
           {
-            forumUrl?.startsWith('https://') &&
+            honkdexSettings?.visuallyEnabled &&
             <FooterButton
-              className={cx(styles.linkItem, styles.linkButton)}
-              iconClassName={styles.signpostIcon}
+              className={cx(styles.linkItem, styles.linkButton, styles.newInstanceButton)}
               labelClassName={styles.linkButtonLabel}
-              iconAsset="signpost.svg"
-              iconDescription="Signpost Icon"
-              label={t('footer.smogon.label')}
-              aria-label={t('footer.smogon.tooltip')}
-              tooltip={t('footer.smogon.tooltip')}
-              onPress={() => window.open(forumUrl, '_blank', 'noopener,noreferrer')}
+              iconAsset="fa-car"
+              label={t('footer.newHonkdex.label')}
+              aria-label={t('footer.newHonkdex.tooltip')}
+              tooltip={t('footer.newHonkdex.tooltip')}
+              onPress={() => void onRequestHonkdex()}
             />
           }
 
           {
-            repoUrl?.startsWith('https://') &&
+            notedexEnabled &&
             <FooterButton
-              className={cx(styles.linkItem, styles.linkButton)}
+              className={cx(styles.linkItem, styles.linkButton, styles.newInstanceButton)}
               labelClassName={styles.linkButtonLabel}
-              iconAsset="github-face.svg"
-              iconDescription="GitHub Octocat Icon"
-              label={t('footer.github.label')}
-              aria-label={t('footer.github.tooltip')}
-              tooltip={t('footer.github.tooltip')}
-              onPress={() => window.open(repoUrl, '_blank', 'noopener,noreferrer')}
+              iconAsset="fa-sticky-note"
+              label={t('footer.newNotedex.label')}
+              aria-label={t('footer.newNotedex.tooltip')}
+              tooltip={t('footer.newNotedex.tooltip')}
+              onPress={() => void onRequestNotedex()}
             />
           }
 
           {
-            communityUrl?.startsWith('https://') &&
-            <FooterButton
-              className={cx(styles.linkItem, styles.linkButton)}
-              labelClassName={styles.linkButtonLabel}
-              iconAsset="discord.svg"
-              iconDescription="Discord Clyde Icon"
-              label={t('footer.discord.label')}
-              aria-label={t('footer.discord.tooltip')}
-              tooltip={t('footer.discord.tooltip')}
-              onPress={() => window.open(communityUrl, '_blank', 'noopener,noreferrer')}
-            />
+            state?.containerSize !== 'xs' &&
+            <>
+              {/*
+                (forumUrl || repoUrl || communityUrl).startsWith('https://') &&
+                <div
+                  className={cx(
+                    styles.linkItem,
+                    styles.linkSeparator,
+                  )}
+                />
+              */}
+
+              {
+                forumUrl?.startsWith('https://') &&
+                <FooterButton
+                  className={cx(styles.linkItem, styles.linkButton)}
+                  iconClassName={styles.signpostIcon}
+                  labelClassName={styles.linkButtonLabel}
+                  iconAsset="signpost.svg"
+                  iconDescription="Signpost Icon"
+                  label={t('footer.smogon.label')}
+                  aria-label={t('footer.smogon.tooltip')}
+                  tooltip={t('footer.smogon.tooltip')}
+                  onPress={() => window.open(forumUrl, '_blank', 'noopener,noreferrer')}
+                />
+              }
+
+              {
+                repoUrl?.startsWith('https://') &&
+                <FooterButton
+                  className={cx(styles.linkItem, styles.linkButton)}
+                  labelClassName={styles.linkButtonLabel}
+                  iconAsset="github-face.svg"
+                  iconDescription="GitHub Octocat Icon"
+                  label={t('footer.github.label')}
+                  aria-label={t('footer.github.tooltip')}
+                  tooltip={t('footer.github.tooltip')}
+                  onPress={() => window.open(repoUrl, '_blank', 'noopener,noreferrer')}
+                />
+              }
+
+              {
+                communityUrl?.startsWith('https://') &&
+                <FooterButton
+                  className={cx(styles.linkItem, styles.linkButton)}
+                  labelClassName={styles.linkButtonLabel}
+                  iconAsset="discord.svg"
+                  iconDescription="Discord Clyde Icon"
+                  label={t('footer.discord.label')}
+                  aria-label={t('footer.discord.tooltip')}
+                  tooltip={t('footer.discord.tooltip')}
+                  onPress={() => window.open(communityUrl, '_blank', 'noopener,noreferrer')}
+                />
+              }
+            </>
           }
         </div>
 
@@ -627,12 +682,14 @@ export const Hellodex = ({
             props: {
               label: t('contextMenu.newNote', 'New Note'),
               icon: 'fa-sticky-note',
+              hidden: !notedexEnabled,
               onPress: hideAfter(onRequestNotedex),
             },
           },
           {
             key: 'new-hr',
             entity: 'separator',
+            props: { hidden: !honkdexSettings?.visuallyEnabled && !notedexEnabled },
           },
           {
             key: 'spectate-battles',
@@ -716,7 +773,7 @@ export const Hellodex = ({
                   return;
                 }
 
-                dupeInstance(
+                dupeCalcdex(
                   instances.find((i) => i?.battleId === id)
                     || { battleId: id },
                 );
@@ -726,9 +783,7 @@ export const Hellodex = ({
           {
             key: 'close-hr',
             entity: 'separator',
-            props: {
-              hidden: !calcdexSettings?.destroyOnClose,
-            },
+            props: { hidden: !calcdexSettings?.destroyOnClose },
           },
           {
             key: 'close-battle',
@@ -754,157 +809,187 @@ export const Hellodex = ({
         ]}
       />
 
-      <ContextMenu
-        id={honkdexMenuId}
-        itemKeyPrefix="InstanceButton:Honkdex:ContextMenu"
-        items={[
-          {
-            key: 'open-honkdex',
-            entity: 'item',
-            props: {
-              label: t('instances.honkdex.contextMenu.open', 'Open'),
-              icon: 'external-link',
-              iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
-              onPress: ({ props: p }) => void hideAfter(() => {
-                const id = (p as Record<'instanceId', string>)?.instanceId;
+      {
+        honkdexSettings?.visuallyEnabled &&
+        <ContextMenu
+          id={honkdexMenuId}
+          itemKeyPrefix="InstanceButton:Honkdex:ContextMenu"
+          items={[
+            {
+              key: 'open-honkdex',
+              entity: 'item',
+              props: {
+                label: t('instances.honkdex.contextMenu.open', 'Open'),
+                icon: 'external-link',
+                iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
+                onPress: ({ props: p }) => void hideAfter(() => {
+                  const id = (p as Record<'instanceId', string>)?.instanceId;
 
-                if (!id) {
-                  return;
-                }
+                  if (!id) {
+                    return;
+                  }
 
-                onRequestHonkdex(id);
-              })(),
+                  onRequestHonkdex(id);
+                })(),
+              },
             },
-          },
-          {
-            key: 'dupe-honkdex',
-            entity: 'item',
-            props: {
-              label: t('instances.honkdex.contextMenu.dupe', 'Duplicate'),
-              icon: 'copy-plus',
-              iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
-              onPress: ({ props: p }) => hideAfter(() => {
-                const id = (p as Record<'instanceId', string>)?.instanceId;
+            {
+              key: 'dupe-honkdex',
+              entity: 'item',
+              props: {
+                label: t('instances.honkdex.contextMenu.dupe', 'Duplicate'),
+                icon: 'copy-plus',
+                iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
+                onPress: ({ props: p }) => hideAfter(() => {
+                  const id = (p as Record<'instanceId', string>)?.instanceId;
 
-                if (!id) {
-                  return;
-                }
+                  if (!id) {
+                    return;
+                  }
 
-                dupeInstance(
-                  instances.find((i) => i?.battleId === id)
-                    || { battleId: id },
-                );
-              })(),
+                  dupeCalcdex(
+                    instances.find((i) => i?.battleId === id)
+                      || { battleId: id },
+                  );
+                })(),
+              },
             },
-          },
-          {
-            key: 'remove-hr',
-            entity: 'separator',
-          },
-          {
-            key: 'remove-honkdex',
-            entity: 'item',
-            props: {
-              theme: 'error',
-              label: t('instances.honkdex.contextMenu.remove', 'Delete'),
-              // icon: 'fa-times-circle',
-              icon: 'trash-close',
-              iconStyle: { transform: 'scale(1.2)' },
-              onPress: ({ props: data }) => void hideAfter(() => {
-                const id = (data as Record<'instanceId', string>)?.instanceId;
-
-                if (!id) {
-                  return;
-                }
-
-                instanceRefs.current[id]?.queueRemoval();
-              })(),
+            {
+              key: 'remove-hr',
+              entity: 'separator',
             },
-          },
-        ]}
-      />
+            {
+              key: 'remove-honkdex',
+              entity: 'item',
+              props: {
+                theme: 'error',
+                label: t('instances.honkdex.contextMenu.remove', 'Delete'),
+                // icon: 'fa-times-circle',
+                icon: 'trash-close',
+                iconStyle: { transform: 'scale(1.2)' },
+                onPress: ({ props: data }) => void hideAfter(() => {
+                  const id = (data as Record<'instanceId', string>)?.instanceId;
 
-      <ContextMenu
-        id={notedexMenuId}
-        itemKeyPrefix="InstanceButton:Notedex:ContextMenu"
-        items={[
-          {
-            key: 'open-notedex',
-            entity: 'item',
-            props: {
-              label: t('instances.notedex.contextMenu.open', 'Open'),
-              icon: 'external-link',
-              iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
-              onPress: ({ props: p }) => void hideAfter(() => {
-                const id = (p as Record<'instanceId', string>)?.instanceId;
+                  if (!id) {
+                    return;
+                  }
 
-                if (!id) {
-                  return;
-                }
-
-                onRequestNotedex(id);
-              })(),
+                  instanceRefs.current[id]?.queueRemoval();
+                })(),
+              },
             },
-          },
-          {
-            key: 'remove-hr',
-            entity: 'separator',
-          },
-          {
-            key: 'remove-notedex',
-            entity: 'item',
-            props: {
-              theme: 'error',
-              label: t('instances.notedex.contextMenu.remove', 'Delete'),
-              icon: 'trash-close',
-              iconStyle: { transform: 'scale(1.2)' },
-              onPress: ({ props: data }) => void hideAfter(() => {
-                const id = (data as Record<'instanceId', string>)?.instanceId;
+          ]}
+        />
+      }
 
-                if (!id) {
-                  return;
-                }
+      {
+        notedexEnabled &&
+        <ContextMenu
+          id={notedexMenuId}
+          itemKeyPrefix="InstanceButton:Notedex:ContextMenu"
+          items={[
+            {
+              key: 'open-notedex',
+              entity: 'item',
+              props: {
+                label: t('instances.notedex.contextMenu.open', 'Open'),
+                icon: 'external-link',
+                iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
+                onPress: ({ props: p }) => void hideAfter(() => {
+                  const id = (p as Record<'instanceId', string>)?.instanceId;
 
-                noteInstanceRefs.current[id]?.queueRemoval();
-              })(),
-            },
-          },
-        ]}
-      />
+                  if (!id) {
+                    return;
+                  }
 
-      <ContextMenu
-        id={recordMenuId}
-        itemKeyPrefix="BattleRecord:ContextMenu"
-        items={[
-          {
-            key: 'reset-record',
-            entity: 'item',
-            props: {
-              label: t('battleRecord.contextMenu.reset', 'Reset'),
-              icon: 'fa-refresh',
-              disabled: !battleRecord?.wins && !battleRecord?.losses,
-              onPress: hideAfter(resetBattleRecord),
+                  onRequestNotedex(id);
+                })(),
+              },
             },
-          },
-          {
-            key: 'hide-separator',
-            entity: 'separator',
-          },
-          {
-            key: 'hide-record',
-            entity: 'item',
-            props: {
-              theme: 'warning',
-              label: t('battleRecord.contextMenu.hide', 'Hide'),
-              icon: 'close-circle',
-              disabled: !settings?.showBattleRecord,
-              onPress: hideAfter(() => updateSettings({
-                hellodex: { showBattleRecord: false },
-              })),
+            {
+              key: 'dupe-notedex',
+              entity: 'item',
+              props: {
+                label: t('instances.notedex.contextMenu.dupe', 'Duplicate'),
+                icon: 'copy-plus',
+                iconStyle: { strokeWidth: 3, transform: 'scale(1.2)' },
+                onPress: ({ props: p }) => void hideAfter(() => {
+                  const id = (p as Record<'instanceId', string>)?.instanceId;
+
+                  if (!id) {
+                    return;
+                  }
+
+                  dupeNotedex({
+                    scope: `${l.scope}:ContextMenu:dupe-notedex~ContextMenuItem:props.onPress()`,
+                    id,
+                  });
+                })(),
+              },
             },
-          },
-        ]}
-      />
+            {
+              key: 'remove-hr',
+              entity: 'separator',
+            },
+            {
+              key: 'remove-notedex',
+              entity: 'item',
+              props: {
+                theme: 'error',
+                label: t('instances.notedex.contextMenu.remove', 'Delete'),
+                icon: 'trash-close',
+                iconStyle: { transform: 'scale(1.2)' },
+                onPress: ({ props: data }) => void hideAfter(() => {
+                  const id = (data as Record<'instanceId', string>)?.instanceId;
+
+                  if (!id) {
+                    return;
+                  }
+
+                  noteInstanceRefs.current[id]?.queueRemoval();
+                })(),
+              },
+            },
+          ]}
+        />
+      }
+
+      {
+        settings?.showBattleRecord &&
+        <ContextMenu
+          id={recordMenuId}
+          itemKeyPrefix="BattleRecord:ContextMenu"
+          items={[
+            {
+              key: 'reset-record',
+              entity: 'item',
+              props: {
+                label: t('battleRecord.contextMenu.reset', 'Reset'),
+                icon: 'fa-refresh',
+                disabled: !battleRecord?.wins && !battleRecord?.losses,
+                onPress: hideAfter(resetBattleRecord),
+              },
+            },
+            {
+              key: 'hide-separator',
+              entity: 'separator',
+            },
+            {
+              key: 'hide-record',
+              entity: 'item',
+              props: {
+                theme: 'warning',
+                label: t('battleRecord.contextMenu.hide', 'Hide'),
+                icon: 'close-circle',
+                disabled: !settings?.showBattleRecord,
+                onPress: hideAfter(() => updateSettings({
+                  hellodex: { showBattleRecord: false },
+                })),
+              },
+            },
+          ]}
+        />
+      }
     </PageContainer>
   );
 };

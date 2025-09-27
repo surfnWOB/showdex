@@ -22,7 +22,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'BOT Keith',
     desc: '(i18n)',
     created: '2024-01-05T12:18:35.813Z',
-    updated: '2025-09-26T11:57:18.400Z',
+    updated: '2025-09-27T14:11:14.678Z',
     disabled: false,
   },
   {
@@ -35,7 +35,7 @@ export const ShowdexLocaleBundles: ShowdexLocaleBundle[] = [
     author: 'Sykless, Betcheg, ChatGPT-4, Google Translate & Grok-3',
     desc: '(i18n)',
     created: '2024-01-08T16:46:10.432Z',
-    updated: '2025-09-23T08:50:13.203Z',
+    updated: '2025-09-27T14:10:47.270Z',
     disabled: false,
   },
 ];
