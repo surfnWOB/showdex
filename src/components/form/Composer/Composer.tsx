@@ -11,12 +11,13 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+// import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+// import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { type EditorState } from 'lexical';
 import cx from 'classnames';
 import { logger } from '@showdex/utils/debug';
@@ -82,9 +83,9 @@ export const Composer = React.forwardRef<HTMLDivElement, ComposerProps>(({
       ListItemNode,
       ListNode,
       QuoteNode,
-      TableCellNode,
-      TableNode,
-      TableRowNode,
+      // TableCellNode,
+      // TableNode,
+      // TableRowNode,
     ],
 
     onError: (error) => {
@@ -129,13 +130,14 @@ export const Composer = React.forwardRef<HTMLDivElement, ComposerProps>(({
           <HistoryPlugin />
           <LinkPlugin />
           <ListPlugin />
-          <TablePlugin />
+          {/* <TablePlugin /> */}
 
           <AutoLinkPlugin />
           <CodePlugin />
           <ListIndentPlugin />
           <MarkdownPlugin />
 
+          <TabIndentationPlugin />
           <ReadOnlyPlugin readOnly={readOnly} />
           <OnChangePlugin ignoreSelectionChange onChange={handleChange} />
         </div>
