@@ -43,7 +43,14 @@ export class HellodexPreactBootstrapper extends BootdexPreactBootstrappable {
     window.PS.join(this.roomId, {
       noURL: true,
       autofocus: shouldFocus,
+      autoclosePopups: false, // default: true; login popup might be open at this stage
     });
+
+    if (shouldFocus) {
+      return;
+    }
+
+    window.PS.focusRoom('rooms' as Showdown.RoomID);
   }
 
   public close(): void {

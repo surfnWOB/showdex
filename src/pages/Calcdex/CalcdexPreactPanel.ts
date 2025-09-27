@@ -12,7 +12,7 @@ import cx from 'classnames';
 import { logger } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import {
-  // BootdexPreactBootstrappable,
+  BootdexPreactBootstrappable as Bootstrappable,
   preact,
   PSPanelWrapper,
   PSRoom,
@@ -21,7 +21,7 @@ import {
 import { CalcdexPreactBattleRoom } from './CalcdexPreactBattlePanel';
 // import { CalcdexDomRenderer } from './CalcdexRenderer';
 
-const l = logger('@showdex/pages/Calcdex/CalcdexPreactRoom');
+const l = logger('@showdex/pages/Calcdex/CalcdexPreactPanel');
 
 export class CalcdexPreactRoom extends PSRoom {
   public static readonly scope = l.scope;
@@ -58,6 +58,21 @@ export class CalcdexPreactRoom extends PSRoom {
     this.battle?.destroy(false);
     super.destroy();
   } */
+
+  public rewriteHistory(): void { // eslint-disable-line class-methods-use-this
+    if (!detectPreactHost(window)) {
+      return;
+    }
+
+    /* if (this.battleRoom?.id) {
+      return void window.PS.focusRoom(this.battleRoom.id);
+    } */
+
+    Bootstrappable.rewriteHistory(
+      '/calcdex',
+      window.location?.pathname?.replace('/calcdex-', '/'),
+    );
+  }
 }
 
 export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
@@ -68,6 +83,7 @@ export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
   public static readonly location = 'right' as const;
   public static readonly icon = preact?.h('i', { class: cx('fa', 'fa-calculator'), 'aria-hidden': true });
   public static readonly title = 'Calcdex';
+  public static readonly noURL = true;
 
   // see Hellodex for more info on these shenanigans
   // update (2025/08/22): now using the calcdexReact* ones from the CalcdexPanelBattle for consistency w/
@@ -112,6 +128,11 @@ export class CalcdexPreactPanel extends PSRoomPanel<CalcdexPreactRoom> {
 
   protected get battle() {
     return this.calcdexPanelRoom?.battle;
+  }
+
+  public override focus(): void {
+    super.focus();
+    this.calcdexPanelRoom?.rewriteHistory();
   }
 
   protected renderCalcdexPanel(): Showdown.Preact.VNode {

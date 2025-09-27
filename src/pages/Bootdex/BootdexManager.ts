@@ -31,12 +31,47 @@ export class BootdexManager {
     notedex: null,
   };
 
+  public static get registry(): (keyof typeof BootdexManager.__bootstrappers)[] {
+    return (Object.entries(this.__bootstrappers) as Entries<typeof BootdexManager.__bootstrappers>)
+      .filter(([, bootstrapper]) => !!bootstrapper?.scope)
+      .map(([name]) => name);
+  }
+
+  public static register<
+    TName extends keyof typeof BootdexManager.__bootstrappers,
+    TBootstrapper extends BootdexManagerBootstrappers[TName],
+  >(
+    name: TName,
+    Bootstrapper: TBootstrapper,
+  ): void {
+    if (!name || !(name in this.__bootstrappers) || typeof Bootstrapper !== 'function') {
+      return;
+    }
+
+    this.__bootstrappers[name] = Bootstrapper as BootdexManagerBootstrappers[typeof name];
+
+    if (__DEV__) {
+      l.debug(
+        'registered', wtf(Bootstrapper), 'as the', name, 'bootstrapper',
+        '\n', 'registry', this.registry,
+      );
+    }
+  }
+
+  public static registered(
+    name: keyof typeof BootdexManager.__bootstrappers,
+  ): boolean {
+    return !!this.__bootstrappers[name]?.scope;
+  }
+
   public static named<
     TName extends keyof typeof BootdexManager.__bootstrappers,
-  >(name: TName) {
+  >(
+    name: TName,
+  ) {
     const Bootstrapper = this.__bootstrappers[name];
 
-    if (!Bootstrapper?.scope) {
+    if (!this.registered(name)) {
       l.error(
         name, 'bootstrapper isn\'t registered into the BootdexManager;',
         'something is horribly wrong here!',
@@ -47,21 +82,6 @@ export class BootdexManager {
     }
 
     return Bootstrapper;
-  }
-
-  public static register<
-    TName extends keyof typeof BootdexManager.__bootstrappers,
-    TBootstrapper extends BootdexManagerBootstrappers[TName],
-  >(
-    name: TName,
-    bootstrapper: TBootstrapper,
-  ): void {
-    if (!name || !(name in BootdexManager.__bootstrappers) || typeof bootstrapper !== 'function') {
-      return;
-    }
-
-    this.__bootstrappers[name] = bootstrapper as BootdexManagerBootstrappers[typeof name];
-    l.debug('registered', wtf(bootstrapper), 'for the', name, 'bootstrapper');
   }
 
   /**

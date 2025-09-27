@@ -50,10 +50,31 @@ export abstract class BootdexPreactBootstrappable extends BootdexBootstrappable 
     window.PS.send('/acceptopenteamsheets', battleId as Showdown.RoomID);
   };
 
+  public static detectMainMenuRoom(
+    room: Showdown.PSRoom,
+  ): room is Showdown.MainMenuRoom {
+    return room?.classType === 'mainmenu';
+  }
+
   public static detectBattleRoom(
     room: Showdown.PSRoom,
   ): room is Showdown.BattleRoom {
-    return room.classType === 'battle';
+    return room?.classType === 'battle';
+  }
+
+  public static rewriteHistory( // hehe
+    pathPrefix: string,
+    destPath = '/',
+  ): void {
+    if (!detectPreactHost(window) || !window.location?.pathname?.startsWith(pathPrefix)) {
+      return;
+    }
+
+    /* if (window.PS.leftPanel?.id && !this.detectMainMenuRoom(window.PS.leftPanel)) {
+      return void window.PS.focusRoom(window.PS.leftPanel.id);
+    } */
+
+    window.history?.replaceState(window.PS.router?.panelState, '', destPath);
   }
 }
 

@@ -7,6 +7,8 @@
 import { logger, wtf } from '@showdex/utils/debug';
 import { detectPreactHost } from '@showdex/utils/host';
 import { BootdexAdapter } from './BootdexAdapter';
+import { BootdexManager } from './BootdexManager';
+// import { BootdexPreactRouter } from './BootdexPreactRouter';
 
 const l = logger('@showdex/pages/Bootdex/BootdexPreactAdapter');
 
@@ -18,6 +20,7 @@ export class BootdexPreactAdapter extends BootdexAdapter {
       throw new Error('BootdexPreactAdapter can only be run in the Preact Showdown client!');
     }
 
+    // this.hookRouter();
     this.hookUser();
     this.hookPrefs();
     this.hookRoomWidths();
@@ -28,6 +31,18 @@ export class BootdexPreactAdapter extends BootdexAdapter {
       throw new Error('BootdexPreactAdapter can only be run in the Preact Showdown client!');
     }
   };
+
+  /* protected static hookRouter(): void {
+    if (!detectPreactHost(window)) {
+      return;
+    }
+
+    l.debug('Hard-swapping the Showdown.PSRouter for the BootdexPreactRouter...');
+    window.PSRouter = BootdexPreactRouter;
+
+    l.debug('Reinstantiating PS.router...');
+    window.PS.router = new window.PSRouter();
+  } */
 
   protected static hookUser(): void {
     if (!detectPreactHost(window)) {
@@ -110,21 +125,12 @@ export class BootdexPreactAdapter extends BootdexAdapter {
     const getWidthFor = window.PS.getWidthFor.bind(window.PS) as Showdown.PS['getWidthFor'];
 
     window.PS.getWidthFor = (room) => {
-      switch (room?.type) {
-        case 'hellodex':
-        case 'calcdex':
-        case 'honkdex':
-        case 'notedex': {
-          return {
-            minWidth: 320,
-            width: 628,
-            maxWidth: 628,
-          };
-        }
-
-        default: {
-          break;
-        }
+      if (BootdexManager.registered(room?.type as UnwrapArray<typeof BootdexManager.registry>)) {
+        return {
+          minWidth: 320,
+          width: 628,
+          maxWidth: 628,
+        };
       }
 
       return getWidthFor(room);
