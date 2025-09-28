@@ -320,6 +320,13 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         sheetsNonce: null,
         sheets: [],
 
+        notes: {
+          ...(operatingMode === 'standalone' && {
+            pre: { visible: false, editorState: null },
+            post: { visible: true, editorState: null },
+          }),
+        },
+
         cached,
       };
 
@@ -329,10 +336,10 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
 
       state[battleId].playerCount = countActivePlayers(state[battleId]);
 
-      endTimer('(done)');
+      endTimer('(done)', battleId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId', battleId || '???',
         '\n', 'payload', action.payload,
         '\n', 'battleState', __DEV__ && current(state)[battleId],
@@ -350,6 +357,7 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       ); */
 
       const {
+        scope,
         battleId,
         battleNonce,
         name,
@@ -365,8 +373,9 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         playerKey,
         opponentKey,
         field,
+        notes,
         cached,
-      } = action.payload;
+      } = action.payload || {};
 
       if (!battleId) {
         l.debug(
@@ -375,21 +384,21 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
           '\n', 'action.payload', action.payload,
         );
 
-        return void endTimer('(no battleId)');
+        return void endTimer('(no battleId)', battleId);
       }
 
-      if (!(battleId in state)) {
+      // note: this is a pointer/reference to the object in `state`
+      const currentState = state[battleId];
+
+      if (!currentState?.battleId) {
         l.error(
           'Could not find a CalcdexBattleState with battleId', battleId,
           '\n', 'action.type', action.type,
           '\n', 'action.payload', action.payload,
         );
 
-        return void endTimer('(bad battleId)');
+        return void endTimer('(bad battleId)', battleId, currentState);
       }
-
-      // note: this is a pointer/reference to the object in `state`
-      const currentState = state[battleId];
 
       const updatedGen = typeof gen === 'number' && gen > 0 ? gen : currentState.gen;
       const legacy = detectLegacyGen(updatedGen);
@@ -454,12 +463,18 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       if (currentState.operatingMode === 'standalone') {
         state[battleId].active = false;
         state[battleId].paused = false;
+
+        state[battleId].notes = {
+          ...currentState.notes,
+          pre: { ...currentState.notes?.pre, ...notes?.pre },
+          post: { ...currentState.notes?.post, ...notes?.post },
+        };
       }
 
-      endTimer('(done)');
+      endTimer('(done)', battleId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId', battleId || '???',
         '\n', 'payload', action.payload,
         '\n', 'battleState', __DEV__ && current(state)[battleId],
@@ -477,37 +492,35 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       ); */
 
       const {
+        scope,
         battleId,
         field,
-      } = action.payload;
+      } = action.payload || {};
 
       if (!battleId) {
         l.error('Attempted to initialize a CalcdexBattleState with a falsy battleId.');
 
-        return void endTimer('(no battleId)');
+        return void endTimer('(no battleId)', battleId);
       }
 
-      if (!(battleId in state)) {
+      if (!state[battleId]?.battleId) {
         l.error('Could not find a CalcdexBattleState with battleId', battleId);
 
-        return void endTimer('(bad battleId)');
+        return void endTimer('(bad battleId)', battleId, state[battleId]);
       }
 
       // using battleField here as both a pointer and popular reference
-      const battleField = state[battleId].field;
+      const { field: battleField } = state[battleId] || {};
 
       // only spreading this hard cause of what I chose to send as the payload,
       // which is a DeepPartial<CalcdexBattleField>, so even the objects inside are partials!
       // ... need to get some of that expand() util tbh lmao
-      state[battleId].field = {
-        ...battleField,
-        ...field,
-      };
+      state[battleId].field = { ...battleField, ...field };
 
-      endTimer('(done)');
+      endTimer('(done)', battleId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId', battleId || '???',
         '\n', 'payload', action.payload,
         '\n', 'battleState', __DEV__ && current(state)[battleId],
@@ -524,18 +537,18 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         '\n', 'state', __DEV__ && current(state),
       ); */
 
-      const { battleId } = action.payload;
+      const { scope, battleId } = action.payload;
 
       if (!battleId) {
         l.error('Attempted to initialize a CalcdexBattleState with a falsy battleId.');
 
-        return void endTimer('(no battleId)');
+        return void endTimer('(no battleId)', battleId);
       }
 
-      if (!(battleId in state)) {
+      if (!state[battleId]?.battleId) {
         l.error('Could not find a CalcdexBattleState with battleId', battleId);
 
-        return void endTimer('(bad battleId)');
+        return void endTimer('(bad battleId)', battleId, state[battleId]);
       }
 
       if (AllPlayerKeys.every((k) => !Object.keys(action.payload[k] || {}).length)) {
@@ -562,10 +575,10 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         };
       });
 
-      endTimer('(done)');
+      endTimer('(done)', battleId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId', battleId || '???',
         '\n', 'payload', action.payload,
         '\n', 'battleState', __DEV__ && current(state)[battleId],
@@ -583,36 +596,37 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
       ); */
 
       const {
+        scope,
         battleId,
         playerKey,
         pokemon,
-      } = action.payload;
+      } = action.payload || {};
 
       if (!battleId) {
         l.error('Attempted to initialize a CalcdexBattleState with a falsy battleId.');
 
-        return void endTimer('(no battleId)');
+        return void endTimer('(no battleId)', battleId);
       }
 
-      if (!(battleId in state)) {
+      if (!state[battleId]?.battleId) {
         l.error('Could not find a CalcdexBattleState with battleId', battleId);
 
-        return void endTimer('(bad battleId)');
+        return void endTimer('(bad battleId)', battleId, state[battleId]);
       }
 
-      const battleState = state[battleId];
+      const { [battleId]: battleState } = state;
 
-      if (!(playerKey in battleState)) {
+      if (!battleState?.[playerKey]?.sideid) {
         l.error(
           'Could not find player', playerKey, 'in state for', battleId,
           '\n', 'pokemon', pokemon,
           '\n', 'battleState', __DEV__ && current(state)[battleId],
         );
 
-        return void endTimer('(bad playerKey)');
+        return void endTimer('(bad playerKey)', playerKey, battleState?.[playerKey]);
       }
 
-      const playerState = battleState[playerKey];
+      const { [playerKey]: playerState } = battleState;
 
       const pokemonId = pokemon?.calcdexId || calcPokemonCalcdexId(pokemon);
       const pokemonStateIndex = playerState.pokemon.findIndex((p) => p.calcdexId === pokemonId);
@@ -639,10 +653,10 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         ...pokemon,
       } as CalcdexPokemon;
 
-      endTimer('(done)');
+      endTimer('(done)', battleId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId', battleId || '???',
         '\n', 'payload', action.payload,
         '\n', 'battleState', __DEV__ && current(state)[battleId],
@@ -729,6 +743,7 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         turn: 0,
         rules: {},
         switchPlayers: false,
+        notes: { ...state[battleId].notes },
         cached: null, // initially not saved until manually done so by the user
       };
 
@@ -803,10 +818,10 @@ export const calcdexSlice = createSlice<CalcdexSliceState, CalcdexSliceReducers,
         returnRef.battleId = newId;
       }
 
-      endTimer('(done)');
+      endTimer('(done)', battleId, '->', newId);
 
       l.debug(
-        'DONE', action.type, 'from', action.payload?.scope || '(anon)',
+        'DONE', action.type, 'from', scope || '(anon)',
         '\n', 'battleId (payload)', action.payload,
         '\n', 'state', __DEV__ && current(state),
       );

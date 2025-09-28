@@ -62,6 +62,7 @@ export const BattleInfo = ({
     defaultName,
     gen,
     format,
+    notes,
     cached,
   } = state || {};
 
@@ -231,7 +232,33 @@ export const BattleInfo = ({
 
           <ToggleButton
             className={styles.toggleButton}
-            label={t('battle.dupe.label')}
+            active={notes?.pre?.visible}
+            absoluteHover
+            disabled={operatingMode !== 'standalone' || saving?.[0]}
+            onPress={() => void updateBattle({
+              notes: { pre: { visible: !notes?.pre?.visible } },
+            }, `${l.scope}:${battleId}:Notes:Pre:Visible~ToggleButton:onPress()`)}
+          >
+            <span>{t('common:products.note_one', 'Note')}</span>
+            <i className="fa fa-arrow-up" />
+          </ToggleButton>
+
+          <ToggleButton
+            className={styles.toggleButton}
+            active={notes?.post?.visible}
+            absoluteHover
+            disabled={operatingMode !== 'standalone' || saving?.[0]}
+            onPress={() => void updateBattle({
+              notes: { post: { visible: !notes?.post?.visible } },
+            }, `${l.scope}:${battleId}:Notes:Post:Visible~ToggleButton:onPress()`)}
+          >
+            <i className="fa fa-arrow-down" />
+            <span>{t('common:products.note_one', 'Note')}</span>
+          </ToggleButton>
+
+          <ToggleButton
+            className={styles.toggleButton}
+            label={t('battle.dupe.label', 'Dupe')}
             tooltip={(
               <Trans
                 t={t}
@@ -248,10 +275,12 @@ export const BattleInfo = ({
 
           <ToggleButton
             className={styles.toggleButton}
-            label={t('battle.close.label')}
             absoluteHover
             onPress={onLeaveRoom}
-          />
+          >
+            <i className="fa fa-close" />
+            <span>{t('battle.close.label', 'Close')}</span>
+          </ToggleButton>
         </div>
       </div>
     </Card>

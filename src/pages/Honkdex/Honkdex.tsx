@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDebouncyFn } from 'use-debouncy';
 import { v4 as uuidv4 } from 'uuid';
 import {
   type BattleInfoProps,
@@ -16,9 +17,11 @@ import {
   useCalcdexSize,
 } from '@showdex/components/calc';
 import { BuildInfo } from '@showdex/components/debug';
+import { Composer } from '@showdex/components/form';
 import { PageContainer, PiconRackProvider, PiconRackSortableContext } from '@showdex/components/layout';
 import { ContextMenu, useContextMenu } from '@showdex/components/ui';
 import { useCalcdexDuplicator } from '@showdex/redux/store';
+import { logger } from '@showdex/utils/debug';
 import { useRandomUuid } from '@showdex/utils/hooks';
 import styles from './Honkdex.module.scss';
 
@@ -27,6 +30,8 @@ export interface HonkdexProps {
   onRequestHonkdex?: BattleInfoProps['onRequestHonkdex'];
   onLeaveRoom?: () => void;
 }
+
+const l = logger('@showdex/pages/Honkdex');
 
 export const Honkdex = ({
   onRequestHellodex,
@@ -38,7 +43,13 @@ export const Honkdex = ({
   useCalcdexSize(containerRef);
 
   const { t } = useTranslation('honkdex');
-  const { state, saving, saveHonk } = useCalcdexContext();
+  const {
+    state,
+    saving,
+    updateBattle,
+    saveHonk,
+  } = useCalcdexContext();
+  const debouncyUpdateBattle = useDebouncyFn(updateBattle, 1000);
   const dupeCalcdex = useCalcdexDuplicator();
 
   const {
@@ -47,8 +58,9 @@ export const Honkdex = ({
     playerKey,
     opponentKey,
     switchPlayers,
+    notes,
     cached,
-  } = state;
+  } = state || {};
 
   const topKey = switchPlayers ? opponentKey : playerKey;
   const bottomKey = topKey === playerKey ? opponentKey : playerKey;
@@ -65,6 +77,7 @@ export const Honkdex = ({
       <PageContainer
         ref={containerRef}
         name="honkdex"
+        scrollableContentClassName={styles.content}
         prefix={<BuildInfo className={styles.buildInfo} position="top-right" />}
         contentScrollable
         onContextMenu={(e) => void showContextMenu({
@@ -77,6 +90,21 @@ export const Honkdex = ({
           onRequestHonkdex={onRequestHonkdex}
           onLeaveRoom={onLeaveRoom}
         />
+
+        {
+          notes?.pre?.visible &&
+          <Composer
+            hint={t('notedex:editor.hint', 'Type something...')}
+            initialEditorState={notes?.pre?.editorState}
+            input={{
+              name: `${l.scope}:${battleId}:Notes:Pre:EditorState`,
+              value: notes?.pre?.editorState,
+              onChange: (value: string) => void debouncyUpdateBattle({
+                notes: { pre: { editorState: value } },
+              }, `${l.scope}:${battleId}:Notes:Pre:EditorState~Composer:input.onChange()`),
+            }}
+          />
+        }
 
         <PiconRackSortableContext playerKey={topKey}>
           <PlayerCalc
@@ -101,6 +129,21 @@ export const Honkdex = ({
             defaultName="Side B"
           />
         </PiconRackSortableContext>
+
+        {
+          notes?.post?.visible &&
+          <Composer
+            hint={t('notedex:editor.hint', 'Type something...')}
+            initialEditorState={notes?.post?.editorState}
+            input={{
+              name: `${l.scope}:${battleId}:Notes:Post:EditorState`,
+              value: notes?.post?.editorState,
+              onChange: (value: string) => void debouncyUpdateBattle({
+                notes: { post: { editorState: value } },
+              }, `${l.scope}:${battleId}:Notes:Post:EditorState~Composer:input.onChange()`),
+            }}
+          />
+        }
       </PageContainer>
 
       <ContextMenu

@@ -224,8 +224,8 @@ div.container {
 
 .info {
   flex: 1;
-  max-width: calc(100% - 26px - 10px);
-  @include spacing.margin($left: 10px);
+  max-width: calc(100% - 26px - 12px);
+  @include spacing.ml(8px);
 
   strong {
     font-weight: 500;

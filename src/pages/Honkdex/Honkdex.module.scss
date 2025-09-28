@@ -5,8 +5,14 @@
 /// @since 1.2.0
 ///
 
+@use 'mixins/flex';
 @use 'mixins/position';
 @use 'mixins/spacing';
+
+.content {
+  @include flex.col-stretch;
+  row-gap: 12px;
+}
 
 .buildInfo {
   z-index: 6;
@@ -18,16 +24,16 @@
   z-index: 5;
 }
 
-.playerCalc {
-  @include spacing.mt(12px);
-}
+// .playerCalc {
+//   @include spacing.mt(12px);
+// }
 
 .fieldCalc {
   max-width: 400px;
   @include spacing.mx-auto;
-  @include spacing.mt(16px);
+  @include spacing.my(4px);
 }
 
-.opponentCalc {
-  @include spacing.mt(16px);
-}
+// .opponentCalc {
+//   @include spacing.mt(16px);
+// }

@@ -158,6 +158,7 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
   const saveRequestTimeout = React.useRef<NodeJS.Timeout>(null);
 
   const saveHonk = React.useCallback(() => void (async () => {
+    saving[1](true);
     await dispatch(saveHonkdex({ battleId: state.battleId }));
 
     saving[1](false);
@@ -178,14 +179,14 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
       clearTimeout(saveRequestTimeout.current);
     }
 
-    if (!saving[0]) {
+    /* if (!saving[0]) {
       saving[1](true);
-    }
+    } */
 
     saveRequestTimeout.current = setTimeout(saveHonk, 1000);
   }, [
     saveHonk,
-    saving,
+    // saving,
     state?.operatingMode,
   ]);
 

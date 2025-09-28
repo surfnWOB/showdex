@@ -169,7 +169,7 @@ export const Notedex = ({
       <Card className={styles.toolbar}>
         <InlineField
           className={styles.noteName}
-          hint={state?.defaultName || t('toolbar.name.hint')}
+          hint={state?.defaultName || t('toolbar.name.hint', 'name this note to maybe save this note')}
           input={{
             name: `${l.scope}:${instanceId}:Name`,
             value: state?.name,
@@ -200,7 +200,7 @@ export const Notedex = ({
 
           <ToggleButton
             className={styles.actionButton}
-            label={t('toolbar.dupe.label')}
+            label={t('toolbar.dupe.label', 'Duplicate')}
             tooltip={(
               <Trans
                 t={t}
@@ -217,17 +217,19 @@ export const Notedex = ({
 
           <ToggleButton
             className={styles.actionButton}
-            label={t('toolbar.close.label')}
             absoluteHover
             onPress={onLeaveRoom}
-          />
+          >
+            <i className="fa fa-close" />
+            <span>{t('toolbar.close.label', 'Close')}</span>
+          </ToggleButton>
         </div>
       </Card>
 
       <Composer
         className={styles.editor}
         inputClassName="autofocus" // by the PSRoomPanel.focus() method
-        hint={t('editor.hint')}
+        hint={t('editor.hint', 'Type something...')}
         initialEditorState={state?.editorState}
         input={{
           name: `${l.scope}:${instanceId}:EditorState`,

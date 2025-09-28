@@ -23,6 +23,10 @@
 
 button.toggleButton {
   font-size: 8px;
+
+  i {
+    line-height: 7px;
+  }
 }
 
 .genWarning {
@@ -92,17 +96,17 @@ div.genOptionButton {
   @include flex.col;
   align-self: center;
   row-gap: 6px;
-  @include spacing.pr(6px);
 }
 
 .honkProps {
   @include flex.row-start;
+  flex-wrap: wrap;
   column-gap: 12px;
-  // @include spacing.margin($top: 6px);
+  row-gap: 4px;
 }
 
 .honkName {
-  @include spacing.px(4px);
+  @include spacing.p($l: 4px, $r: 6px);
   @include font.apply(fonts.$primary, ( font-weight: 500 ));
   font-size: 14px;
   letter-spacing: 0.1px;

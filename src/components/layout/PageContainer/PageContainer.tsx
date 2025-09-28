@@ -17,6 +17,8 @@ export interface PageContainerProps extends Omit<React.HTMLAttributes<HTMLDivEle
   style?: React.CSSProperties;
   contentClassName?: string;
   contentStyle?: React.CSSProperties;
+  scrollableContentClassName?: string; // yuck
+  scrollableContentStyle?: React.CSSProperties;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   contentScrollable?: boolean;
@@ -30,6 +32,8 @@ export const PageContainer = React.forwardRef<HTMLDivElement, PageContainerProps
   style,
   contentClassName,
   contentStyle,
+  scrollableContentClassName,
+  scrollableContentStyle,
   prefix,
   suffix,
   contentScrollable,
@@ -62,6 +66,8 @@ export const PageContainer = React.forwardRef<HTMLDivElement, PageContainerProps
           contentRef={contentRef}
           className={cx(styles.content, contentClassName)}
           style={contentStyle}
+          contentClassName={scrollableContentClassName}
+          contentStyle={scrollableContentStyle}
         >
           {children}
         </Scrollable>
