@@ -22,4 +22,5 @@
   "js/ts.implicitProjectConfig.checkJs": true,
 
   "typescript.preferences.quoteStyle": "single",
+  "typescript.tsdk": "node_modules/typescript/lib",
 }
