@@ -8,6 +8,13 @@ import { type CalcdexPokemon } from '@showdex/interfaces/calc';
  */
 export const ChampionsLevel = 50;
 
+/**
+ * Per-stat cap for Stat Points (SPs), which replace EVs in Champions formats.
+ *
+ * @since 1.4.0
+ */
+export const ChampionsSpCap = 32;
+
 export interface ChampionsCalcArgs {
   level: number;
   ivs: Showdown.StatsTable;

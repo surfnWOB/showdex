@@ -14,6 +14,7 @@ import { PokemonBoostNames, PokemonNatureBoosts, PokemonStatNames } from '@showd
 import { CalcdexPlayerKeys as AllPlayerKeys } from '@showdex/interfaces/calc';
 import { useColorScheme, useHonkdexSettings } from '@showdex/redux/store';
 import {
+  ChampionsSpCap,
   calcPokemonFinalStats,
   calcStatAutoBoosts,
   convertIvToLegacyDv,
@@ -21,7 +22,7 @@ import {
 } from '@showdex/utils/calc';
 import { clamp, env, formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
-import { getDefaultSpreadValue, legalLockedFormat } from '@showdex/utils/dex';
+import { detectChampionsFormat, getDefaultSpreadValue, legalLockedFormat } from '@showdex/utils/dex';
 import { useRandomUuid } from '@showdex/utils/hooks';
 import { detectStatBoostDelta, formatStatBoost } from '@showdex/utils/ui';
 import { useCalcdexPokeContext } from '../CalcdexPokeContext';
@@ -94,7 +95,9 @@ export const PokeStats = ({
       || (!defaultShowBehavior && lockedVisibilities.includes('base'))
   );
 
-  const showIvsRow = !!pokemon?.speciesForme && (
+  const isChampionsFormat = detectChampionsFormat(format);
+
+  const showIvsRow = !!pokemon?.speciesForme && !isChampionsFormat && (
     forceShowGenetics
       || pokemon.showGenetics
       || (!defaultShowBehavior && lockedVisibilities.includes('iv'))
@@ -556,12 +559,12 @@ export const PokeStats = ({
                     pokemon: friendlyPokemonName,
                   }) as string}
                   hideLabel
-                  hint={ev.toString() || '252'}
+                  hint={ev.toString() || (isChampionsFormat ? String(ChampionsSpCap) : '252')}
                   fallbackValue={0}
                   min={0}
-                  max={allowIllegalSpreads ? 999 : 252}
-                  step={4}
-                  shiftStep={16}
+                  max={isChampionsFormat ? ChampionsSpCap : (allowIllegalSpreads ? 999 : 252)}
+                  step={isChampionsFormat ? 1 : 4}
+                  shiftStep={isChampionsFormat ? 4 : 16}
                   loop
                   loopStepsOnly
                   clearOnFocus

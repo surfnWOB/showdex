@@ -42,7 +42,7 @@ import {
 } from '@showdex/consts/dex';
 import { type CalcdexPlayerSide } from '@showdex/interfaces/calc';
 import { useColorScheme, useHonkdexSettings } from '@showdex/redux/store';
-import { calcPokemonHpPercentage } from '@showdex/utils/calc';
+import { ChampionsLevel, calcPokemonHpPercentage } from '@showdex/utils/calc';
 import {
   dedupeArray,
   formatId,
@@ -50,7 +50,7 @@ import {
   writeClipboardText,
 } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
-import { hasNickname, legalLockedFormat, toggleableAbility } from '@showdex/utils/dex';
+import { detectChampionsFormat, hasNickname, legalLockedFormat, toggleableAbility } from '@showdex/utils/dex';
 import { useRandomUuid } from '@showdex/utils/hooks';
 import { openSmogonDex } from '@showdex/utils/host';
 import { capitalize } from '@showdex/utils/humanize';
@@ -126,6 +126,8 @@ export const PokeInfo = ({
   const honkdexSettings = useHonkdexSettings();
   const colorScheme = useColorScheme();
   const randomUuid = useRandomUuid();
+
+  const isChampionsFormat = detectChampionsFormat(format);
 
   const pokemonKey = pokemon?.calcdexId || pokemon?.name || randomUuid || '???';
   const friendlyPokemonName = pokemon?.speciesForme || pokemon?.name || pokemonKey;
@@ -670,19 +672,19 @@ export const PokeInfo = ({
                   className={cx(
                     styles.levelField,
                     styles.absoluteHover,
-                    !pokemon?.speciesForme && styles.disabled,
+                    (!pokemon?.speciesForme || isChampionsFormat) && styles.disabled,
                   )}
                   inputClassName={styles.levelInputField}
                   label={t('poke.info.level.aria', { pokemon: friendlyPokemonName }) as string}
                   hideLabel
                   hint={(
                     pokemon?.speciesForme
-                      ? String(pokemon.level ?? defaultLevel)
+                      ? String(isChampionsFormat ? ChampionsLevel : (pokemon.level ?? defaultLevel))
                       : t('poke.info.level.hint') as string
                   )}
-                  fallbackValue={pokemon?.speciesForme ? defaultLevel : null}
-                  min={1}
-                  max={100}
+                  fallbackValue={pokemon?.speciesForme ? (isChampionsFormat ? ChampionsLevel : defaultLevel) : null}
+                  min={isChampionsFormat ? ChampionsLevel : 1}
+                  max={isChampionsFormat ? ChampionsLevel : 100}
                   step={1}
                   shiftStep={10}
                   clearOnFocus
@@ -690,14 +692,16 @@ export const PokeInfo = ({
                   meta={{}}
                   input={{
                     name: `${l.scope}:${pokemonKey}:Level`,
-                    value: (!!pokemon?.speciesForme && (pokemon.level || defaultLevel)) || null,
+                    value: isChampionsFormat
+                      ? (pokemon?.speciesForme ? ChampionsLevel : null)
+                      : ((!!pokemon?.speciesForme && (pokemon.level || defaultLevel)) || null),
                     onChange: (value: number) => updatePokemon({
-                      level: value,
+                      level: isChampionsFormat ? ChampionsLevel : value,
                     }, `${l.scope}:ValueField~Level:input.onChange()`),
                     onBlur: () => void 0,
                     onFocus: () => void 0,
                   }}
-                  disabled={!pokemon?.speciesForme}
+                  disabled={!pokemon?.speciesForme || isChampionsFormat}
                 />
               </div>
             }
@@ -731,7 +735,7 @@ export const PokeInfo = ({
             />
 
             {
-              (!!pokemon?.speciesForme && gen > 8) &&
+              (!!pokemon?.speciesForme && gen > 8 && !isChampionsFormat) &&
               <PokeTypeField
                 className={cx(styles.typesField, styles.teraTypeField)}
                 label={t('poke.info.teraType.aria', { pokemon: friendlyPokemonName }) as string}
