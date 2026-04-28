@@ -6,18 +6,23 @@
 
 import { type ItemName } from '@smogon/calc';
 import { type CalcdexPokemon } from '@showdex/interfaces/calc';
+import { detectChampionsFormat } from './detectChampionsFormat';
+import { getDexForFormat } from './getDexForFormat';
 
 /**
  * Determine what the provided `pokemon`'s species forme should be.
  *
  * * If the `pokemon` is transformed, its `transformedForme` will take precedence, unless `ignoreTransformed` is `true`.
  * * Returns its current transformed / species forme if there's no change in formes.
+ * * In Champions formats, equipping a Mega Stone transitions to the corresponding Mega forme,
+ *   since Mega Evolution is a permanent forme change in Champions (not a battle-time toggle).
  *
  * @since 1.2.3
  */
 export const determineSpeciesForme = (
   pokemon: CalcdexPokemon,
   ignoreTransformed?: boolean,
+  format?: string,
 ): string => {
   if (!pokemon?.speciesForme) {
     return null;
@@ -139,6 +144,24 @@ export const determineSpeciesForme = (
     }
 
     default: {
+      if (!detectChampionsFormat(format) || !item) {
+        break;
+      }
+
+      const dex = getDexForFormat(format);
+      const itemMegaForme = dex?.items.get(item)?.megaStone;
+
+      if (!itemMegaForme || currentForme === itemMegaForme) {
+        break;
+      }
+
+      const targetBase = dex.species.get(itemMegaForme)?.baseSpecies;
+      const currentBase = dex.species.get(currentForme)?.baseSpecies || currentForme;
+
+      if (targetBase && targetBase === currentBase) {
+        return itemMegaForme;
+      }
+
       break;
     }
   }
