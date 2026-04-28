@@ -81,7 +81,7 @@
     "@react-hook/size": "^2.1.2",
     "@react-spring/web": "^10.0.3",
     "@reduxjs/toolkit": "^2.11.2",
-    "@smogon/calc": "^0.11.0",
+    "@smogon/calc": "github:surfnWOB/damage-calc#915d05ed4f729d38567a109b34b4726daeace747",
     "@tippyjs/react": "^4.2.6",
     "@use-gesture/react": "^10.2.27",
     "base-64": "^1.0.0",
@@ -170,7 +170,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@swc/core"
+      "@swc/core",
+      "@smogon/calc"
     ],
     "overrides": {
       "webpack-visualizer-plugin2>react": "$react",
