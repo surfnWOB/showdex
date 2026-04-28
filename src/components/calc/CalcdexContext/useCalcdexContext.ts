@@ -495,17 +495,17 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
       mutating('speciesForme')
         && prev.speciesForme !== mutated.speciesForme
         && !mutating('terastallized')
-        && determineSpeciesForme(mutated, true) !== determineSpeciesForme({
+        && determineSpeciesForme(mutated, true, state.format) !== determineSpeciesForme({
           ...mutated, terastallized: !mutated.terastallized,
-        }, true)
+        }, true, state.format)
     ) {
       mutated.terastallized = !mutated.terastallized;
     }
 
-    mutated.speciesForme = determineSpeciesForme(mutated, true);
+    mutated.speciesForme = determineSpeciesForme(mutated, true, state.format);
 
     if (mutated.transformedForme) {
-      mutated.transformedForme = determineSpeciesForme(mutated);
+      mutated.transformedForme = determineSpeciesForme(mutated, false, state.format);
     }
 
     if (prev.speciesForme !== mutated.speciesForme) {
@@ -913,10 +913,10 @@ export const useCalcdexContext = (): CalcdexContextConsumables => {
         maxhp: 100,
       }, state.format);
 
-      newPokemon.speciesForme = determineSpeciesForme(newPokemon, true);
+      newPokemon.speciesForme = determineSpeciesForme(newPokemon, true, state.format);
 
       if (newPokemon.transformedForme) {
-        newPokemon.transformedForme = determineSpeciesForme(newPokemon);
+        newPokemon.transformedForme = determineSpeciesForme(newPokemon, false, state.format);
       }
 
       newPokemon.ident = `${playerKey}: ${newPokemon.calcdexId.slice(-7)}`;
