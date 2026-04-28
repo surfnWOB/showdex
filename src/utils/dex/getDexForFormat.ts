@@ -1,6 +1,7 @@
 import { type GenerationNum } from '@smogon/calc';
 import { formatId } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
+import { detectChampionsFormat } from './detectChampionsFormat';
 import { detectGenFromFormat } from './detectGenFromFormat';
 
 const l = logger('@showdex/utils/dex/getDexForFormat()');
@@ -48,6 +49,12 @@ export const getDexForFormat = (format?: string | GenerationNum): Showdown.Modde
 
   if (formatAsId.includes('bdsp')) {
     return Dex.mod('gen8bdsp');
+  }
+
+  if (detectChampionsFormat(formatAsId)) {
+    const championsDex = typeof Dex.mod === 'function' ? Dex.mod('champions' as never) : null;
+
+    return championsDex || Dex.forGen(9);
   }
 
   const gen = detectGenFromFormat(formatAsId);

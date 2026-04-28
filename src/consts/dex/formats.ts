@@ -65,6 +65,13 @@ export const FormatLabels: Record<string, string> = {
   challengecup1v1: 'Challenge Cup 1v1',
   challengecup2v2: 'Challenge Cup 2v2',
   challengecup6v6: 'Challenge Cup 6v6',
+  champions: 'Champions',
+  championsbssregma: 'Champions BSS Reg M-A',
+  championscustomgame: 'Champions Custom Game',
+  championsdraft: 'Champions Draft',
+  championsou: 'Champions OU',
+  championsvgc2026regma: 'Champions VGC 2026 Reg M-A',
+  championsvgc2026regmabo3: 'Champions VGC 2026 Reg M-A (Bo3)',
   chatbats: 'ChatBats', // epic chat battles of history?
   chimera1v1: 'Chimera 1v1',
   computergeneratedteams: 'CG Teams',
