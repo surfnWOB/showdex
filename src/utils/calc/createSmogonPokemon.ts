@@ -14,6 +14,7 @@ import { type CalcdexPokemon } from '@showdex/interfaces/calc';
 import { clamp, formatId, nonEmptyObject } from '@showdex/utils/core';
 import { logger } from '@showdex/utils/debug';
 import {
+  detectChampionsFormat,
   detectGenFromFormat,
   detectLegacyGen,
   getGenDexForFormat,
@@ -21,6 +22,7 @@ import {
 } from '@showdex/utils/dex';
 import { calcPokemonHpPercentage } from './calcPokemonHp';
 import { calcStatAutoBoosts } from './calcStatAutoBoosts';
+import { championsCalcMapper } from './championsCalcMapper';
 
 export type SmogonPokemonOptions = ConstructorParameters<typeof SmogonPokemon>[2];
 export type SmogonPokemonOverrides = SmogonPokemonOptions['overrides'];
@@ -45,8 +47,11 @@ export const createSmogonPokemon = (
   const dex = getGenDexForFormat(format);
   const gen = detectGenFromFormat(format);
   const legacy = detectLegacyGen(gen);
+  const champions = detectChampionsFormat(format);
 
-  if (!dex || gen < 1 || !gameType || !pokemon?.calcdexId || !pokemon.speciesForme) {
+  // Champions formats route through the gen-0 sentinel in @smogon/calc, so we allow
+  // `gen < 1` past the guard when this is a Champions battle.
+  if (!dex || (!champions && gen < 1) || !gameType || !pokemon?.calcdexId || !pokemon.speciesForme) {
     return null;
   }
 
@@ -162,6 +167,9 @@ export const createSmogonPokemon = (
     ivs: { ...pokemon.ivs },
     evs: { ...pokemon.evs },
 
+    // ...overridden below if the format is Champions; the gen-0 mechanic interprets `evs` as SPs,
+    // `ivs` as empty, and the level as locked at 50.
+
     // update (2023/05/15): typically only used to provide the client-reported stat from Protosynthesis & Quark Drive
     // (populated in syncPokemon() via `volatiles`)
     // update (2024/01/03): apparently 'auto' is an accepted value, which is ok to fallback on since this property is
@@ -208,6 +216,14 @@ export const createSmogonPokemon = (
       ].slice(0, 2) as SmogonPokemonOverrides['types'],
     },
   };
+
+  if (champions) {
+    const championsArgs = championsCalcMapper(pokemon);
+
+    options.level = championsArgs.level;
+    options.ivs = { ...championsArgs.ivs };
+    options.evs = { ...championsArgs.evs };
+  }
 
   // in legacy gens, make sure that the SPD DVs match the SPA DVs
   // (even though gen 1 doesn't have SPD [or even SPA, technically], doesn't hurt to set it anyways)

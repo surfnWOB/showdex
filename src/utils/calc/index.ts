@@ -11,6 +11,7 @@ export * from './calcPokemonSpreadStats';
 export * from './calcPokemonStat';
 export * from './calcSmogonMatchup';
 export * from './calcStatAutoBoosts';
+export * from './championsCalcMapper';
 export * from './convertLegacyStats';
 export * from './createSmogonField';
 export * from './createSmogonMove';

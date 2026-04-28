@@ -1,5 +1,6 @@
 import { type Generation, type GenerationNum, type Specie } from '@smogon/calc';
 import { env } from '@showdex/utils/core';
+import { detectChampionsFormat } from './detectChampionsFormat';
 import { detectGenFromFormat } from './detectGenFromFormat';
 import { getDexForFormat } from './getDexForFormat';
 import { getNaturesDex } from './getNaturesDex';
@@ -27,12 +28,19 @@ export const getGenDexForFormat = (
     return null;
   }
 
-  const gen = dex.gen as GenerationNum
-    || (
-      typeof format === 'string'
-        ? detectGenFromFormat(format)
-        : env.int<GenerationNum>('calcdex-default-gen')
-    );
+  const champions = typeof format === 'string' && detectChampionsFormat(format);
+
+  // Champions formats use gen 0 as a sentinel at the @smogon/calc boundary so that
+  // `calculate()` routes to its `calculateChampions` mechanic. Showdex itself still treats
+  // these as Gen 9 elsewhere.
+  const gen: GenerationNum = champions ? (0 as GenerationNum) : (
+    dex.gen as GenerationNum
+      || (
+        typeof format === 'string'
+          ? detectGenFromFormat(format)
+          : env.int<GenerationNum>('calcdex-default-gen')
+      )
+  );
 
   // we need to override dex.species.get() to populate the `nfe` property
   // since it's not provided by Showdown's global Dex
