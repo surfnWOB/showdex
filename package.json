@@ -21,6 +21,7 @@
   "type": "module",
   "scripts": {
     "patch-ghooks": "./scripts/patch-ghooks.sh",
+    "bake:champions": "node ./scripts/bake-champions-bundle.mjs",
     "commit": "./node_modules/cz-customizable/standalone.js",
     "cm": "pnpm commit",
     "cz": "pnpm commit",

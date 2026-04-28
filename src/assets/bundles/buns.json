@@ -18,6 +18,20 @@
       }
     },
     "presets": {
+      "champions-ou-curated": {
+        "id": "champions-ou-curated",
+        "ntt": "presets",
+        "name": "Champions OU (curated)",
+        "label": "Champions OU (curated)",
+        "author": "smogon/damage-calc",
+        "ext": null,
+        "gen": 9,
+        "format": "championsou",
+        "desc": "Curated Champions OU sets baked from SETDEX_CHAMPIONS in smogon/damage-calc.",
+        "created": "2026-04-28T18:21:32.845Z",
+        "updated": "2026-04-28T18:21:32.846Z",
+        "disabled": false
+      },
       "d45db13d-567e-4b41-91d4-268cc83e1ce6": {
         "id": "d45db13d-567e-4b41-91d4-268cc83e1ce6",
         "ntt": "presets",
