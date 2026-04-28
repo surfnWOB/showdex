@@ -1,6 +1,6 @@
 import { NIL as NIL_UUID, v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 import { type CalcdexPlayerKey, type CalcdexPokemon, type CalcdexPokemonPreset } from '@showdex/interfaces/calc';
-import { detectPlayerKeyFromPokemon } from '@showdex/utils/battle';
+import { detectPlayerKeyFromPokemon } from '@showdex/utils/battle/detectPlayerKey';
 import { dedupeArray, env, nonEmptyObject } from '@showdex/utils/core';
 
 export const serializePayload = <T>(

@@ -11,12 +11,14 @@ import {
 import { useCalcdexSettings, useTeamdexPresets } from '@showdex/redux/store';
 // import { logger } from '@showdex/utils/debug';
 import {
+  detectChampionsFormat,
   detectGenFromFormat,
   getGenfulFormat,
   getGenlessFormat,
   legalLockedFormat,
   parseBattleFormat,
 } from '@showdex/utils/dex';
+import { ChampionsBundleId } from './championsPresetConverter';
 import { type CalcdexPokemonUsageAltSorter, usageAltPercentFinder, usageAltPercentSorter } from '@showdex/utils/presets';
 
 /**
@@ -193,6 +195,25 @@ export const useBattlePresets = (
   const gen = detectGenFromFormat(format);
   const genlessFormat = getGenlessFormat(format);
   const randoms = genlessFormat?.includes('random');
+  const champions = detectChampionsFormat(format);
+
+  // Champions formats short-circuit pkmn.github.io (no curated data exists upstream); curated sets
+  // come exclusively from the baked-in `champions-ou-curated` bundle, with Gen 9 OU & Gen 9 NatDex
+  // presets fetched in parallel as tagged fallbacks.
+  const effectiveBundleIds = React.useMemo(() => {
+    if (!champions) {
+      return includePresetsBundles || [];
+    }
+
+    const seen = new Set<string>(includePresetsBundles || []);
+
+    seen.add(ChampionsBundleId);
+
+    return [...seen];
+  }, [
+    champions,
+    includePresetsBundles,
+  ]);
 
   const teambuilderPresets = React.useMemo(() => (
     includeTeambuilder !== 'never'
@@ -211,11 +232,13 @@ export const useBattlePresets = (
   ]);
 
   const shouldSkipAny = disabled || !gen || !genlessFormat;
-  const shouldSkipBundles = shouldSkipAny || !includePresetsBundles?.length;
-  const shouldSkipFormats = shouldSkipAny || randoms || !downloadSmogonPresets;
-  const shouldSkipFormatStats = shouldSkipAny || randoms || !downloadUsageStats;
+  const shouldSkipBundles = shouldSkipAny || !effectiveBundleIds.length;
+  const shouldSkipFormats = shouldSkipAny || randoms || champions || !downloadSmogonPresets;
+  const shouldSkipFormatStats = shouldSkipAny || randoms || champions || !downloadUsageStats;
   const shouldSkipRandoms = shouldSkipAny || !randoms || !downloadRandomsPresets;
   const shouldSkipRandomsStats = shouldSkipAny || !randoms || !downloadUsageStats;
+  const shouldSkipChampionsOuFallback = shouldSkipAny || !champions || !downloadSmogonPresets;
+  const shouldSkipChampionsNatDexFallback = shouldSkipAny || !champions || !downloadSmogonPresets;
 
   const {
     data: bundledPresets,
@@ -223,7 +246,7 @@ export const useBattlePresets = (
     isLoading: bundledPresetsLoading,
   } = usePokemonBundledPresetQuery({
     gen,
-    bundleIds: includePresetsBundles,
+    bundleIds: effectiveBundleIds,
   }, {
     skip: shouldSkipBundles,
   });
@@ -252,6 +275,52 @@ export const useBattlePresets = (
   }, {
     skip: shouldSkipFormatStats,
   });
+
+  const {
+    data: championsOuFallbackPresetsRaw,
+    isUninitialized: championsOuFallbackPending,
+    isLoading: championsOuFallbackLoading,
+  } = usePokemonFormatPresetQuery({
+    gen: 9,
+    format: 'gen9ou',
+    maxAge,
+  }, {
+    skip: shouldSkipChampionsOuFallback,
+  });
+
+  const {
+    data: championsNatDexFallbackPresetsRaw,
+    isUninitialized: championsNatDexFallbackPending,
+    isLoading: championsNatDexFallbackLoading,
+  } = usePokemonFormatPresetQuery({
+    gen: 9,
+    format: 'gen9nationaldex',
+    maxAge,
+  }, {
+    skip: shouldSkipChampionsNatDexFallback,
+  });
+
+  const championsOuFallbackPresets = React.useMemo<CalcdexPokemonPreset[]>(() => (
+    (championsOuFallbackPresetsRaw || []).map((preset) => ({
+      ...preset,
+      name: preset?.name?.startsWith('(Gen 9 OU)')
+        ? preset.name
+        : `(Gen 9 OU) ${preset?.name || ''}`.trim(),
+    }))
+  ), [
+    championsOuFallbackPresetsRaw,
+  ]);
+
+  const championsNatDexFallbackPresets = React.useMemo<CalcdexPokemonPreset[]>(() => (
+    (championsNatDexFallbackPresetsRaw || []).map((preset) => ({
+      ...preset,
+      name: preset?.name?.startsWith('(Gen 9 NatDex)')
+        ? preset.name
+        : `(Gen 9 NatDex) ${preset?.name || ''}`.trim(),
+    }))
+  ), [
+    championsNatDexFallbackPresetsRaw,
+  ]);
 
   const {
     data: randomsPresets,
@@ -288,9 +357,11 @@ export const useBattlePresets = (
       ...(bundledPresets || []),
       ...(formatPresets || []),
       ...(formatStats || []),
+      ...(champions ? championsOuFallbackPresets : []),
+      ...(champions ? championsNatDexFallbackPresets : []),
     ];
 
-    if (!legalFormat || includeOtherMetaPresets) {
+    if (champions || !legalFormat || includeOtherMetaPresets) {
       return output;
     }
 
@@ -298,6 +369,9 @@ export const useBattlePresets = (
     return output.filter((p) => legalLockedFormat(p.format));
   }, [
     bundledPresets,
+    champions,
+    championsNatDexFallbackPresets,
+    championsOuFallbackPresets,
     formatPresets,
     formatStats,
     includeOtherMetaPresets,
@@ -366,6 +440,8 @@ export const useBattlePresets = (
       || (!shouldSkipFormatStats && formatStatsPending)
       || (!shouldSkipRandoms && randomsPresetsPending)
       || (!shouldSkipRandomsStats && randomsStatsPending)
+      || (!shouldSkipChampionsOuFallback && championsOuFallbackPending)
+      || (!shouldSkipChampionsNatDexFallback && championsNatDexFallbackPending)
   );
 
   const loading = (
@@ -375,6 +451,8 @@ export const useBattlePresets = (
       || (!shouldSkipFormatStats && formatStatsLoading)
       || (!shouldSkipRandoms && randomsPresetsLoading)
       || (!shouldSkipRandomsStats && randomsStatsLoading)
+      || (!shouldSkipChampionsOuFallback && championsOuFallbackLoading)
+      || (!shouldSkipChampionsNatDexFallback && championsNatDexFallbackLoading)
   );
 
   const ready = (
@@ -383,6 +461,8 @@ export const useBattlePresets = (
       && shouldSkipFormatStats
       && shouldSkipRandoms
       && shouldSkipRandomsStats
+      && shouldSkipChampionsOuFallback
+      && shouldSkipChampionsNatDexFallback
   ) || (
     !pending
       && !loading

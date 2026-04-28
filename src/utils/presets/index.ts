@@ -1,5 +1,6 @@
 export * from './appliedPreset';
 export * from './applyPreset';
+export * from './championsPresetConverter';
 export * from './detectCompletePreset';
 export * from './detectUsageAlt';
 export * from './exportMultiPokePastes';
