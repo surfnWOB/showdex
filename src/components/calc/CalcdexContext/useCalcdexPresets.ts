@@ -19,7 +19,12 @@ import {
 } from '@showdex/utils/calc';
 import { formatId, nonEmptyObject } from '@showdex/utils/core';
 import { logger, runtimer } from '@showdex/utils/debug';
-import { determineTerrain, determineWeather, getGenlessFormat } from '@showdex/utils/dex';
+import {
+  detectChampionsFormat,
+  determineTerrain,
+  determineWeather,
+  getGenlessFormat,
+} from '@showdex/utils/dex';
 import {
   type CalcdexBattlePresetsHookValue,
   applyPreset,
@@ -117,6 +122,7 @@ export const useCalcdexPresets = (
     }
 
     const randoms = state.format.includes('random');
+    const champions = detectChampionsFormat(state.format);
     const playersPayload: Partial<Record<CalcdexPlayerKey, Partial<CalcdexPlayer>>> = {};
     const field: Partial<CalcdexBattleField> = {};
 
@@ -177,7 +183,11 @@ export const useCalcdexPresets = (
         let preset: CalcdexPokemonPreset;
         let [usage] = pokemonUsages;
 
-        if (pokemon.source === 'server' && nonEmptyObject(pokemon.serverStats)) {
+        // Champions uses gen-0 stat math (`calcStatChampions`), so the brute-force matchers below
+        // (`guessTeambuilderPreset` & `guessServerSpread`) never match `serverStats` and produce a
+        // bogus "Yours" preset with `nature: null` that short-circuits the bundle preset path.
+        // Skip this block entirely for Champions and let the bundle/preselection path apply.
+        if (pokemon.source === 'server' && nonEmptyObject(pokemon.serverStats) && !champions) {
           // was gunna use this elsewhere, so I separated it from the map() below, but never ended up needing it lol
           // (in other words, too lazy to move this back into the map() below)
           const mergeMatches = (

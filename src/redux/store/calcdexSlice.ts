@@ -399,7 +399,7 @@ export const calcdexSlice = createSlice({
         return void endTimer('(bad battleId)', battleId, currentState);
       }
 
-      const updatedGen = (typeof gen === 'number' && gen > 0 ? gen : currentState.gen) as GenerationNum;
+      const updatedGen = (typeof gen === 'number' && gen >= 0 ? gen : currentState.gen) as GenerationNum;
       const legacy = detectLegacyGen(updatedGen);
 
       // note: `state` is actually a Proxy object via the WritableDraft from Immutable,
