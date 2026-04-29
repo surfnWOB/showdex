@@ -138,7 +138,9 @@ export const syncBattle = createAsyncThunk<CalcdexBattleState, SyncBattlePayload
   }
 
   // update the gen, if provided
-  if (typeof gen === 'number' && gen > 0) {
+  // note: gen 0 is a valid sentinel for the @smogon/calc Champions mechanic, so we allow it here;
+  // missing/invalid gens come in as null/undefined (or non-numbers) instead.
+  if (typeof gen === 'number' && gen >= 0) {
     battleState.gen = gen as GenerationNum;
   }
 

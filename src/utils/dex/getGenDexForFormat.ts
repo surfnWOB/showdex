@@ -51,7 +51,13 @@ export const getGenDexForFormat = (
     get: (id) => {
       const specie = dex.species.get(id) as unknown as Specie;
 
-      if (typeof specie?.nfe !== 'boolean') {
+      // for Champions (gen 0), the dex is restricted to a 286-species roster, so user-controlled
+      // formes outside that roster come back as null/undefined here -- bail before mutating.
+      if (!specie) {
+        return specie;
+      }
+
+      if (typeof specie.nfe !== 'boolean') {
         (specie as Writable<Specie>).nfe = notFullyEvolved(id, format);
       }
 
