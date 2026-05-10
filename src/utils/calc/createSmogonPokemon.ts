@@ -223,6 +223,12 @@ export const createSmogonPokemon = (
     options.level = championsArgs.level;
     options.ivs = { ...championsArgs.ivs };
     options.evs = { ...championsArgs.evs };
+
+    // drop the rawStats override so @smogon/calc's gen-0 mechanic (`calcStatChampions`)
+    // computes stats from `evs` (interpreted as SPs) instead of using the spreadStats
+    // verbatim. `calcPokemonStat` has a matching Champions branch, so spreadStats and the
+    // calc-internal stats both derive from the same formula and stay in lock-step.
+    delete options.rawStats;
   }
 
   // in legacy gens, make sure that the SPD DVs match the SPA DVs
@@ -285,7 +291,7 @@ export const createSmogonPokemon = (
 
   // update (2023/07/27): TIL @smogon/calc doesn't implement 'Power Trick' at all LOL
   // (I'm assuming most people were probably manually switching ATK/DEF in the calc to workaround this)
-  if (nonEmptyObject(pokemon.volatiles) && 'powertrick' in pokemon.volatiles) {
+  if (nonEmptyObject(pokemon.volatiles) && 'powertrick' in pokemon.volatiles && options.rawStats) {
     const { atk: rawAtk, def: rawDef } = options.rawStats;
     const { atk: baseAtk, def: baseDef } = options.overrides.baseStats;
 
