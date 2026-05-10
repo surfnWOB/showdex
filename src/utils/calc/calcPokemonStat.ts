@@ -1,7 +1,12 @@
 import { type GenerationNum } from '@smogon/calc';
 import { PokemonNatureBoosts } from '@showdex/consts/dex';
 import { clamp } from '@showdex/utils/core';
-import { detectGenFromFormat, detectLegacyGen, getDefaultSpreadValue } from '@showdex/utils/dex';
+import {
+  detectChampionsFormat,
+  detectGenFromFormat,
+  detectLegacyGen,
+  getDefaultSpreadValue,
+} from '@showdex/utils/dex';
 
 /**
  * Truncates `num` to the number of `bits`.
@@ -43,6 +48,36 @@ export const calcPokemonStat = (
   level = 100,
   nature?: Showdown.NatureName,
 ): number => {
+  // Champions formats (gen 0 sentinel at the @smogon/calc boundary): HP = base + sp + 75,
+  // others = floor(n * (base + sp + 20)). IVs are ignored, EVs are reinterpreted as Stat
+  // Points (SPs), level does not factor in. Mirrors `calcStatChampions` in
+  // @smogon/calc/stats.ts so spreadStats (used by Showdex's UI) match what the damage
+  // calc derives. Without this branch, the standard EV formula is silently applied to
+  // Champions Pokemon — producing inflated damage % via deflated HP denominators.
+  if (typeof format === 'string' && detectChampionsFormat(format)) {
+    const sp = Math.max(0, ev ?? 0);
+
+    if (stat === 'hp') {
+      return base === 1 ? base : base + sp + 75;
+    }
+
+    let n = 1;
+
+    if (nature && nature in PokemonNatureBoosts) {
+      const [plus, minus] = PokemonNatureBoosts[nature];
+
+      if (plus === stat && minus === stat) {
+        n = 1;
+      } else if (plus === stat) {
+        n = 1.1;
+      } else if (minus === stat) {
+        n = 0.9;
+      }
+    }
+
+    return Math.floor(n * (base + sp + 20));
+  }
+
   const gen = typeof format === 'string'
     ? detectGenFromFormat(format)
     : format;

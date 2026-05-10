@@ -264,13 +264,17 @@ export const championsPresetConverter = (
       }
 
       const evs = expandSps(entry.sps);
+      // Champions Pokemon don't actually have IVs (the gen-0 sentinel formula ignores them),
+      // but Showdex's preset machinery and downstream consumers default-fill IVs of 31. Emit
+      // 31s here so a Champions preset accidentally consumed by a non-Champions code path
+      // doesn't read as an all-zero spread.
       const ivs: Showdown.StatsTable = {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spa: 0,
-        spd: 0,
-        spe: 0,
+        hp: 31,
+        atk: 31,
+        def: 31,
+        spa: 31,
+        spd: 31,
+        spe: 31,
       };
 
       const moves = (entry.moves || []).filter((m): m is string => typeof m === 'string' && !!m) as MoveName[];

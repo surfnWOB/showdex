@@ -93,6 +93,20 @@ describe('championsPresetConverter()', () => {
     });
   });
 
+  it('emits all-31 ivs (gen-0 ignores them, but downstream Showdex consumers expect 31s)', () => {
+    const presets = championsPresetConverter(fixture, bundleOptions);
+
+    expect(presets.length).toBeGreaterThan(0);
+    presets.forEach((preset) => {
+      expect(preset.ivs).toEqual({
+        hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31,
+      });
+      expect(preset.spreads?.[0]?.ivs).toEqual({
+        hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31,
+      });
+    });
+  });
+
   it('keeps the origin format tag in preset.name', () => {
     const presets = championsPresetConverter(fixture, bundleOptions);
     const names = presets.map((p) => p.name);
