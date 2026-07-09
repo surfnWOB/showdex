@@ -57,6 +57,11 @@ const KnownFormatSlices: [
   test: RegExp,
   ...codes: Showdown.BattleTeambuilderTableFormatCode[],
 ][] = [
+  // surfnWOB (keep-ours on upstream rebase): the [Gen 3] Megas fork mod is OU-based. Its 'uu'/'ubers'
+  // variants already fall through to the generic /uu/ + /ubers/ rules below; only the OU base 'gen3megas'
+  // (no 'ou' substring) matches nothing, so anchor it here. The (?:ou)?$ end-anchor is deliberate so this
+  // does NOT swallow 'gen3megasuu' / 'gen3megasubers' (which need UU / Uber slices).
+  [/gen3megas(?:ou)?$/, 'OU'],
   [/ubers?(?:uu)?|nationaldexdoubles/, 'Uber'],
   [/vgc20(?:10|16|19|22)|(?:bss|battlespot|battlestadium).*(?:series(?:10|11)$)/, 'Restricted Legendary'],
   [/(?:bss|battlespot|battlestadium).*series13$/, 'CAP'], // refers to index 0 in `

@@ -42,6 +42,23 @@ export const getDexForFormat = (format?: string | GenerationNum): Showdown.Modde
 
   const formatAsId = formatId(format);
 
+  // surfnWOB (keep-ours on upstream rebase): prefer the client's own central
+  // format -> mod router. This fork's client (battle-dex.ts) exposes Dex.forFormat(),
+  // which maps every custom mod -- gen3mega, gen3pss, gen3frlg, champions, bdsp,
+  // letsgo, ... -- to its ModdedDex in one place. It's the same routing the client
+  // uses to render these battle rooms, so Calcdex inherits exactly the client's
+  // (working) mod resolution, including any lazily-loaded mod teambuilder tables.
+  // Falls through to Showdex's own gen routing below on a stock client w/o forFormat.
+  const clientDex = Dex as unknown as { forFormat?: (f: string) => Showdown.ModdedDex };
+
+  if (typeof clientDex.forFormat === 'function') {
+    const moddedDex = clientDex.forFormat(formatAsId);
+
+    if (moddedDex) {
+      return moddedDex;
+    }
+  }
+
   if (formatAsId.includes('letsgo')) {
     return Dex.mod('gen7letsgo');
   }

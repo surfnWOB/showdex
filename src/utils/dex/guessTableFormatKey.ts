@@ -72,6 +72,18 @@ export const guessTableFormatKey = (
     }
   }
 
+  // surfnWOB (keep-ours on upstream rebase): the [Gen 3] Megas fork mod ('gen3megas'/'gen3megasuu'/etc.)
+  // builds its custom Mega species + overrideTier data into its own 'gen3mega' teambuilder table (mod id is
+  // singular, mirroring the client's Dex.forFormat -> Dex.mod('gen3mega') routing), so the forme dropdown +
+  // tiers must source from it. Guarded so it degrades to the plain 'gen3' table on a stock client.
+  if (detectGenFromFormat(format) === 3 && format.includes('mega')) {
+    const key = 'gen3mega' as Showdown.BattleTeambuilderTableFormat;
+
+    if (key in BattleTeambuilderTable) {
+      return key;
+    }
+  }
+
   // first sniff out any special formats, like gen8bdsp & gen9dlc1
   const knownFormat = KnownFormats.find(([regex]) => regex.test(format));
 
