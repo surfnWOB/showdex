@@ -31,6 +31,41 @@ export const tRef: Record<'value', TFunction> = {
 
 const l = logger('@showdex/utils/app/loadI18nextLocales()');
 
+// surfnWOB (keep-ours on upstream rebase): a transient non-2xx on one bundle (e.g., a deploy-window
+// 502 on i18n.en.json) used to silently shrink `supportedLngs`, hard-locking English browsers to
+// French via the LanguageDetector's localStorage cache. Retry each bundle fetch before giving up.
+const BUNDLE_FETCH_ATTEMPTS = 3;
+const BUNDLE_FETCH_RETRY_DELAY_MS = 1000;
+
+const fetchLocaleBundle = async (
+  url: string,
+): Promise<Record<string, unknown>> => {
+  for (let attempt = 0; attempt < BUNDLE_FETCH_ATTEMPTS; attempt++) {
+    if (attempt) {
+      await new Promise((resolve) => { setTimeout(resolve, BUNDLE_FETCH_RETRY_DELAY_MS * attempt); });
+    }
+
+    try {
+      const response = await runtimeFetch<Record<string, unknown>>(url);
+
+      if (!response.ok) {
+        continue;
+      }
+
+      const data = response.json();
+
+      if (nonEmptyObject(data.common?.['--meta'])) {
+        return data;
+      }
+    } catch {
+      // e.g., the fetch itself threw mid-deploy; retry (a rejection here previously killed the
+      // entire loader, booting Showdex with no i18n at all)
+    }
+  }
+
+  return null;
+};
+
 /**
  * Loads each locale bundle into `i18n`.
  *
@@ -71,10 +106,9 @@ export const loadI18nextLocales = async (
     }
 
     const url = getResourceUrl(`i18n.${locale}${ext ? `.${ext}` : ''}`);
-    const response = await runtimeFetch<Record<string, unknown>>(url);
-    const data = response.json();
+    const data = await fetchLocaleBundle(url);
 
-    if (!nonEmptyObject(data.common?.['--meta'])) {
+    if (!data) {
       l.debug(
         'downloaded absolutely nothing for the', locale, 'locale!',
         '\n', 'url', url,
@@ -113,9 +147,22 @@ export const loadI18nextLocales = async (
 
       // debug: __DEV__, // default: false
       lng: initLocale || undefined, // falling back to `undefined` to allow the LanguageDetector to kick in
+
+      // surfnWOB (keep-ours on upstream rebase): pin the fallback to 'en' whenever it loaded --
+      // bundle load order must never decide the fallback language.
       supportedLngs,
-      fallbackLng: supportedLngs[0],
+      fallbackLng: 'en' in resources ? 'en' : supportedLngs[0],
       cleanCode: true, // e.g., 'EN' -> 'en', 'En-uS', -> 'en-US'
+
+      // surfnWOB (keep-ours on upstream rebase): the user's chosen locale already persists via
+      // Showdex settings (passed in as `initLocale`), so the detector should only ever reflect the
+      // browser: never read or write its localStorage cache. (A single boot that resolved 'fr'
+      // because 'en' failed to download used to persist 'i18nextLng' = 'fr' forever; ignoring the
+      // cache also heals browsers already poisoned that way.)
+      detection: {
+        order: ['querystring', 'navigator'],
+        caches: [],
+      },
 
       ns,
       defaultNS: 'common',
