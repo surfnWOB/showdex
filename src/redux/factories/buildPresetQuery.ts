@@ -4,6 +4,7 @@ import { type CalcdexPokemonPreset, type CalcdexPokemonPresetSource } from '@sho
 import { env, nonEmptyObject, runtimeFetch } from '@showdex/utils/core';
 import { logger, runtimer } from '@showdex/utils/debug';
 import { readPresetsDb, writePresetsDb } from '@showdex/utils/storage';
+import { buildPresetUrl } from './buildPresetUrl';
 // import { cachePresets } from '@showdex/utils/presets/cachePresets'; /** @todo fix circular dependency import */
 // import { getCachedPresets } from '@showdex/utils/presets/getCachedPresets'; /** @todo fix circular dependency import */
 
@@ -170,11 +171,7 @@ export const buildPresetQuery = <
     }
 
     // build the preset API URL to fetch from
-    const url = env('pkmn-presets-base-url')
-      // remove any potential double-slashes (or more) in the URL path
-      // e.g., '/smogon/data/sets//gen9ou' -> '/smogon/data/sets/gen9ou'
-      + `${path}/${endpoint}`.replace(/\/{2,}/g, '/')
-      + env('pkmn-presets-endpoint-suffix');
+    const url = buildPresetUrl(path, endpoint);
 
     try {
       // fetch the presets
