@@ -76,8 +76,19 @@ export const guessTableFormatKey = (
   // builds its custom Mega species + overrideTier data into its own 'gen3mega' teambuilder table (mod id is
   // singular, mirroring the client's Dex.forFormat -> Dex.mod('gen3mega') routing), so the forme dropdown +
   // tiers must source from it. Guarded so it degrades to the plain 'gen3' table on a stock client.
-  if (detectGenFromFormat(format) === 3 && format.includes('mega')) {
+  const gen = detectGenFromFormat(format);
+
+  if (gen === 3 && format.includes('mega')) {
     const key = 'gen3mega' as Showdown.BattleTeambuilderTableFormat;
+
+    if (key in BattleTeambuilderTable) {
+      return key;
+    }
+  }
+
+  // The sole [Gen 4] Megas format uses the same dedicated-table convention.
+  if (format === 'gen4megas') {
+    const key = 'gen4mega' as Showdown.BattleTeambuilderTableFormat;
 
     if (key in BattleTeambuilderTable) {
       return key;
@@ -101,8 +112,6 @@ export const guessTableFormatKey = (
   // while other gens (e.g., 'gen8') will be properties alongside the current gen;
   // i.e., you won't find a 'gen9' BattleTeambuilderTable property, but what you'd normally find inside of it is
   // available in the root of the BattleTeambuilderTable object itself
-  const gen = detectGenFromFormat(format);
-
   // doubles (even of the current gen, e.g., 'gen9doubles') will always be a BattleTeambuilderTable property
   if (format.includes('doubles')) {
     const key = `gen${gen}doubles` as Showdown.BattleTeambuilderTableFormat;
