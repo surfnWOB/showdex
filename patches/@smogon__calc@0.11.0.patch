@@ -21246,7 +21246,7 @@ index c8c918d1be6a67602f6d0cd34fb7cd72c36dce9f..a823c2303274c61e4ade11237520da0a
 +{"version":3,"file":"gen12.js","sourceRoot":"","sources":["../../src/mechanics/gen12.ts"],"names":[],"mappings":"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"}
 \ No newline at end of file
 diff --git a/dist/mechanics/gen3.d.ts b/dist/mechanics/gen3.d.ts
-index 5d5ffce5a11e64256d4a17d43a0444d710750cd7..1aab51537bc68a5c129370e72f97ce35522c7677 100644
+index 5d5ffce5a11e64256d4a17d43a0444d710750cd7..1be25cb91945caf9c17517b82b046dac79a4ae89 100644
 --- a/dist/mechanics/gen3.d.ts
 +++ b/dist/mechanics/gen3.d.ts
 @@ -1,11 +1,12 @@
@@ -21259,16 +21259,18 @@ index 5d5ffce5a11e64256d4a17d43a0444d710750cd7..1aab51537bc68a5c129370e72f97ce35
  import { Result } from '../result';
 -export declare function calculateADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field): Result;
 -export declare function calculateBasePowerADV(attacker: Pokemon, defender: Pokemon, move: Move, desc: RawDesc, hit?: number): number;
+-export declare function calculateBPModsADV(attacker: Pokemon, move: Move, desc: RawDesc, basePower: number): number;
+-export declare function calculateAttackADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, desc: RawDesc, isCritical?: boolean): number;
 +export declare function calculateADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field, mods?: ShowdexCalcMods): Result;
 +export declare function calculateBasePowerADV(attacker: Pokemon, defender: Pokemon, move: Move, desc: RawDesc, hit?: number, mods?: ShowdexCalcMods): number;
- export declare function calculateBPModsADV(attacker: Pokemon, move: Move, desc: RawDesc, basePower: number): number;
- export declare function calculateAttackADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, desc: RawDesc, isCritical?: boolean): number;
++export declare function calculateBPModsADV(attacker: Pokemon, move: Move, field: Field, desc: RawDesc, basePower: number, hasAteAbilityTypeChange?: boolean): number;
++export declare function calculateAttackADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field, desc: RawDesc, isCritical?: boolean): number;
  export declare function calculateDefenseADV(gen: Generation, defender: Pokemon, move: Move, desc: RawDesc, isCritical?: boolean): number;
 diff --git a/dist/mechanics/gen3.js b/dist/mechanics/gen3.js
-index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92767a35dc 100644
+index ea2a1345d3014e261e3bc950e922a454b2b7102e..6439fe11d9bfd8c52d3d41b9438c8ab31b63df04 100644
 --- a/dist/mechanics/gen3.js
 +++ b/dist/mechanics/gen3.js
-@@ -1,36 +1,12 @@
+@@ -1,36 +1,35 @@
  "use strict";
 -var __read = (this && this.__read) || function (o, n) {
 -    var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -21307,12 +21309,35 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
 +const items_1 = require("../items");
 +const result_1 = require("../result");
 +const util_1 = require("./util");
++// @smogon/calc's per-generation move data only adds these later-generation
++// mechanic flags when the games first consume them. The gen3mega server
++// backports the abilities, so retain the authoritative ADV move membership
++// here instead of relying solely on the absent flags.
++const SHEER_FORCE_MOVES_ADV = new Set([
++    'Acid', 'Ancient Power', 'Astonish', 'Aurora Beam', 'Bite', 'Blaze Kick',
++    'Blizzard', 'Body Slam', 'Bone Club', 'Bounce', 'Bubble', 'Bubble Beam',
++    'Confusion', 'Constrict', 'Crunch', 'Crush Claw', 'Dizzy Punch',
++    'Dragon Breath', 'Dynamic Punch', 'Ember', 'Extrasensory', 'Fake Out',
++    'Fire Blast', 'Fire Punch', 'Flame Wheel', 'Flamethrower', 'Headbutt',
++    'Heat Wave', 'Hyper Fang', 'Ice Beam', 'Ice Punch', 'Icy Wind', 'Iron Tail',
++    'Lick', 'Luster Purge', 'Metal Claw', 'Meteor Mash', 'Mist Ball', 'Mud Shot',
++    'Mud-Slap', 'Muddy Water', 'Needle Arm', 'Octazooka', 'Poison Fang',
++    'Poison Sting', 'Poison Tail', 'Powder Snow', 'Psybeam', 'Psychic',
++    'Rock Slide', 'Rock Smash', 'Rock Tomb', 'Rolling Kick', 'Sacred Fire',
++    'Secret Power', 'Shadow Ball', 'Signal Beam', 'Silver Wind', 'Sky Attack',
++    'Sludge', 'Sludge Bomb', 'Smog', 'Snore', 'Spark', 'Steel Wing', 'Stomp',
++    'Thunder', 'Thunder Punch', 'Thunder Shock', 'Thunderbolt', 'Tri Attack',
++    'Twineedle', 'Twister', 'Water Pulse', 'Zap Cannon',
++]);
++const STRONG_JAW_MOVES_ADV = new Set([
++    'Bite', 'Crunch', 'Hyper Fang', 'Poison Fang',
++]);
 +function calculateADV(gen, attacker, defender, move, field, mods) {
 +    var _a, _b;
      (0, util_1.checkAirLock)(attacker, field);
      (0, util_1.checkAirLock)(defender, field);
      (0, util_1.checkForecast)(attacker, field.weather);
-@@ -39,13 +15,13 @@ function calculateADV(gen, attacker, defender, move, field) {
+@@ -39,13 +38,13 @@ function calculateADV(gen, attacker, defender, move, field) {
      (0, util_1.checkIntimidate)(gen, defender, attacker);
      attacker.stats.spe = (0, util_1.getFinalSpeed)(gen, attacker, field, field.attackerSide);
      defender.stats.spe = (0, util_1.getFinalSpeed)(gen, defender, field, field.defenderSide);
@@ -21330,7 +21355,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
          return result;
      }
      if (field.defenderSide.isProtected) {
-@@ -53,9 +29,9 @@ function calculateADV(gen, attacker, defender, move, field) {
+@@ -53,15 +52,21 @@ function calculateADV(gen, attacker, defender, move, field) {
          return result;
      }
      if (move.name === 'Pain Split') {
@@ -21342,17 +21367,69 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
 +        result.damage = damage;
          return result;
      }
++    const defenderAbilityIgnored = defender.hasAbility('Battle Armor', 'Filter', 'Flash Fire', 'Levitate', 'Marvel Scale', 'Multiscale', 'Shell Armor', 'Soundproof', 'Thick Fat', 'Volt Absorb', 'Water Absorb', 'Wonder Guard');
++    if (attacker.hasAbility('Mold Breaker') && defenderAbilityIgnored) {
++        desc.attackerAbility = attacker.ability;
++        defender.ability = undefined;
++    }
++    const isMegaSol = attacker.hasAbility('Mega Sol');
      if (move.named('Weather Ball')) {
-@@ -74,7 +50,7 @@ function calculateADV(gen, attacker, defender, move, field) {
+         move.type =
+-            field.hasWeather('Sun') ? 'Fire'
+-                : field.hasWeather('Rain') ? 'Water'
++            field.hasWeather('Sun', 'Harsh Sunshine') || isMegaSol ? 'Fire'
++                : field.hasWeather('Rain', 'Heavy Rain') ? 'Water'
+                     : field.hasWeather('Sand') ? 'Rock'
+                         : field.hasWeather('Hail') ? 'Ice'
+                             : 'Normal';
+@@ -74,7 +79,45 @@ function calculateADV(gen, attacker, defender, move, field) {
          field.defenderSide.isReflect = false;
          field.defenderSide.isLightScreen = false;
      }
 -    var typeEffectivenessPrecedenceRules = [
++    let hasAteAbilityTypeChange = false;
++    const noAteTypeChange = move.named('Weather Ball', 'Struggle');
++    if (!noAteTypeChange && move.hasType('Normal')) {
++        if (attacker.hasAbility('Aerilate')) {
++            move.type = 'Flying';
++            hasAteAbilityTypeChange = true;
++        }
++        else if (attacker.hasAbility('Dragonize')) {
++            move.type = 'Dragon';
++            hasAteAbilityTypeChange = true;
++        }
++        else if (attacker.hasAbility('Refrigerate')) {
++            move.type = 'Ice';
++            hasAteAbilityTypeChange = true;
++        }
++        if (hasAteAbilityTypeChange) {
++            desc.attackerAbility = attacker.ability;
++            desc.moveType = move.type;
++        }
++    }
++    // ADV derives a damaging move's category from its type. This must happen after
++    // Aerilate/Refrigerate/Dragonize (and after Showdex's equivalent type override).
++    if (move.category !== 'Status' && !move.hasType('???')) {
++        const specialTypes = ['Fire', 'Water', 'Grass', 'Ice', 'Electric', 'Dark', 'Psychic', 'Dragon'];
++        const category = specialTypes.includes(move.type) ? 'Special' : 'Physical';
++        move.category = category;
++        if (move.overrideOffensiveStat === 'atk' || move.overrideOffensiveStat === 'spa') {
++            move.overrideOffensiveStat = category === 'Physical' ? 'atk' : 'spa';
++        }
++        if (move.overrideDefensiveStat === 'def' || move.overrideDefensiveStat === 'spd') {
++            move.overrideDefensiveStat = category === 'Physical' ? 'def' : 'spd';
++        }
++    }
++    if ((field.hasWeather('Harsh Sunshine') && move.hasType('Water')) ||
++        (field.hasWeather('Heavy Rain') && move.hasType('Fire'))) {
++        desc.weather = field.weather;
++        return result;
++    }
 +    const typeEffectivenessPrecedenceRules = [
          'Normal',
          'Fire',
          'Water',
-@@ -93,20 +69,20 @@ function calculateADV(gen, attacker, defender, move, field) {
+@@ -93,20 +136,20 @@ function calculateADV(gen, attacker, defender, move, field) {
          'Dark',
          'Steel',
      ];
@@ -21381,16 +21458,29 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (typeEffectiveness === 0) {
          return result;
      }
-@@ -120,7 +96,7 @@ function calculateADV(gen, attacker, defender, move, field) {
+@@ -120,75 +163,110 @@ function calculateADV(gen, attacker, defender, move, field) {
          return result;
      }
      desc.HPEVs = (0, util_1.getStatDescriptionText)(gen, defender, 'hp');
 -    var fixedDamage = (0, util_1.handleFixedDamageMoves)(attacker, move);
++    const isSpread = field.gameType !== 'Singles' &&
++        ['allAdjacent', 'allAdjacentFoes'].includes(move.target);
++    const isParentalBondBlockedMove = move.named('Bounce', 'Dig', 'Dive', 'Doom Desire', 'Endeavor', 'Explosion', 'Fly', 'Future Sight', 'Ice Ball', 'Razor Wind', 'Rollout', 'Self-Destruct', 'Skull Bash', 'Sky Attack', 'Solar Beam');
++    const canParentalBond = attacker.hasAbility('Parental Bond') &&
++        move.hits === 1 &&
++        !isSpread &&
++        !isParentalBondBlockedMove &&
++        !move.isZ &&
++        !move.isMax;
 +    const fixedDamage = (0, util_1.handleFixedDamageMoves)(attacker, move);
      if (fixedDamage) {
-         result.damage = fixedDamage;
+-        result.damage = fixedDamage;
++        result.damage = canParentalBond ? [fixedDamage, fixedDamage] : fixedDamage;
++        if (canParentalBond) {
++            desc.attackerAbility = attacker.ability;
++        }
          return result;
-@@ -128,67 +104,78 @@ function calculateADV(gen, attacker, defender, move, field) {
+     }
      if (move.hits > 1) {
          desc.hits = move.hits;
      }
@@ -21399,14 +21489,15 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (bp === 0) {
          return result;
      }
-     bp = calculateBPModsADV(attacker, move, desc, bp);
+-    bp = calculateBPModsADV(attacker, move, desc, bp);
 -    var isCritical = move.isCrit && !defender.hasAbility('Battle Armor', 'Shell Armor');
 -    var at = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
 -    var df = calculateDefenseADV(gen, defender, move, desc, isCritical);
 -    var lv = attacker.level;
 -    var baseDamage = Math.floor(Math.floor((Math.floor((2 * lv) / 5 + 2) * at * bp) / df) / 50);
++    bp = calculateBPModsADV(attacker, move, field, desc, bp, hasAteAbilityTypeChange);
 +    const isCritical = move.isCrit && !defender.hasAbility('Battle Armor', 'Shell Armor');
-+    const at = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
++    const at = calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical);
 +    const df = calculateDefenseADV(gen, defender, move, desc, isCritical);
 +    const lv = attacker.level;
 +    // let baseDamage = Math.floor(Math.floor((Math.floor((2 * lv) / 5 + 2) * at * bp) / df) / 50);
@@ -21419,11 +21510,23 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      baseDamage = Math.floor(baseDamage * type2Effectiveness);
 -    var damage = [];
 -    for (var i = 85; i <= 100; i++) {
++    const unmodifiedAbilityDamage = baseDamage;
++    baseDamage = calculateAbilityDamageModsADV(baseDamage, attacker, defender, move, field, desc, typeEffectiveness);
 +    const damage = [];
 +    for (let i = 85; i <= 100; i++) {
          damage[i - 85] = Math.max(1, Math.floor((baseDamage * i) / 100));
      }
-     result.damage = damage;
+-    result.damage = damage;
++    let childDamage;
++    if (canParentalBond) {
++        const childBaseDamage = calculateAbilityDamageModsADV(unmodifiedAbilityDamage, attacker, defender, move, field, desc, typeEffectiveness, 2, true);
++        childDamage = [];
++        for (let i = 85; i <= 100; i++) {
++            childDamage[i - 85] = Math.max(1, Math.floor((childBaseDamage * i) / 100));
++        }
++        desc.attackerAbility = attacker.ability;
++    }
++    result.damage = childDamage ? [damage, childDamage] : damage;
      if (move.timesUsed > 1 || move.hits > 1) {
 -        var origDefBoost = desc.defenseBoost;
 -        var origAtkBoost = desc.attackBoost;
@@ -21450,10 +21553,11 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
              usedItems = (0, util_1.checkMultihitBoost)(gen, attacker, defender, move, field, desc, usedItems[0], usedItems[1]);
 -            var newAt = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
 -            var newBp = calculateBasePowerADV(attacker, defender, move, desc);
-+            const newAt = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
-+            let newBp = calculateBasePowerADV(attacker, defender, move, desc, times + 1, mods);
-             newBp = calculateBPModsADV(attacker, move, desc, newBp);
+-            newBp = calculateBPModsADV(attacker, move, desc, newBp);
 -            var newBaseDmg = Math.floor(Math.floor((Math.floor((2 * lv) / 5 + 2) * newAt * newBp) / df) / 50);
++            const newAt = calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical);
++            let newBp = calculateBasePowerADV(attacker, defender, move, desc, times + 1, mods);
++            newBp = calculateBPModsADV(attacker, move, field, desc, newBp, hasAteAbilityTypeChange);
 +            let newBaseDmg = Math.floor(Math.floor((Math.floor((2 * lv) / 5 + 2) * newAt * newBp) / df) / 50);
              newBaseDmg = calculateFinalModsADV(newBaseDmg, attacker, move, field, desc, isCritical);
              newBaseDmg = Math.floor(newBaseDmg * type1Effectiveness);
@@ -21462,6 +21566,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
 -            for (var i = 85; i <= 100; i++) {
 -                var newFinalDamage = Math.max(1, Math.floor((newBaseDmg * i) / 100));
 -                damage_2[i - 85] = newFinalDamage;
++            newBaseDmg = calculateAbilityDamageModsADV(newBaseDmg, attacker, defender, move, field, desc, typeEffectiveness, times + 1);
 +            // note: damage[] was already defined, so to avoid hurting myself in my confusion, I renamed this lol --keith
 +            const damageArray = [];
 +            for (let i = 85; i <= 100; i++) {
@@ -21496,7 +21601,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
              bp = p <= 1 ? 200 : p <= 4 ? 150 : p <= 9 ? 100 : p <= 16 ? 80 : p <= 32 ? 40 : 20;
              desc.moveBP = bp;
              break;
-@@ -198,7 +185,7 @@ function calculateBasePowerADV(attacker, defender, move, desc, hit) {
+@@ -198,7 +276,7 @@ function calculateBasePowerADV(attacker, defender, move, desc, hit) {
              desc.moveBP = bp;
              break;
          case 'Low Kick':
@@ -21505,7 +21610,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
              bp = w >= 200 ? 120 : w >= 100 ? 100 : w >= 50 ? 80 : w >= 25 ? 60 : w >= 10 ? 40 : 20;
              desc.moveBP = bp;
              break;
-@@ -213,13 +200,18 @@ function calculateBasePowerADV(attacker, defender, move, desc, hit) {
+@@ -213,17 +291,22 @@ function calculateBasePowerADV(attacker, defender, move, desc, hit) {
              bp = 60;
              desc.moveName = 'Swift';
              break;
@@ -21528,10 +21633,39 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      return bp;
  }
  exports.calculateBasePowerADV = calculateBasePowerADV;
-@@ -232,15 +224,15 @@ function calculateBPModsADV(attacker, move, desc, basePower) {
+-function calculateBPModsADV(attacker, move, desc, basePower) {
++function calculateBPModsADV(attacker, move, field, desc, basePower, hasAteAbilityTypeChange = false) {
+     if (attacker.curHP() <= attacker.maxHP() / 3 &&
+         ((attacker.hasAbility('Overgrow') && move.hasType('Grass')) ||
+             (attacker.hasAbility('Blaze') && move.hasType('Fire')) ||
+@@ -232,15 +315,39 @@ function calculateBPModsADV(attacker, move, desc, basePower) {
          basePower = Math.floor(basePower * 1.5);
          desc.attackerAbility = attacker.ability;
      }
++    let abilityMod = 4096;
++    if (attacker.hasAbility('Technician') && basePower <= 60) {
++        abilityMod = 6144;
++    }
++    else if (hasAteAbilityTypeChange) {
++        abilityMod = 4915;
++    }
++    else if ((attacker.hasAbility('Sand Force') &&
++        field.hasWeather('Sand') && move.hasType('Rock', 'Ground', 'Steel')) ||
++        (attacker.hasAbility('Sheer Force') &&
++            (!!move.secondaries || SHEER_FORCE_MOVES_ADV.has(move.name))) ||
++        (attacker.hasAbility('Tough Claws') && !!move.flags.contact)) {
++        abilityMod = 5325;
++    }
++    else if ((attacker.hasAbility('Mega Launcher') &&
++        (!!move.flags.pulse || move.named('Water Pulse'))) ||
++        (attacker.hasAbility('Strong Jaw') &&
++            (!!move.flags.bite || STRONG_JAW_MOVES_ADV.has(move.name)))) {
++        abilityMod = 6144;
++    }
++    if (abilityMod !== 4096) {
++        basePower = (0, util_1.pokeRound)((basePower * abilityMod) / 4096);
++        desc.attackerAbility = attacker.ability;
++    }
 +    desc.moveBP = basePower;
      return basePower;
  }
@@ -21540,7 +21674,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
 -    if (isCritical === void 0) { isCritical = false; }
 -    var isPhysical = move.category === 'Physical';
 -    var attackStat = isPhysical ? 'atk' : 'spa';
-+function calculateAttackADV(gen, attacker, defender, move, desc, isCritical = false) {
++function calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical = false) {
 +    const isPhysical = move.category === 'Physical';
 +    const attackStat = move.overrideOffensiveStat || (isPhysical ? 'atk' : 'spa');
      desc.attackEVs = (0, util_1.getStatDescriptionText)(gen, attacker, attackStat);
@@ -21549,7 +21683,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (isPhysical && attacker.hasAbility('Huge Power', 'Pure Power')) {
          at *= 2;
          desc.attackerAbility = attacker.ability;
-@@ -274,7 +266,7 @@ function calculateAttackADV(gen, attacker, defender, move, desc, isCritical) {
+@@ -274,20 +381,25 @@ function calculateAttackADV(gen, attacker, defender, move, desc, isCritical) {
          at = Math.floor(at * 1.5);
          desc.attackerAbility = attacker.ability;
      }
@@ -21558,7 +21692,13 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (attackBoost > 0 || (!isCritical && attackBoost < 0)) {
          at = (0, util_1.getModifiedStat)(at, attackBoost);
          desc.attackBoost = attackBoost;
-@@ -282,12 +274,11 @@ function calculateAttackADV(gen, attacker, defender, move, desc, isCritical) {
+     }
++    if (!isPhysical &&
++        attacker.hasAbility('Solar Power') &&
++        field.hasWeather('Sun', 'Harsh Sunshine')) {
++        at = Math.floor(at * 1.5);
++        desc.attackerAbility = attacker.ability;
++    }
      return at;
  }
  exports.calculateAttackADV = calculateAttackADV;
@@ -21575,7 +21715,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (!isPhysical && defender.hasItem('Soul Dew') && defender.named('Latios', 'Latias')) {
          df = Math.floor(df * 1.5);
          desc.defenderItem = defender.item;
-@@ -304,7 +295,7 @@ function calculateDefenseADV(gen, defender, move, desc, isCritical) {
+@@ -304,7 +416,7 @@ function calculateDefenseADV(gen, defender, move, desc, isCritical) {
      if (move.named('Explosion', 'Self-Destruct')) {
          df = Math.floor(df / 2);
      }
@@ -21584,7 +21724,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
      if (defenseBoost < 0 || (!isCritical && defenseBoost > 0)) {
          df = (0, util_1.getModifiedStat)(df, defenseBoost);
          desc.defenseBoost = defenseBoost;
-@@ -312,15 +303,14 @@ function calculateDefenseADV(gen, defender, move, desc, isCritical) {
+@@ -312,15 +424,14 @@ function calculateDefenseADV(gen, defender, move, desc, isCritical) {
      return df;
  }
  exports.calculateDefenseADV = calculateDefenseADV;
@@ -21603,15 +21743,80 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..39c5c9e630decbad3b20e9d801b5ff92
          if (isPhysical && field.defenderSide.isReflect) {
              baseDamage = Math.floor(baseDamage * screenMultiplier);
              desc.isReflect = true;
-@@ -365,7 +355,7 @@ function calculateFinalModsADV(baseDamage, attacker, move, field, desc, isCritic
+@@ -333,16 +444,27 @@ function calculateFinalModsADV(baseDamage, attacker, move, field, desc, isCritic
+     if (field.gameType !== 'Singles' && move.target === 'allAdjacentFoes') {
+         baseDamage = Math.floor(baseDamage / 2);
+     }
+-    if ((field.hasWeather('Sun') && move.hasType('Fire')) ||
+-        (field.hasWeather('Rain') && move.hasType('Water'))) {
++    const isMegaSol = attacker.hasAbility('Mega Sol');
++    if (((isMegaSol || field.hasWeather('Sun', 'Harsh Sunshine')) && move.hasType('Fire')) ||
++        (!isMegaSol && field.hasWeather('Rain', 'Heavy Rain') && move.hasType('Water'))) {
+         baseDamage = Math.floor(baseDamage * 1.5);
+-        desc.weather = field.weather;
++        if (isMegaSol) {
++            desc.attackerAbility = attacker.ability;
++        }
++        else {
++            desc.weather = field.weather;
++        }
+     }
+-    else if ((field.hasWeather('Sun') && move.hasType('Water')) ||
+-        (field.hasWeather('Rain') && move.hasType('Fire')) ||
+-        (move.named('Solar Beam') && field.hasWeather('Rain', 'Sand', 'Hail'))) {
++    else if (((isMegaSol || field.hasWeather('Sun')) && move.hasType('Water')) ||
++        (!isMegaSol && field.hasWeather('Rain') && move.hasType('Fire')) ||
++        (!isMegaSol && move.named('Solar Beam') && field.hasWeather('Rain', 'Heavy Rain', 'Sand', 'Hail'))) {
+         baseDamage = Math.floor(baseDamage / 2);
+-        desc.weather = field.weather;
++        if (isMegaSol) {
++            desc.attackerAbility = attacker.ability;
++        }
++        else {
++            desc.weather = field.weather;
++        }
+     }
+     if (attacker.hasAbility('Flash Fire') && attacker.abilityOn && move.hasType('Fire')) {
+         baseDamage = Math.floor(baseDamage * 1.5);
+@@ -365,9 +487,34 @@ function calculateFinalModsADV(baseDamage, attacker, move, field, desc, isCritic
          baseDamage = Math.floor(baseDamage * 1.5);
          desc.isHelpingHand = true;
      }
 -    if (move.hasType.apply(move, __spreadArray([], __read(attacker.types), false))) {
+-        baseDamage = Math.floor(baseDamage * 1.5);
 +    if (move.hasType(...attacker.types)) {
-         baseDamage = Math.floor(baseDamage * 1.5);
++        baseDamage = attacker.hasAbility('Adaptability')
++            ? baseDamage * 2
++            : Math.floor(baseDamage * 1.5);
++        if (attacker.hasAbility('Adaptability')) {
++            desc.attackerAbility = attacker.ability;
++        }
      }
      return baseDamage;
+ }
+-//# sourceMappingURL=gen3.js.map
+\ No newline at end of file
++function calculateAbilityDamageModsADV(baseDamage, attacker, defender, move, field, desc, typeEffectiveness, hit = 1, isParentalBondChild = false) {
++    let modifier = 1;
++    if (defender.hasAbility('Filter') && typeEffectiveness > 1) {
++        modifier *= 0.75;
++        desc.defenderAbility = defender.ability;
++    }
++    const hazardsBreakMultiscale = !!field.defenderSide.spikes &&
++        !defender.hasType('Flying') &&
++        !defender.hasAbility('Levitate');
++    if (defender.hasAbility('Multiscale') &&
++        defender.curHP() === defender.maxHP() &&
++        hit === 1 &&
++        !hazardsBreakMultiscale) {
++        modifier *= 0.5;
++        desc.defenderAbility = defender.ability;
++    }
++    if (isParentalBondChild) {
++        modifier *= 0.25;
++    }
++    return modifier === 1 ? baseDamage : (0, util_1.pokeRound)(baseDamage * modifier);
++}
 diff --git a/dist/mechanics/gen3.js.map b/dist/mechanics/gen3.js.map
 index 71ffcab2770a369d4e4c38bd756cc4ef76255596..68f0d4920ffabad3b53695807e6e6c2ae9316047 100644
 --- a/dist/mechanics/gen3.js.map
@@ -39642,7 +39847,7 @@ index 77234ef760df9d23b4e526277cd7a3349cd62cfd..e6aa233ad4984ca10a7fcded166aa217
      if (gen.num === 2) { // in gen 2 damage is always rounded up to 1. TODO ADD TESTS
        damage[i - 217] = Math.max(1, Math.floor((baseDamage * i) / 255));
 diff --git a/src/mechanics/gen3.ts b/src/mechanics/gen3.ts
-index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f0bc4c944 100644
+index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb229d00297 100644
 --- a/src/mechanics/gen3.ts
 +++ b/src/mechanics/gen3.ts
 @@ -1,3 +1,4 @@
@@ -39650,7 +39855,40 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
  import type {Generation} from '../data/interface';
  import {getItemBoostType} from '../items';
  import type {RawDesc} from '../desc';
-@@ -22,7 +23,8 @@ export function calculateADV(
+@@ -15,14 +16,41 @@ import {
+   checkIntimidate,
+   checkMultihitBoost,
+   handleFixedDamageMoves,
++  pokeRound,
+ } from './util';
+
++// @smogon/calc's per-generation move data only adds these later-generation
++// mechanic flags when the games first consume them. The gen3mega server
++// backports the abilities, so retain the authoritative ADV move membership
++// here instead of relying solely on the absent flags.
++const SHEER_FORCE_MOVES_ADV = new Set([
++  'Acid', 'Ancient Power', 'Astonish', 'Aurora Beam', 'Bite', 'Blaze Kick',
++  'Blizzard', 'Body Slam', 'Bone Club', 'Bounce', 'Bubble', 'Bubble Beam',
++  'Confusion', 'Constrict', 'Crunch', 'Crush Claw', 'Dizzy Punch',
++  'Dragon Breath', 'Dynamic Punch', 'Ember', 'Extrasensory', 'Fake Out',
++  'Fire Blast', 'Fire Punch', 'Flame Wheel', 'Flamethrower', 'Headbutt',
++  'Heat Wave', 'Hyper Fang', 'Ice Beam', 'Ice Punch', 'Icy Wind', 'Iron Tail',
++  'Lick', 'Luster Purge', 'Metal Claw', 'Meteor Mash', 'Mist Ball', 'Mud Shot',
++  'Mud-Slap', 'Muddy Water', 'Needle Arm', 'Octazooka', 'Poison Fang',
++  'Poison Sting', 'Poison Tail', 'Powder Snow', 'Psybeam', 'Psychic',
++  'Rock Slide', 'Rock Smash', 'Rock Tomb', 'Rolling Kick', 'Sacred Fire',
++  'Secret Power', 'Shadow Ball', 'Signal Beam', 'Silver Wind', 'Sky Attack',
++  'Sludge', 'Sludge Bomb', 'Smog', 'Snore', 'Spark', 'Steel Wing', 'Stomp',
++  'Thunder', 'Thunder Punch', 'Thunder Shock', 'Thunderbolt', 'Tri Attack',
++  'Twineedle', 'Twister', 'Water Pulse', 'Zap Cannon',
++]);
++
++const STRONG_JAW_MOVES_ADV = new Set([
++  'Bite', 'Crunch', 'Hyper Fang', 'Poison Fang',
++]);
++
+ export function calculateADV(
+   gen: Generation,
    attacker: Pokemon,
    defender: Pokemon,
    move: Move,
@@ -39660,7 +39898,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
  ) {
    checkAirLock(attacker, field);
    checkAirLock(defender, field);
-@@ -39,9 +41,9 @@ export function calculateADV(
+@@ -39,9 +67,9 @@ export function calculateADV(
      defenderName: defender.name,
    };
  
@@ -39672,7 +39910,116 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
      return result;
    }
  
-@@ -143,7 +145,7 @@ export function calculateADV(
+@@ -57,10 +85,23 @@ export function calculateADV(
+     return result;
+   }
+
++  const defenderAbilityIgnored = defender.hasAbility(
++    'Battle Armor', 'Filter', 'Flash Fire', 'Levitate', 'Marvel Scale',
++    'Multiscale', 'Shell Armor', 'Soundproof', 'Thick Fat',
++    'Volt Absorb', 'Water Absorb', 'Wonder Guard'
++  );
++
++  if (attacker.hasAbility('Mold Breaker') && defenderAbilityIgnored) {
++    desc.attackerAbility = attacker.ability;
++    defender.ability = undefined;
++  }
++
++  const isMegaSol = attacker.hasAbility('Mega Sol');
++
+   if (move.named('Weather Ball')) {
+     move.type =
+-      field.hasWeather('Sun') ? 'Fire'
+-      : field.hasWeather('Rain') ? 'Water'
++      field.hasWeather('Sun', 'Harsh Sunshine') || isMegaSol ? 'Fire'
++      : field.hasWeather('Rain', 'Heavy Rain') ? 'Water'
+       : field.hasWeather('Sand') ? 'Rock'
+       : field.hasWeather('Hail') ? 'Ice'
+       : 'Normal';
+@@ -73,6 +114,51 @@ export function calculateADV(
+     field.defenderSide.isLightScreen = false;
+   }
+
++  let hasAteAbilityTypeChange = false;
++  const noAteTypeChange = move.named('Weather Ball', 'Struggle');
++
++  if (!noAteTypeChange && move.hasType('Normal')) {
++    if (attacker.hasAbility('Aerilate')) {
++      move.type = 'Flying';
++      hasAteAbilityTypeChange = true;
++    } else if (attacker.hasAbility('Dragonize')) {
++      move.type = 'Dragon';
++      hasAteAbilityTypeChange = true;
++    } else if (attacker.hasAbility('Refrigerate')) {
++      move.type = 'Ice';
++      hasAteAbilityTypeChange = true;
++    }
++
++    if (hasAteAbilityTypeChange) {
++      desc.attackerAbility = attacker.ability;
++      desc.moveType = move.type;
++    }
++  }
++
++  // ADV derives a damaging move's category from its type. This must happen after
++  // Aerilate/Refrigerate/Dragonize (and after Showdex's equivalent type override).
++  if (move.category !== 'Status' && !move.hasType('???')) {
++    const specialTypes = ['Fire', 'Water', 'Grass', 'Ice', 'Electric', 'Dark', 'Psychic', 'Dragon'];
++    const category = specialTypes.includes(move.type) ? 'Special' : 'Physical';
++
++    move.category = category;
++
++    if (move.overrideOffensiveStat === 'atk' || move.overrideOffensiveStat === 'spa') {
++      move.overrideOffensiveStat = category === 'Physical' ? 'atk' : 'spa';
++    }
++    if (move.overrideDefensiveStat === 'def' || move.overrideDefensiveStat === 'spd') {
++      move.overrideDefensiveStat = category === 'Physical' ? 'def' : 'spd';
++    }
++  }
++
++  if (
++    (field.hasWeather('Harsh Sunshine') && move.hasType('Water')) ||
++    (field.hasWeather('Heavy Rain') && move.hasType('Fire'))
++  ) {
++    desc.weather = field.weather;
++    return result;
++  }
++
+   const typeEffectivenessPrecedenceRules = [
+     'Normal',
+     'Fire',
+@@ -133,9 +219,29 @@ export function calculateADV(
+
+   desc.HPEVs = getStatDescriptionText(gen, defender, 'hp');
+
++  const isSpread = field.gameType !== 'Singles' &&
++    ['allAdjacent', 'allAdjacentFoes'].includes(move.target);
++  const isParentalBondBlockedMove = move.named(
++    'Bounce', 'Dig', 'Dive', 'Doom Desire', 'Endeavor', 'Explosion',
++    'Fly', 'Future Sight', 'Ice Ball', 'Razor Wind', 'Rollout',
++    'Self-Destruct', 'Skull Bash', 'Sky Attack', 'Solar Beam',
++  );
++  const canParentalBond =
++    attacker.hasAbility('Parental Bond') &&
++    move.hits === 1 &&
++    !isSpread &&
++    !isParentalBondBlockedMove &&
++    !move.isZ &&
++    !move.isMax;
++
+   const fixedDamage = handleFixedDamageMoves(attacker, move);
+   if (fixedDamage) {
+-    result.damage = fixedDamage;
++    result.damage = canParentalBond ? [fixedDamage, fixedDamage] : fixedDamage;
++
++    if (canParentalBond) {
++      desc.attackerAbility = attacker.ability;
++    }
++
+     return result;
+   }
+
+@@ -143,29 +249,68 @@ export function calculateADV(
      desc.hits = move.hits;
    }
  
@@ -39681,7 +40028,13 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
  
    if (bp === 0) {
      return result;
-@@ -155,13 +157,18 @@ export function calculateADV(
+   }
+-  bp = calculateBPModsADV(attacker, move, desc, bp);
++  bp = calculateBPModsADV(attacker, move, field, desc, bp, hasAteAbilityTypeChange);
+
+   const isCritical = move.isCrit && !defender.hasAbility('Battle Armor', 'Shell Armor');
+-  const at = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
++  const at = calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical);
    const df = calculateDefenseADV(gen, defender, move, desc, isCritical);
  
    const lv = attacker.level;
@@ -39698,11 +40051,50 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
    baseDamage = Math.floor(baseDamage * type1Effectiveness);
    baseDamage = Math.floor(baseDamage * type2Effectiveness);
 -  const damage = [];
++  const unmodifiedAbilityDamage = baseDamage;
++  baseDamage = calculateAbilityDamageModsADV(
++    baseDamage,
++    attacker,
++    defender,
++    move,
++    field,
++    desc,
++    typeEffectiveness,
++  );
 +  const damage: number[] = [];
    for (let i = 85; i <= 100; i++) {
      damage[i - 85] = Math.max(1, Math.floor((baseDamage * i) / 100));
    }
-@@ -179,12 +186,13 @@ export function calculateADV(
+-  result.damage = damage;
++
++  let childDamage: number[] | undefined;
++
++  if (canParentalBond) {
++    const childBaseDamage = calculateAbilityDamageModsADV(
++      unmodifiedAbilityDamage,
++      attacker,
++      defender,
++      move,
++      field,
++      desc,
++      typeEffectiveness,
++      2,
++      true,
++    );
++    childDamage = [];
++
++    for (let i = 85; i <= 100; i++) {
++      childDamage[i - 85] = Math.max(1, Math.floor((childBaseDamage * i) / 100));
++    }
++
++    desc.attackerAbility = attacker.ability;
++  }
++
++  result.damage = childDamage ? [damage, childDamage] : damage;
+
+   if (move.timesUsed! > 1 || move.hits > 1) {
+     // store boosts so intermediate boosts don't show.
+@@ -179,28 +324,44 @@ export function calculateADV(
        numAttacks = move.hits;
      }
      let usedItems = [false, false];
@@ -39711,15 +40103,28 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
      for (let times = 1; times < numAttacks; times++) {
        usedItems = checkMultihitBoost(gen, attacker, defender, move,
          field, desc, usedItems[0], usedItems[1]);
-       const newAt = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
+-      const newAt = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
 -      let newBp = calculateBasePowerADV(attacker, defender, move, desc);
+-      newBp = calculateBPModsADV(attacker, move, desc, newBp);
++      const newAt = calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical);
 +      let newBp = calculateBasePowerADV(attacker, defender, move, desc, times + 1, mods);
-       newBp = calculateBPModsADV(attacker, move, desc, newBp);
++      newBp = calculateBPModsADV(attacker, move, field, desc, newBp, hasAteAbilityTypeChange);
        let newBaseDmg = Math.floor(
          Math.floor((Math.floor((2 * lv) / 5 + 2) * newAt * newBp) / df) / 50
-@@ -193,14 +201,19 @@ export function calculateADV(
+       );
+       newBaseDmg = calculateFinalModsADV(newBaseDmg, attacker, move, field, desc, isCritical);
        newBaseDmg = Math.floor(newBaseDmg * type1Effectiveness);
        newBaseDmg = Math.floor(newBaseDmg * type2Effectiveness);
++      newBaseDmg = calculateAbilityDamageModsADV(
++        newBaseDmg,
++        attacker,
++        defender,
++        move,
++        field,
++        desc,
++        typeEffectiveness,
++        times + 1,
++      );
  
 -      const damage = [];
 +      // note: damage[] was already defined, so to avoid hurting myself in my confusion, I renamed this lol --keith
@@ -39740,7 +40145,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
      desc.defenseBoost = origDefBoost;
      desc.attackBoost = origAtkBoost;
    }
-@@ -214,6 +227,7 @@ export function calculateBasePowerADV(
+@@ -214,6 +375,7 @@ export function calculateBasePowerADV(
    move: Move,
    desc: RawDesc,
    hit = 1,
@@ -39748,7 +40153,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
  ) {
    let bp = move.bp;
    switch (move.name) {
-@@ -244,13 +258,18 @@ export function calculateBasePowerADV(
+@@ -244,21 +406,28 @@ export function calculateBasePowerADV(
      bp = 60;
      desc.moveName = 'Swift';
      break;
@@ -39771,15 +40176,59 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
    return bp;
  }
  
-@@ -269,6 +288,7 @@ export function calculateBPModsADV(
+ export function calculateBPModsADV(
+   attacker: Pokemon,
+   move: Move,
++  field: Field,
+   desc: RawDesc,
+   basePower: number,
++  hasAteAbilityTypeChange = false,
+ ) {
+   if (attacker.curHP() <= attacker.maxHP() / 3 &&
+     ((attacker.hasAbility('Overgrow') && move.hasType('Grass')) ||
+@@ -269,6 +438,36 @@ export function calculateBPModsADV(
      basePower = Math.floor(basePower * 1.5);
      desc.attackerAbility = attacker.ability;
    }
++
++  let abilityMod = 4096;
++
++  if (attacker.hasAbility('Technician') && basePower <= 60) {
++    abilityMod = 6144;
++  } else if (hasAteAbilityTypeChange) {
++    abilityMod = 4915;
++  } else if (
++    (attacker.hasAbility('Sand Force') &&
++      field.hasWeather('Sand') && move.hasType('Rock', 'Ground', 'Steel')) ||
++    (attacker.hasAbility('Sheer Force') &&
++      (!!move.secondaries || SHEER_FORCE_MOVES_ADV.has(move.name))) ||
++    (attacker.hasAbility('Tough Claws') && !!move.flags.contact)
++  ) {
++    abilityMod = 5325;
++  } else if (
++    (attacker.hasAbility('Mega Launcher') &&
++      (!!move.flags.pulse || move.named('Water Pulse'))) ||
++    (attacker.hasAbility('Strong Jaw') &&
++      (!!move.flags.bite || STRONG_JAW_MOVES_ADV.has(move.name)))
++  ) {
++    abilityMod = 6144;
++  }
++
++  if (abilityMod !== 4096) {
++    basePower = pokeRound((basePower * abilityMod) / 4096);
++    desc.attackerAbility = attacker.ability;
++  }
++
 +  desc.moveBP = basePower;
    return basePower;
  }
  
-@@ -281,7 +301,7 @@ export function calculateAttackADV(
+@@ -277,11 +476,12 @@ export function calculateAttackADV(
+   attacker: Pokemon,
+   defender: Pokemon,
+   move: Move,
++  field: Field,
+   desc: RawDesc,
    isCritical = false
  ) {
    const isPhysical = move.category === 'Physical';
@@ -39788,7 +40237,22 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
    desc.attackEVs = getStatDescriptionText(gen, attacker, attackStat);
  
    let at = attacker.rawStats[attackStat];
-@@ -341,7 +361,7 @@ export function calculateDefenseADV(
+@@ -330,6 +530,14 @@ export function calculateAttackADV(
+     at = getModifiedStat(at, attackBoost);
+     desc.attackBoost = attackBoost;
+   }
++
++  if (!isPhysical &&
++      attacker.hasAbility('Solar Power') &&
++      field.hasWeather('Sun', 'Harsh Sunshine')) {
++    at = Math.floor(at * 1.5);
++    desc.attackerAbility = attacker.ability;
++  }
++
+   return at;
+ }
+
+@@ -341,7 +549,7 @@ export function calculateDefenseADV(
    isCritical = false
  ) {
    const isPhysical = move.category === 'Physical';
@@ -39797,6 +40261,97 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..f666850fed34408e940c02aed053306f
    desc.defenseEVs = getStatDescriptionText(gen, defender, defenseStat);
  
    let df = defender.rawStats[defenseStat];
+@@ -403,17 +611,29 @@ function calculateFinalModsADV(
+     baseDamage = Math.floor(baseDamage / 2);
+   }
+
+-  if ((field.hasWeather('Sun') && move.hasType('Fire')) ||
+-      (field.hasWeather('Rain') && move.hasType('Water'))) {
++  const isMegaSol = attacker.hasAbility('Mega Sol');
++
++  if (
++    ((isMegaSol || field.hasWeather('Sun', 'Harsh Sunshine')) && move.hasType('Fire')) ||
++    (!isMegaSol && field.hasWeather('Rain', 'Heavy Rain') && move.hasType('Water'))
++  ) {
+     baseDamage = Math.floor(baseDamage * 1.5);
+-    desc.weather = field.weather;
++    if (isMegaSol) {
++      desc.attackerAbility = attacker.ability;
++    } else {
++      desc.weather = field.weather;
++    }
+   } else if (
+-    (field.hasWeather('Sun') && move.hasType('Water')) ||
+-    (field.hasWeather('Rain') && move.hasType('Fire')) ||
+-    (move.named('Solar Beam') && field.hasWeather('Rain', 'Sand', 'Hail'))
++    ((isMegaSol || field.hasWeather('Sun')) && move.hasType('Water')) ||
++    (!isMegaSol && field.hasWeather('Rain') && move.hasType('Fire')) ||
++    (!isMegaSol && move.named('Solar Beam') && field.hasWeather('Rain', 'Heavy Rain', 'Sand', 'Hail'))
+   ) {
+     baseDamage = Math.floor(baseDamage / 2);
+-    desc.weather = field.weather;
++    if (isMegaSol) {
++      desc.attackerAbility = attacker.ability;
++    } else {
++      desc.weather = field.weather;
++    }
+   }
+
+   if (attacker.hasAbility('Flash Fire') && attacker.abilityOn && move.hasType('Fire')) {
+@@ -443,7 +663,52 @@ function calculateFinalModsADV(
+   }
+
+   if (move.hasType(...attacker.types)) {
+-    baseDamage = Math.floor(baseDamage * 1.5);
++    baseDamage = attacker.hasAbility('Adaptability')
++      ? baseDamage * 2
++      : Math.floor(baseDamage * 1.5);
++
++    if (attacker.hasAbility('Adaptability')) {
++      desc.attackerAbility = attacker.ability;
++    }
+   }
+   return baseDamage;
+ }
++
++function calculateAbilityDamageModsADV(
++  baseDamage: number,
++  attacker: Pokemon,
++  defender: Pokemon,
++  move: Move,
++  field: Field,
++  desc: RawDesc,
++  typeEffectiveness: number,
++  hit = 1,
++  isParentalBondChild = false,
++) {
++  let modifier = 1;
++
++  if (defender.hasAbility('Filter') && typeEffectiveness > 1) {
++    modifier *= 0.75;
++    desc.defenderAbility = defender.ability;
++  }
++
++  const hazardsBreakMultiscale = !!field.defenderSide.spikes &&
++    !defender.hasType('Flying') &&
++    !defender.hasAbility('Levitate');
++
++  if (
++    defender.hasAbility('Multiscale') &&
++    defender.curHP() === defender.maxHP() &&
++    hit === 1 &&
++    !hazardsBreakMultiscale
++  ) {
++    modifier *= 0.5;
++    desc.defenderAbility = defender.ability;
++  }
++
++  if (isParentalBondChild) {
++    modifier *= 0.25;
++  }
++
++  return modifier === 1 ? baseDamage : pokeRound(baseDamage * modifier);
++}
 diff --git a/src/mechanics/gen4.ts b/src/mechanics/gen4.ts
 index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011ce371407 100644
 --- a/src/mechanics/gen4.ts

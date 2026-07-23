@@ -156,6 +156,20 @@ export const calcMoveBasePower = (
     // 4 of the 5 skinning abilities modify any Normal type moves, while the last one, Normalize, modifies all moves to
     // become Normal type, which is what you'd expect... just kinda annoying to implement lmao
     if (moveType === 'Normal') {
+      const shouldBoostGen3MegaSkin = gen === 3
+        && (['Aerilate', 'Dragonize', 'Refrigerate'] as AbilityName[]).includes(ability)
+        && !hiddenPowerMove
+        && !isZ
+        && !PokemonDenormalizedMoves.includes(move)
+        && move !== 'Struggle' as MoveName;
+
+      if (shouldBoostGen3MegaSkin) {
+        // The gen3mega server pins these abilities to 4915/4096. Apply the
+        // same half-down fixed-point rounding before passing the BP override
+        // into @smogon/calc, which receives Showdex's already-changed type.
+        basePower = Math.floor(((basePower * 4915) + 2047) / 4096);
+      }
+
       // these abilities were introduced in gen 6
       if ((['Aerilate', 'Pixilate', 'Refrigerate'] as AbilityName[]).includes(ability) && gen > 5) {
         // note: in gen 6 (X/Y), it's a 30% boost; after in gens 7+, it got nerfed to 20%

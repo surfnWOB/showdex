@@ -133,6 +133,7 @@ export const PokemonToggleAbilities: Record<GameType, AbilityName[]> = {
  */
 export const PokemonMoveSkinAbilities: Record<AbilityName, Showdown.TypeName> = {
   Aerilate: 'Flying',
+  Dragonize: 'Dragon',
   Galvanize: 'Electric',
   Normalize: 'Normal',
   Pixilate: 'Fairy',
