@@ -5,10 +5,14 @@
  */
 
 import { type GenerationNum } from '@smogon/calc';
-import { PokemonPresetFuckedBaseFormes, PokemonPresetFuckedBattleFormes } from '@showdex/consts/dex';
+import {
+  PokemonPresetFuckedBaseFormes,
+  PokemonPresetFuckedBattleFormes,
+} from '@showdex/consts/dex/formes';
 import { type CalcdexPokemonPresetSource } from '@showdex/interfaces/calc';
-import { formatId } from '@showdex/utils/core';
-import { getDexForFormat, hasMegaForme } from '@showdex/utils/dex';
+import { formatId } from '@showdex/utils/core/formatId';
+import { getDexForFormat } from '@showdex/utils/dex/getDexForFormat';
+import { hasMegaForme } from '@showdex/utils/dex/hasMegaForme';
 
 /**
  * Returns an array of possible formes for the provided `speciesForme` that the `speciesFormes` of each
@@ -112,6 +116,7 @@ export const getPresetFormes = (
     cosmeticFormes,
     otherFormes,
     isMega,
+    isPrimal,
     canGigantamax,
   } = dexSpecies;
 
@@ -137,12 +142,16 @@ export const getPresetFormes = (
     output.push(...cosmeticFormes);
   }
 
-  // check for Mega formes
+  // Mega and Primal formes are represented as separate Random Battle preset
+  // entries, but the battle starts from their shared base species.
   if (!ignoreMega && otherFormes?.length) {
-    const megaFormes = otherFormes.filter((f) => hasMegaForme(f));
+    const transformationFormes = otherFormes.filter((forme) => (
+      hasMegaForme(forme)
+      || dex.species.get(forme)?.isPrimal
+    ));
 
-    if (megaFormes.length) {
-      output.push(...megaFormes);
+    if (transformationFormes.length) {
+      output.push(...transformationFormes);
     }
   }
 
@@ -167,7 +176,10 @@ export const getPresetFormes = (
   }
 
   // e.g., name = 'Poltchageist-Artisan', baseSpecies = 'Poltchageist' -> includes('Poltchageist') = true
-  if (name !== baseSpecies && (isMega || PokemonPresetFuckedBaseFormes.includes(baseSpecies))) {
+  if (
+    name !== baseSpecies
+    && (isMega || isPrimal || PokemonPresetFuckedBaseFormes.includes(baseSpecies))
+  ) {
     output.push(baseSpecies);
   }
 
