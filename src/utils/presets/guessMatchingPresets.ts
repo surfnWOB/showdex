@@ -1,16 +1,15 @@
 import { type AbilityName } from '@smogon/calc';
 import { type CalcdexPokemon, type CalcdexPokemonPreset } from '@showdex/interfaces/calc';
-import { replaceBehemothMoves } from '@showdex/utils/battle';
-import { dedupeArray } from '@showdex/utils/core';
-import { logger } from '@showdex/utils/debug';
-import {
-  detectGenFromFormat,
-  detectLegacyGen,
-  getGenfulFormat,
-  isMegaStone,
-} from '@showdex/utils/dex';
+import { replaceBehemothMoves } from '@showdex/utils/battle/replaceBehemothMoves';
+import { dedupeArray } from '@showdex/utils/core/dedupeArray';
+import { logger } from '@showdex/utils/debug/logger';
+import { detectGenFromFormat } from '@showdex/utils/dex/detectGenFromFormat';
+import { detectLegacyGen } from '@showdex/utils/dex/detectLegacyGen';
+import { getGenfulFormat } from '@showdex/utils/dex/getGenfulFormat';
+import { isTransformationItem } from '@showdex/utils/dex/isTransformationItem';
 import { flattenAlts } from './flattenAlts';
 import { findMatchingUsage } from './findMatchingUsage';
+import { prioritizeMatchingLevelPresets } from './prioritizeMatchingLevelPresets';
 
 const l = logger('@showdex/utils/presets/guessMatchingPresets()');
 
@@ -84,7 +83,15 @@ export const guessMatchingPresets = (
     // '\n', 'guessedMoves[]', guessedMoves,
   );
 
-  const matched = presets.filter((preset) => {
+  // Random Battle levels are public information and can distinguish a base
+  // set from its Mega/Primal candidate before the transformation is revealed.
+  // Fall back to the full pool when no preset has that level (for example,
+  // Zoroark's Illusion level or a custom Adjust Level challenge).
+  const candidatePresets = randoms
+    ? prioritizeMatchingLevelPresets(presets, pokemon.level)
+    : presets;
+
+  const matched = candidatePresets.filter((preset) => {
     const matchingUsage = findMatchingUsage(usages, preset);
     const guaranteedMoves = ((matchingUsage?.altMoves as typeof usageMoves) || usageMoves || []).filter((m) => m?.[1] === 1).map((m) => m[0]);
     const guessedMoves = replaceBehemothMoves(preset.speciesForme, dedupeArray([...revealedSourceMoves, ...guaranteedMoves]));
@@ -115,10 +122,10 @@ export const guessMatchingPresets = (
       || !preset.teraTypes?.length
       || preset.teraTypes.includes(revealedTeraType);
 
-    // like itemsMatch (below), the ability isn't reliably role-discriminative in Randoms — and mega formes
-    // guarantee a mismatch: the preset lists the POST-mega ability (e.g. Venusaur-Mega "Thick Fat") while the
-    // battle still reveals the BASE ability (Chlorophyll/Overgrow), so a mismatched ability must NOT reject an
-    // otherwise move-matching role. let the revealed MOVES discriminate; abilities only gate non-Randoms.
+    // like itemsMatch (below), the ability isn't reliably role-discriminative in Randoms. Battle-only-form
+    // presets retain the generated starting ability, while the live Pokemon reports its transformed ability,
+    // so a mismatch must not reject an otherwise move-matching role. Let revealed moves discriminate;
+    // abilities only gate non-Randoms.
     const abilitiesMatch = randoms
       || !revealedAbility
       || (currentForme.startsWith('Terapagos') && preset.speciesForme === 'Terapagos' && preset.ability === 'Tera Shift' as AbilityName)
@@ -130,10 +137,9 @@ export const guessMatchingPresets = (
     // in Randoms the item is usually a sampled, NON-discriminative drop (e.g. Samurott reveals Aqua Jet -> only
     // "Setup Sweeper" has it, but it also rolled a Life Orb that neither role lists), so a mismatched item must
     // NOT reject an otherwise move-matching role -- let the revealed MOVES discriminate.
-    // EXCEPTION: a Mega stone IS the discriminator between a mon's base & mega roles (e.g. Abomasnow &
-    // Abomasnow-Mega both roll "Bulky Support" w/ the same moves; only the revealed Abomasite tells them apart),
-    // so when the revealed item is a Mega stone, keep gating even in Randoms.
-    const itemsMatch = (randoms && !isMegaStone(revealedItem)) || itemMatched;
+    // EXCEPTION: a transformation item IS the discriminator between a mon's base & Mega/Primal roles (e.g.
+    // Abomasnow-Mega's Abomasite or Kyogre-Primal's Blue Orb), so keep gating those items even in Randoms.
+    const itemsMatch = (randoms && !isTransformationItem(revealedItem)) || itemMatched;
 
     l.debug(
       'Result for preset', preset.calcdexId, preset.name, 'for', preset.speciesForme,

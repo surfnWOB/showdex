@@ -1,5 +1,5 @@
 import { type CalcdexPokemon, type CalcdexPokemonPreset } from '@showdex/interfaces/calc';
-import { replaceBehemothMoves } from '@showdex/utils/battle';
+import { replaceBehemothMoves } from '@showdex/utils/battle/replaceBehemothMoves';
 import { flattenAlts } from './flattenAlts';
 
 /**

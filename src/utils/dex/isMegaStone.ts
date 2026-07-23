@@ -1,4 +1,4 @@
-import { formatId } from '@showdex/utils/core';
+import { formatId } from '@showdex/utils/core/formatId';
 
 /**
  * Whether the given `item` is a Mega stone.
