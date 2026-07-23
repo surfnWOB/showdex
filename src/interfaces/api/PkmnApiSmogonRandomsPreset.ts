@@ -67,7 +67,7 @@ export interface PkmnApiSmogonRandomsPreset {
     [roleName: string]: {
       abilities: AbilityName[];
       items: ItemName[];
-      teraTypes: Showdown.TypeName[];
+      teraTypes?: Showdown.TypeName[];
       moves: MoveName[];
       ivs?: Showdown.StatsTable;
       evs?: Showdown.StatsTable;

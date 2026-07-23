@@ -20,8 +20,10 @@ export interface PkmnApiSmogonRandomsStats {
       weight: number;
       abilities?: { [name: AbilityName]: number; };
       items?: { [name: ItemName]: number; };
-      teraTypes: Record<Showdown.TypeName, number>;
+      teraTypes?: Record<Showdown.TypeName, number>;
       moves: { [name: MoveName]: number; };
+      ivs?: Showdown.StatsTable;
+      evs?: Showdown.StatsTable;
     };
   };
 }

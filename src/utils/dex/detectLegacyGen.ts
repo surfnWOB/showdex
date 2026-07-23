@@ -1,5 +1,5 @@
 import { type GenerationNum } from '@smogon/calc';
-import { env } from '@showdex/utils/core';
+import { env } from '@showdex/utils/core/getEnv';
 import { detectGenFromFormat } from './detectGenFromFormat';
 
 /**

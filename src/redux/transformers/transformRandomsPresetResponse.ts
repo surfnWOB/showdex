@@ -1,9 +1,10 @@
 import { type PkmnApiSmogonPresetRequest, type PkmnApiSmogonRandomsPresetResponse } from '@showdex/interfaces/api';
 import { type CalcdexPokemonPreset } from '@showdex/interfaces/calc';
-import { calcPresetCalcdexId, populateStatsTable } from '@showdex/utils/calc';
-import { nonEmptyObject } from '@showdex/utils/core';
+import { calcPresetCalcdexId } from '@showdex/utils/calc/calcCalcdexId';
+import { populateStatsTable } from '@showdex/utils/calc/populateStatsTable';
+import { nonEmptyObject } from '@showdex/utils/core/nonEmptyObject';
 // import { logger } from '@showdex/utils/debug';
-import { detectLegacyGen, getGenlessFormat } from '@showdex/utils/dex';
+import { getGenlessFormat } from '@showdex/utils/dex/getGenlessFormat';
 
 // const l = logger('@showdex/redux/transformers/transformRandomsPresetResponse()');
 
@@ -27,7 +28,6 @@ export const transformRandomsPresetResponse = (
   }
 
   const format = args.format || `gen${args.gen}randombattle`;
-  const legacy = detectLegacyGen(args.gen);
 
   // this will be our final return value
   const output: CalcdexPokemonPreset[] = [];
@@ -131,9 +131,10 @@ export const transformRandomsPresetResponse = (
         rolePreset.moves = roleMoves.slice(0, 4);
         rolePreset.altMoves = [...roleMoves];
 
-        // update (2023/01/28): adding support for role-specific EVs/IVs, but for also when Pre eventually
-        // moves the EVs/IVs into each role instead of in the parent (only for Gen 9 Randoms btw)
-        if (!legacy && nonEmptyObject(roleEvs)) {
+        // Role-specific EVs are present in older Random Battle feeds too. In
+        // particular, Gen 3 roles can differ between 0 and 85 Attack EVs, so
+        // ignoring this field produces incorrect opponent stats.
+        if (nonEmptyObject(roleEvs)) {
           rolePreset.evs = populateStatsTable(roleEvs, { spread: 'ev', format });
         }
 

@@ -1,7 +1,8 @@
 import { type GenerationNum } from '@smogon/calc';
 import { PokemonStatNames } from '@showdex/consts/dex';
-import { clamp, nonEmptyObject } from '@showdex/utils/core';
-import { getDefaultSpreadValue } from '@showdex/utils/dex';
+import { clamp } from '@showdex/utils/core/clamp';
+import { nonEmptyObject } from '@showdex/utils/core/nonEmptyObject';
+import { getDefaultSpreadValue } from '@showdex/utils/dex/getDefaultSpreadValue';
 
 /**
  * Parses the provided `stats` & builds a fully populated `Showdown.StatsTable`.

@@ -1,10 +1,12 @@
 import { type PkmnApiSmogonPresetRequest, type PkmnApiSmogonRandomsStatsResponse } from '@showdex/interfaces/api';
 import { type CalcdexPokemonPreset } from '@showdex/interfaces/calc';
-import { calcPresetCalcdexId, populateStatsTable } from '@showdex/utils/calc';
-import { nonEmptyObject } from '@showdex/utils/core';
+import { calcPresetCalcdexId } from '@showdex/utils/calc/calcCalcdexId';
+import { populateStatsTable } from '@showdex/utils/calc/populateStatsTable';
+import { nonEmptyObject } from '@showdex/utils/core/nonEmptyObject';
 // import { logger } from '@showdex/utils/debug';
-import { getGenlessFormat } from '@showdex/utils/dex';
-import { flattenAlts, processUsageAlts } from '@showdex/utils/presets';
+import { getGenlessFormat } from '@showdex/utils/dex/getGenlessFormat';
+import { flattenAlts } from '@showdex/utils/presets/flattenAlts';
+import { processUsageAlts } from '@showdex/utils/presets/processUsageAlts';
 
 // const l = logger('@showdex/redux/transformers/transformRandomsStatsResponse()');
 
@@ -96,6 +98,8 @@ export const transformRandomsStatsResponse = (
           items: roleItems,
           teraTypes,
           moves: roleMoves,
+          evs: roleEvs,
+          ivs: roleIvs,
         } = roleStats;
 
         if (roleName) {
@@ -136,6 +140,14 @@ export const transformRandomsStatsResponse = (
          * @todo Needs to be updated once we support more than 4 moves.
          */
         rolePreset.moves = flattenAlts(rolePreset.altMoves.slice(0, 4));
+
+        if (nonEmptyObject(roleEvs)) {
+          rolePreset.evs = populateStatsTable(roleEvs, { spread: 'ev', format });
+        }
+
+        if (nonEmptyObject(roleIvs)) {
+          rolePreset.ivs = populateStatsTable(roleIvs, { spread: 'iv', format });
+        }
 
         rolePreset.calcdexId = calcPresetCalcdexId(rolePreset);
         rolePreset.id = rolePreset.calcdexId;
