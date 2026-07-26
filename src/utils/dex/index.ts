@@ -30,6 +30,7 @@ export * from './guessTableFormatSlice';
 export * from './hasMegaForme';
 export * from './hasNickname';
 export * from './legalLockedFormat';
+export * from './modifyBaseStatsForFormat';
 export * from './notFullyEvolved';
 export * from './parseBattleFormat';
 export * from './shouldIgnoreItem';

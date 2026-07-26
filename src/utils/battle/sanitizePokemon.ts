@@ -9,7 +9,12 @@ import {
   nonEmptyObject,
   similarArrays,
 } from '@showdex/utils/core';
-import { detectGenFromFormat, detectLegacyGen, getDexForFormat } from '@showdex/utils/dex';
+import {
+  detectGenFromFormat,
+  detectLegacyGen,
+  getDexForFormat,
+  modifyBaseStatsForFormat,
+} from '@showdex/utils/dex';
 import { flattenAlts } from '@showdex/utils/presets';
 import { detectPlayerKeyFromPokemon } from './detectPlayerKey';
 import { detectPokemonIdent } from './detectPokemonIdent';
@@ -242,7 +247,9 @@ export const sanitizePokemon = <
   const species = dex.species.get(sanitizedPokemon.speciesForme);
 
   // don't really care if species is falsy here
-  sanitizedPokemon.baseStats = { ...species?.baseStats };
+  sanitizedPokemon.baseStats = species?.baseStats
+    ? modifyBaseStatsForFormat(species.baseStats, format)
+    : {};
   sanitizedPokemon.dmaxable = !species?.cannotDynamax;
 
   // grab the base species forme to obtain its other formes
@@ -347,7 +354,7 @@ export const sanitizePokemon = <
   }
 
   if (nonEmptyObject(transformedSpecies?.baseStats)) {
-    sanitizedPokemon.transformedBaseStats = { ...transformedSpecies.baseStats };
+    sanitizedPokemon.transformedBaseStats = modifyBaseStatsForFormat(transformedSpecies.baseStats, format);
 
     // Transform ability doesn't copy the base HP stat
     // (uses the original Pokemon's base HP stat)
