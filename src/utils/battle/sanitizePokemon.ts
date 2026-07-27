@@ -247,8 +247,10 @@ export const sanitizePokemon = <
   const species = dex.species.get(sanitizedPokemon.speciesForme);
 
   // don't really care if species is falsy here
+  // format-level base-stat mods (Bad 'n Boosted, Tier Shift) are server rules, not
+  // Dex data — apply them here so Calcdex matches battle / teambuilder numbers
   sanitizedPokemon.baseStats = species?.baseStats
-    ? modifyBaseStatsForFormat(species.baseStats, format)
+    ? modifyBaseStatsForFormat(species.baseStats, format, species)
     : {};
   sanitizedPokemon.dmaxable = !species?.cannotDynamax;
 
@@ -354,7 +356,11 @@ export const sanitizePokemon = <
   }
 
   if (nonEmptyObject(transformedSpecies?.baseStats)) {
-    sanitizedPokemon.transformedBaseStats = modifyBaseStatsForFormat(transformedSpecies.baseStats, format);
+    sanitizedPokemon.transformedBaseStats = modifyBaseStatsForFormat(
+      transformedSpecies.baseStats,
+      format,
+      transformedSpecies,
+    );
 
     // Transform ability doesn't copy the base HP stat
     // (uses the original Pokemon's base HP stat)
