@@ -59,7 +59,13 @@ const calculateMove = (
 );
 
 describe('Gen 3 Mega damage abilities', () => {
+  it('Sharpness leaves non-slicing moves unchanged', () => {
+    expect(calculateMove('Sharpness', 'Tackle').damage).toEqual(calculateMove('Pressure', 'Tackle').damage);
+  });
+
   it.each([
+    ['Sharpness', 'Slash', undefined, 105],
+    ['Sharpness', 'Aerial Ace', undefined, 90],
     ['Tough Claws', 'Double-Edge', undefined, 156],
     ['Strong Jaw', 'Crunch', undefined, 120],
     ['Sheer Force', 'Fire Blast', undefined, 156],

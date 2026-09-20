@@ -21643,7 +21643,7 @@ index ea2a1345d3014e261e3bc950e922a454b2b7102e..6439fe11d9bfd8c52d3d41b9438c8ab3
          desc.attackerAbility = attacker.ability;
      }
 +    let abilityMod = 4096;
-+    if (attacker.hasAbility('Technician') && basePower <= 60) {
++    if ((attacker.hasAbility('Technician') && basePower <= 60) || (attacker.hasAbility('Sharpness') && (!!move.flags.slicing || move.named('Fury Cutter', 'Leaf Blade', 'Air Cutter', 'Cut', 'Aerial Ace', 'Razor Leaf', 'Slash')))) {
 +        abilityMod = 6144;
 +    }
 +    else if (hasAteAbilityTypeChange) {
@@ -40193,7 +40193,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +
 +  let abilityMod = 4096;
 +
-+  if (attacker.hasAbility('Technician') && basePower <= 60) {
++  if ((attacker.hasAbility('Technician') && basePower <= 60) || (attacker.hasAbility('Sharpness') && (!!move.flags.slicing || move.named('Fury Cutter', 'Leaf Blade', 'Air Cutter', 'Cut', 'Aerial Ace', 'Razor Leaf', 'Slash')))) {
 +    abilityMod = 6144;
 +  } else if (hasAteAbilityTypeChange) {
 +    abilityMod = 4915;
