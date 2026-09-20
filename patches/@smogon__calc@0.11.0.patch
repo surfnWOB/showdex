@@ -21267,7 +21267,7 @@ index 5d5ffce5a11e64256d4a17d43a0444d710750cd7..1be25cb91945caf9c17517b82b046dac
 +export declare function calculateAttackADV(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field, desc: RawDesc, isCritical?: boolean): number;
  export declare function calculateDefenseADV(gen: Generation, defender: Pokemon, move: Move, desc: RawDesc, isCritical?: boolean): number;
 diff --git a/dist/mechanics/gen3.js b/dist/mechanics/gen3.js
-index ea2a1345d3014e261e3bc950e922a454b2b7102e..6439fe11d9bfd8c52d3d41b9438c8ab31b63df04 100644
+index ea2a1345d3014e261e3bc950e922a454b2b7102e..ab356c87045140b476d46d2316fc313fe06d13e0 100644
 --- a/dist/mechanics/gen3.js
 +++ b/dist/mechanics/gen3.js
 @@ -1,36 +1,35 @@
@@ -21846,7 +21846,7 @@ index f795bbd65bb74b71d1f3e820888ab034e589a934..46d60dd0749ccddece1bf591d1285559
  export declare function calculateAttackDPP(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field, desc: RawDesc, isCritical?: boolean): number;
  export declare function calculateDefenseDPP(gen: Generation, attacker: Pokemon, defender: Pokemon, move: Move, field: Field, desc: RawDesc, isCritical?: boolean): number;
 diff --git a/dist/mechanics/gen4.js b/dist/mechanics/gen4.js
-index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8555a4950 100644
+index 47b4cac852f04f59c1156477687d0f036c6470ce..2c1e7535269bed6dc3e9730736a99349b86a870b 100644
 --- a/dist/mechanics/gen4.js
 +++ b/dist/mechanics/gen4.js
 @@ -1,37 +1,13 @@
@@ -21926,7 +21926,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
          return result;
      }
 -    var defenderAbilityIgnored = defender.hasAbility('Battle Armor', 'Clear Body', 'Damp', 'Dry Skin', 'Filter', 'Flash Fire', 'Flower Gift', 'Heatproof', 'Hyper Cutter', 'Immunity', 'Inner Focus', 'Insomnia', 'Keen Eye', 'Leaf Guard', 'Levitate', 'Lightning Rod', 'Limber', 'Magma Armor', 'Marvel Scale', 'Motor Drive', 'Oblivious', 'Own Tempo', 'Sand Veil', 'Shell Armor', 'Shield Dust', 'Simple', 'Snow Cloak', 'Solid Rock', 'Soundproof', 'Sticky Hold', 'Storm Drain', 'Sturdy', 'Suction Cups', 'Tangled Feet', 'Thick Fat', 'Unaware', 'Vital Spirit', 'Volt Absorb', 'Water Absorb', 'Water Veil', 'White Smoke', 'Wonder Guard');
-+    const defenderAbilityIgnored = defender.hasAbility('Battle Armor', 'Clear Body', 'Damp', 'Dry Skin', 'Filter', 'Flash Fire', 'Flower Gift', 'Heatproof', 'Hyper Cutter', 'Immunity', 'Inner Focus', 'Insomnia', 'Keen Eye', 'Leaf Guard', 'Levitate', 'Lightning Rod', 'Limber', 'Magma Armor', 'Marvel Scale', 'Motor Drive', 'Oblivious', 'Own Tempo', 'Sand Veil', 'Shell Armor', 'Shield Dust', 'Simple', 'Snow Cloak', 'Solid Rock', 'Soundproof', 'Sticky Hold', 'Storm Drain', 'Sturdy', 'Suction Cups', 'Tangled Feet', 'Thick Fat', 'Unaware', 'Vital Spirit', 'Volt Absorb', 'Water Absorb', 'Water Veil', 'White Smoke', 'Wonder Guard');
++    const defenderAbilityIgnored = defender.hasAbility('Aura Guard', 'Battle Armor', 'Clear Body', 'Damp', 'Dry Skin', 'Filter', 'Flash Fire', 'Flower Gift', 'Heatproof', 'Hyper Cutter', 'Immunity', 'Inner Focus', 'Insomnia', 'Keen Eye', 'Leaf Guard', 'Levitate', 'Lightning Rod', 'Limber', 'Magma Armor', 'Marvel Scale', 'Motor Drive', 'Oblivious', 'Own Tempo', 'Sand Veil', 'Shell Armor', 'Shield Dust', 'Simple', 'Snow Cloak', 'Solid Rock', 'Soundproof', 'Sticky Hold', 'Storm Drain', 'Sturdy', 'Suction Cups', 'Tangled Feet', 'Thick Fat', 'Unaware', 'Vital Spirit', 'Volt Absorb', 'Water Absorb', 'Water Veil', 'White Smoke', 'Wonder Guard');
      if (attacker.hasAbility('Mold Breaker') && defenderAbilityIgnored) {
          defender.ability = '';
          desc.attackerAbility = attacker.ability;
@@ -22052,7 +22052,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
          if (attacker.hasAbility('Adaptability')) {
              stabMod = 2;
              desc.attackerAbility = attacker.ability;
-@@ -191,29 +184,29 @@ function calculateDPP(gen, attacker, defender, move, field) {
+@@ -191,29 +184,33 @@ function calculateDPP(gen, attacker, defender, move, field) {
              stabMod = 1.5;
          }
      }
@@ -22083,12 +22083,21 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      }
 -    var damage = [];
 -    for (var i = 0; i < 16; i++) {
++    // surfnWOB: Aura Guard is a final-damage modifier, including special contact moves.
++    const auraGuard = defender.hasAbility('Aura Guard') && !!move.flags.contact;
++    if (auraGuard) desc.defenderAbility = defender.ability;
++
 +    const damage = [];
 +    for (let i = 0; i < 16; i++) {
          damage[i] = Math.floor((baseDamage * (85 + i)) / 100);
          damage[i] = Math.floor(damage[i] * stabMod);
          damage[i] = Math.floor(damage[i] * type1Effectiveness);
-@@ -226,33 +219,35 @@ function calculateDPP(gen, attacker, defender, move, field) {
+@@ -222,59 +219,68 @@ function calculateDPP(gen, attacker, defender, move, field) {
+         damage[i] = Math.floor(damage[i] * ebeltMod);
+         damage[i] = Math.floor(damage[i] * tintedMod);
+         damage[i] = Math.floor(damage[i] * berryMod);
++        if (auraGuard) damage[i] = Math.floor(damage[i] * 0.5);
+         damage[i] = Math.max(1, damage[i]);
      }
      result.damage = damage;
      if (move.timesUsed > 1 || move.hits > 1) {
@@ -22140,7 +22149,11 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
                  newFinalDamage = Math.floor(newFinalDamage * stabMod);
                  newFinalDamage = Math.floor(newFinalDamage * type1Effectiveness);
                  newFinalDamage = Math.floor(newFinalDamage * type2Effectiveness);
-@@ -263,18 +258,23 @@ function calculateDPP(gen, attacker, defender, move, field) {
+                 newFinalDamage = Math.floor(newFinalDamage * filterMod);
+                 newFinalDamage = Math.floor(newFinalDamage * ebeltMod);
+                 newFinalDamage = Math.floor(newFinalDamage * tintedMod);
++                if (auraGuard) newFinalDamage = Math.floor(newFinalDamage * 0.5);
+                 newFinalDamage = Math.max(1, newFinalDamage);
                  damageArray[i] = newFinalDamage;
              }
              damageMatrix[times] = damageArray;
@@ -22168,7 +22181,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      switch (move.name) {
          case 'Brine':
              if (defender.curHP() <= defender.maxHP() / 2) {
-@@ -295,7 +295,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
+@@ -295,7 +301,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
              break;
          case 'Flail':
          case 'Reversal':
@@ -22177,7 +22190,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
              basePower = p <= 1 ? 200 : p <= 5 ? 150 : p <= 12 ? 100 : p <= 21 ? 80 : p <= 42 ? 40 : 20;
              desc.moveBP = basePower;
              break;
-@@ -306,7 +306,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
+@@ -306,7 +312,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
              break;
          case 'Grass Knot':
          case 'Low Kick':
@@ -22186,7 +22199,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
              basePower = w >= 200 ? 120 : w >= 100 ? 100 : w >= 50 ? 80 : w >= 25 ? 60 : w >= 10 ? 40 : 20;
              desc.moveBP = basePower;
              break;
-@@ -325,7 +325,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
+@@ -325,7 +331,7 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
              desc.moveBP = basePower;
              break;
          case 'Pursuit':
@@ -22195,7 +22208,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
              basePower = move.bp * (switching ? 2 : 1);
              if (switching)
                  desc.isSwitching = 'out';
-@@ -348,10 +348,10 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
+@@ -348,10 +354,10 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
              basePower = Math.floor((defender.curHP() * 120) / defender.maxHP()) + 1;
              desc.moveBP = basePower;
              break;
@@ -22210,7 +22223,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
          case 'Weather Ball':
              basePower = move.bp * (field.weather ? 2 : 1);
              desc.moveBP = basePower;
-@@ -359,6 +359,11 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
+@@ -359,6 +365,11 @@ function calculateBasePowerDPP(gen, attacker, defender, move, field, desc, hit)
          default:
              basePower = move.bp;
      }
@@ -22222,7 +22235,20 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      return basePower;
  }
  exports.calculateBasePowerDPP = calculateBasePowerDPP;
-@@ -371,7 +376,7 @@ function calculateBPModsDPP(attacker, defender, move, field, desc, basePower) {
+@@ -367,11 +378,20 @@ function calculateBPModsDPP(attacker, defender, move, field, desc, basePower) {
+         basePower = Math.floor(basePower * 1.5);
+         desc.isHelpingHand = true;
+     }
++    // surfnWOB: legacy calc move data lacks slicing flags for some Gen 4 moves.
++    if (attacker.hasAbility('Sharpness') && (move.flags.slicing || move.named(
++        'Fury Cutter', 'Air Cutter', 'Air Slash', 'Cut', 'Aerial Ace', 'Cross Poison',
++        'Leaf Blade', 'Night Slash', 'Psycho Cut', 'Razor Leaf', 'Slash', 'X-Scissor',
++    ))) {
++        basePower = Math.floor(basePower * 1.5);
++        desc.attackerAbility = attacker.ability;
++    }
++
+     if (attacker.hasAbility('Technician') && basePower <= 60) {
          basePower = Math.floor(basePower * 1.5);
          desc.attackerAbility = attacker.ability;
      }
@@ -22231,7 +22257,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      if ((attacker.hasItem('Muscle Band') && isPhysical) ||
          (attacker.hasItem('Wise Glasses') && !isPhysical)) {
          basePower = Math.floor(basePower * 1.1);
-@@ -423,20 +428,20 @@ function calculateBPModsDPP(attacker, defender, move, field, desc, basePower) {
+@@ -423,20 +443,20 @@ function calculateBPModsDPP(attacker, defender, move, field, desc, basePower) {
          }
          desc.attackerAbility = attacker.ability;
      }
@@ -22258,7 +22284,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      if (defender.hasAbility('Unaware')) {
          desc.defenderAbility = defender.ability;
      }
-@@ -489,17 +494,16 @@ function calculateAttackDPP(gen, attacker, defender, move, field, desc, isCritic
+@@ -489,17 +509,16 @@ function calculateAttackDPP(gen, attacker, defender, move, field, desc, isCritic
      return attack;
  }
  exports.calculateAttackDPP = calculateAttackDPP;
@@ -22281,7 +22307,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
      if (attacker.hasAbility('Unaware')) {
          desc.attackerAbility = attacker.ability;
      }
-@@ -548,11 +552,10 @@ function calculateDefenseDPP(gen, attacker, defender, move, field, desc, isCriti
+@@ -548,11 +567,10 @@ function calculateDefenseDPP(gen, attacker, defender, move, field, desc, isCriti
      return defense;
  }
  exports.calculateDefenseDPP = calculateDefenseDPP;
@@ -22296,7 +22322,7 @@ index 47b4cac852f04f59c1156477687d0f036c6470ce..d0fdecb3bfd41bf1f5bde2ab86ddc8c8
          if (isPhysical && field.defenderSide.isReflect) {
              baseDamage = Math.floor(baseDamage * screenMultiplier);
              desc.isReflect = true;
-@@ -599,7 +602,7 @@ function calculateFinalModsDPP(baseDamage, attacker, move, field, desc, isCritic
+@@ -599,7 +617,7 @@ function calculateFinalModsDPP(baseDamage, attacker, move, field, desc, isCritic
      return baseDamage;
  }
  function getSimpleModifiedStat(stat, mod) {
@@ -39847,7 +39873,7 @@ index 77234ef760df9d23b4e526277cd7a3349cd62cfd..e6aa233ad4984ca10a7fcded166aa217
      if (gen.num === 2) { // in gen 2 damage is always rounded up to 1. TODO ADD TESTS
        damage[i - 217] = Math.max(1, Math.floor((baseDamage * i) / 255));
 diff --git a/src/mechanics/gen3.ts b/src/mechanics/gen3.ts
-index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb229d00297 100644
+index 17522d1aff7f920b98e87e13cb01ac93a188053f..49c76a844771a313bd39b6e88d97f3b4056235a8 100644
 --- a/src/mechanics/gen3.ts
 +++ b/src/mechanics/gen3.ts
 @@ -1,3 +1,4 @@
@@ -39861,7 +39887,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
    handleFixedDamageMoves,
 +  pokeRound,
  } from './util';
-
+ 
 +// @smogon/calc's per-generation move data only adds these later-generation
 +// mechanic flags when the games first consume them. The gen3mega server
 +// backports the abilities, so retain the authoritative ADV move membership
@@ -39913,7 +39939,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 @@ -57,10 +85,23 @@ export function calculateADV(
      return result;
    }
-
+ 
 +  const defenderAbilityIgnored = defender.hasAbility(
 +    'Battle Armor', 'Filter', 'Flash Fire', 'Levitate', 'Marvel Scale',
 +    'Multiscale', 'Shell Armor', 'Soundproof', 'Thick Fat',
@@ -39939,7 +39965,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 @@ -73,6 +114,51 @@ export function calculateADV(
      field.defenderSide.isLightScreen = false;
    }
-
+ 
 +  let hasAteAbilityTypeChange = false;
 +  const noAteTypeChange = move.named('Weather Ball', 'Struggle');
 +
@@ -39989,9 +40015,9 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
      'Normal',
      'Fire',
 @@ -133,9 +219,29 @@ export function calculateADV(
-
+ 
    desc.HPEVs = getStatDescriptionText(gen, defender, 'hp');
-
+ 
 +  const isSpread = field.gameType !== 'Singles' &&
 +    ['allAdjacent', 'allAdjacentFoes'].includes(move.target);
 +  const isParentalBondBlockedMove = move.named(
@@ -40018,7 +40044,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +
      return result;
    }
-
+ 
 @@ -143,29 +249,68 @@ export function calculateADV(
      desc.hits = move.hits;
    }
@@ -40031,7 +40057,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
    }
 -  bp = calculateBPModsADV(attacker, move, desc, bp);
 +  bp = calculateBPModsADV(attacker, move, field, desc, bp, hasAteAbilityTypeChange);
-
+ 
    const isCritical = move.isCrit && !defender.hasAbility('Battle Armor', 'Shell Armor');
 -  const at = calculateAttackADV(gen, attacker, defender, move, desc, isCritical);
 +  const at = calculateAttackADV(gen, attacker, defender, move, field, desc, isCritical);
@@ -40091,7 +40117,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +  }
 +
 +  result.damage = childDamage ? [damage, childDamage] : damage;
-
+ 
    if (move.timesUsed! > 1 || move.hits > 1) {
      // store boosts so intermediate boosts don't show.
 @@ -179,28 +324,44 @@ export function calculateADV(
@@ -40251,7 +40277,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +
    return at;
  }
-
+ 
 @@ -341,7 +549,7 @@ export function calculateDefenseADV(
    isCritical = false
  ) {
@@ -40264,7 +40290,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 @@ -403,17 +611,29 @@ function calculateFinalModsADV(
      baseDamage = Math.floor(baseDamage / 2);
    }
-
+ 
 -  if ((field.hasWeather('Sun') && move.hasType('Fire')) ||
 -      (field.hasWeather('Rain') && move.hasType('Water'))) {
 +  const isMegaSol = attacker.hasAbility('Mega Sol');
@@ -40296,11 +40322,11 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +      desc.weather = field.weather;
 +    }
    }
-
+ 
    if (attacker.hasAbility('Flash Fire') && attacker.abilityOn && move.hasType('Fire')) {
 @@ -443,7 +663,52 @@ function calculateFinalModsADV(
    }
-
+ 
    if (move.hasType(...attacker.types)) {
 -    baseDamage = Math.floor(baseDamage * 1.5);
 +    baseDamage = attacker.hasAbility('Adaptability')
@@ -40353,7 +40379,7 @@ index 17522d1aff7f920b98e87e13cb01ac93a188053f..bc08f8f88046dd871d7985ced1433fb2
 +  return modifier === 1 ? baseDamage : pokeRound(baseDamage * modifier);
 +}
 diff --git a/src/mechanics/gen4.ts b/src/mechanics/gen4.ts
-index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011ce371407 100644
+index 219c77602e4a0706af38db5b8116b175d1f72439..7804f3371dc4c3daa8e4874afdea6706f4cbf5e5 100644
 --- a/src/mechanics/gen4.ts
 +++ b/src/mechanics/gen4.ts
 @@ -1,3 +1,4 @@
@@ -40383,6 +40409,15 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
      return result;
    }
  
+@@ -70,7 +72,7 @@ export function calculateDPP(
+   }
+ 
+   const defenderAbilityIgnored = defender.hasAbility(
+-    'Battle Armor', 'Clear Body', 'Damp', 'Dry Skin',
++    'Aura Guard', 'Battle Armor', 'Clear Body', 'Damp', 'Dry Skin',
+     'Filter', 'Flash Fire', 'Flower Gift', 'Heatproof',
+     'Hyper Cutter', 'Immunity', 'Inner Focus', 'Insomnia',
+     'Keen Eye', 'Leaf Guard', 'Levitate', 'Lightning Rod',
 @@ -205,7 +207,7 @@ export function calculateDPP(
    // #endregion
    // #region Base Power
@@ -40410,7 +40445,26 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
  
    if (attacker.hasStatus('brn') && isPhysical && !attacker.hasAbility('Guts')) {
      baseDamage = Math.floor(baseDamage * 0.5);
-@@ -294,11 +301,12 @@ export function calculateDPP(
+@@ -268,6 +275,10 @@ export function calculateDPP(
+     desc.defenderItem = defender.item;
+   }
+ 
++  // surfnWOB: Aura Guard is a final-damage modifier, including special contact moves.
++  const auraGuard = defender.hasAbility('Aura Guard') && !!move.flags.contact;
++  if (auraGuard) desc.defenderAbility = defender.ability;
++
+   const damage: number[] = [];
+   for (let i = 0; i < 16; i++) {
+     damage[i] = Math.floor((baseDamage * (85 + i)) / 100);
+@@ -278,6 +289,7 @@ export function calculateDPP(
+     damage[i] = Math.floor(damage[i] * ebeltMod);
+     damage[i] = Math.floor(damage[i] * tintedMod);
+     damage[i] = Math.floor(damage[i] * berryMod);
++    if (auraGuard) damage[i] = Math.floor(damage[i] * 0.5);
+     damage[i] = Math.max(1, damage[i]);
+   }
+   result.damage = damage;
+@@ -294,11 +306,12 @@ export function calculateDPP(
        numAttacks = move.hits;
      }
      let usedItems = [false, false];
@@ -40424,7 +40478,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
        newBasePower = calculateBPModsDPP(attacker, defender, move, field, desc, newBasePower);
        const newAtk = calculateAttackDPP(gen, attacker, defender, move, field, desc, isCritical);
        let baseDamage = Math.floor(
-@@ -312,7 +320,7 @@ export function calculateDPP(
+@@ -312,7 +325,7 @@ export function calculateDPP(
        }
        baseDamage = calculateFinalModsDPP(baseDamage, attacker, move, field, desc, isCritical);
  
@@ -40433,7 +40487,12 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
        for (let i = 0; i < 16; i++) {
          let newFinalDamage = 0;
          newFinalDamage = Math.floor((baseDamage * (85 + i)) / 100);
-@@ -326,8 +334,12 @@ export function calculateDPP(
+@@ -322,12 +335,17 @@ export function calculateDPP(
+         newFinalDamage = Math.floor(newFinalDamage * filterMod);
+         newFinalDamage = Math.floor(newFinalDamage * ebeltMod);
+         newFinalDamage = Math.floor(newFinalDamage * tintedMod);
++        if (auraGuard) newFinalDamage = Math.floor(newFinalDamage * 0.5);
+         newFinalDamage = Math.max(1, newFinalDamage);
          damageArray[i] = newFinalDamage;
        }
        damageMatrix[times] = damageArray;
@@ -40446,7 +40505,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
      desc.defenseBoost = origDefBoost;
      desc.attackBoost = origAtkBoost;
    }
-@@ -345,6 +357,7 @@ export function calculateBasePowerDPP(
+@@ -345,6 +363,7 @@ export function calculateBasePowerDPP(
    field: Field,
    desc: RawDesc,
    hit = 1,
@@ -40454,7 +40513,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
  ) {
    let basePower = move.bp;
    const turnOrder = attacker.stats.spe > defender.stats.spe ? 'first' : 'last';
-@@ -420,10 +433,10 @@ export function calculateBasePowerDPP(
+@@ -420,10 +439,10 @@ export function calculateBasePowerDPP(
      basePower = Math.floor((defender.curHP() * 120) / defender.maxHP()) + 1;
      desc.moveBP = basePower;
      break;
@@ -40469,7 +40528,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
    case 'Weather Ball':
      basePower = move.bp * (field.weather ? 2 : 1);
      desc.moveBP = basePower;
-@@ -431,6 +444,11 @@ export function calculateBasePowerDPP(
+@@ -431,6 +450,11 @@ export function calculateBasePowerDPP(
    default:
      basePower = move.bp;
    }
@@ -40481,7 +40540,23 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
    return basePower;
  }
  
-@@ -505,7 +523,7 @@ export function calculateBPModsDPP(
+@@ -447,6 +471,15 @@ export function calculateBPModsDPP(
+     desc.isHelpingHand = true;
+   }
+ 
++  // surfnWOB: legacy calc move data lacks slicing flags for some Gen 4 moves.
++  if (attacker.hasAbility('Sharpness') && (move.flags.slicing || move.named(
++    'Fury Cutter', 'Air Cutter', 'Air Slash', 'Cut', 'Aerial Ace', 'Cross Poison',
++    'Leaf Blade', 'Night Slash', 'Psycho Cut', 'Razor Leaf', 'Slash', 'X-Scissor',
++  ))) {
++    basePower = Math.floor(basePower * 1.5);
++    desc.attackerAbility = attacker.ability;
++  }
++
+   if (attacker.hasAbility('Technician') && basePower <= 60) {
+     basePower = Math.floor(basePower * 1.5);
+     desc.attackerAbility = attacker.ability;
+@@ -505,7 +538,7 @@ export function calculateBPModsDPP(
      }
      desc.attackerAbility = attacker.ability;
    }
@@ -40490,7 +40565,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
    return basePower;
  }
  
-@@ -519,7 +537,7 @@ export function calculateAttackDPP(
+@@ -519,7 +552,7 @@ export function calculateAttackDPP(
    isCritical = false
  ) {
    const isPhysical = move.category === 'Physical';
@@ -40499,7 +40574,7 @@ index 219c77602e4a0706af38db5b8116b175d1f72439..6c9b64f998d1d24f3c2b685d33641011
    desc.attackEVs =
      getStatDescriptionText(gen, attacker, attackStat, field.attackerSide.isPowerTrick);
    if (field.attackerSide.isPowerTrick && isPhysical) {
-@@ -592,7 +610,7 @@ export function calculateDefenseDPP(
+@@ -592,7 +625,7 @@ export function calculateDefenseDPP(
    isCritical = false
  ) {
    const isPhysical = move.category === 'Physical';
